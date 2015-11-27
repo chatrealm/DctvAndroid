@@ -1,0 +1,61 @@
+ECLIPSE ANDROID PROJECT IMPORT SUMMARY
+======================================
+
+Ignored Files:
+--------------
+The following files were *not* copied into the new Gradle project; you
+should evaluate whether these are still needed in your project and if
+so manually move them:
+
+* .DS_Store
+* README.md
+* proguard-project.txt
+
+Moved Files:
+------------
+Android Gradle projects use a different directory structure than ADT
+Eclipse projects. Here's how the projects were restructured:
+
+* AndroidManifest.xml => vitamio\src\main\AndroidManifest.xml
+* libs\armeabi-v7a\libffmpeg.so => vitamio\src\main\jniLibs\armeabi-v7a\libffmpeg.so
+* libs\armeabi-v7a\libOMX.11.so => vitamio\src\main\jniLibs\armeabi-v7a\libOMX.11.so
+* libs\armeabi-v7a\libOMX.14.so => vitamio\src\main\jniLibs\armeabi-v7a\libOMX.14.so
+* libs\armeabi-v7a\libOMX.18.so => vitamio\src\main\jniLibs\armeabi-v7a\libOMX.18.so
+* libs\armeabi-v7a\libOMX.9.so => vitamio\src\main\jniLibs\armeabi-v7a\libOMX.9.so
+* libs\armeabi-v7a\libstlport_shared.so => vitamio\src\main\jniLibs\armeabi-v7a\libstlport_shared.so
+* libs\armeabi-v7a\libvao.0.so => vitamio\src\main\jniLibs\armeabi-v7a\libvao.0.so
+* libs\armeabi-v7a\libvplayer.so => vitamio\src\main\jniLibs\armeabi-v7a\libvplayer.so
+* libs\armeabi-v7a\libvscanner.so => vitamio\src\main\jniLibs\armeabi-v7a\libvscanner.so
+* libs\armeabi-v7a\libvvo.0.so => vitamio\src\main\jniLibs\armeabi-v7a\libvvo.0.so
+* libs\armeabi-v7a\libvvo.7.so => vitamio\src\main\jniLibs\armeabi-v7a\libvvo.7.so
+* libs\armeabi-v7a\libvvo.8.so => vitamio\src\main\jniLibs\armeabi-v7a\libvvo.8.so
+* libs\armeabi-v7a\libvvo.9.so => vitamio\src\main\jniLibs\armeabi-v7a\libvvo.9.so
+* libs\armeabi-v7a\libvvo.j.so => vitamio\src\main\jniLibs\armeabi-v7a\libvvo.j.so
+* libs\x86\libffmpeg.so => vitamio\src\main\jniLibs\x86\libffmpeg.so
+* libs\x86\libOMX.14.so => vitamio\src\main\jniLibs\x86\libOMX.14.so
+* libs\x86\libOMX.18.so => vitamio\src\main\jniLibs\x86\libOMX.18.so
+* libs\x86\libOMX.9.so => vitamio\src\main\jniLibs\x86\libOMX.9.so
+* libs\x86\libstlport_shared.so => vitamio\src\main\jniLibs\x86\libstlport_shared.so
+* libs\x86\libvao.0.so => vitamio\src\main\jniLibs\x86\libvao.0.so
+* libs\x86\libvplayer.so => vitamio\src\main\jniLibs\x86\libvplayer.so
+* libs\x86\libvscanner.so => vitamio\src\main\jniLibs\x86\libvscanner.so
+* libs\x86\libvvo.0.so => vitamio\src\main\jniLibs\x86\libvvo.0.so
+* libs\x86\libvvo.9.so => vitamio\src\main\jniLibs\x86\libvvo.9.so
+* libs\x86\libvvo.j.so => vitamio\src\main\jniLibs\x86\libvvo.j.so
+* res\ => vitamio\src\main\res\
+* src\ => vitamio\src\main\java\
+
+Next Steps:
+-----------
+You can now build the project. The Gradle project needs network
+connectivity to download dependencies.
+
+Bugs:
+-----
+If for some reason your project does not build, and you determine that
+it is due to a bug or limitation of the Eclipse to Gradle importer,
+please file a bug at http://b.android.com with category
+Component-Tools.
+
+(This import summary is for your information only, and can be deleted
+after import once you are satisfied with the results.)
