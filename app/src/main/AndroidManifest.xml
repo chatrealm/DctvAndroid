@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.tinnvec.dctvandroid">
+    package="com.tinnvec.dctvandroid">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -32,7 +32,7 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.tinnvec.dctvandroid.LiveChannelsActivity" />
+                android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />
 
         </activity>
 
