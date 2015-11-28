@@ -6,7 +6,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,125 +32,6 @@ import java.util.List;
 public class LiveChannelsActivity extends AppCompatActivity {
     public static final String CHANNEL_DATA = "com.tinnvec.dctv_android.CHANNEL_MESSAGE";
     private RecyclerView mRecyclerView;
-    private ImageAdapter mAdapter;
-    private SwipeRefreshLayout swipeContainer;
-
-    private List<DctvChannel> fetchLiveChannels() {
-        URL url;
-        HttpURLConnection urlConnection;
-        InputStream in;
-        List<DctvChannel> liveChannels = null;
-        try {
-            String apiURL = "http://diamondclub.tv/api/channelsv2.php";
-            url = new URL(apiURL);
-            urlConnection = (HttpURLConnection) url.openConnection();
-            in = new BufferedInputStream(urlConnection.getInputStream());
-            liveChannels = readDctvApi(in);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-        }
-        return liveChannels;
-    }
-
-    private List<DctvChannel> readDctvApi(InputStream in) throws IOException {
-        JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
-        List<DctvChannel> channels = new ArrayList<>();
-        try {
-            reader.beginObject();
-            while (reader.hasNext()) {
-                channels.addAll(readDctvObject(reader));
-            }
-            reader.endObject();
-            return channels;
-        } finally {
-            reader.close();
-        }
-    }
-
-    private List<DctvChannel> readDctvObject(JsonReader reader) throws IOException {
-        List<DctvChannel> channels = new ArrayList<>();
-        if (!reader.nextName().isEmpty()) {
-            reader.beginArray();
-            while (reader.hasNext()) {
-                channels.addAll(readDctvChannelsArray(reader));
-            }
-            reader.endArray();
-        }
-        return channels;
-    }
-
-    private List<DctvChannel> readDctvChannelsArray(JsonReader reader) throws IOException {
-        List<DctvChannel> channels = new ArrayList<>();
-        reader.beginObject();
-        while (reader.hasNext()) {
-            channels.add(readDctvChannel(reader));
-        }
-        reader.endObject();
-        return channels;
-    }
-
-    private DctvChannel readDctvChannel(JsonReader reader) throws IOException {
-        DctvChannel channel = new DctvChannel(null);
-        while (reader.hasNext()) {
-            switch (reader.nextName()) {
-                case "streamid":
-                    channel.streamid = reader.nextInt();
-                    break;
-                case "channelname":
-                    channel.channelname = reader.nextString();
-                    break;
-                case "friendlyalias":
-                    channel.friendlyalias = reader.nextString();
-                    break;
-                case "streamtype":
-                    channel.streamtype = reader.nextString();
-                    break;
-                case "nowonline":
-                    channel.nowonline = reader.nextString();
-                    break;
-                case "alerts":
-                    channel.alerts = reader.nextBoolean();
-                    break;
-                case "twitch_currentgame":
-                    channel.twitch_currentgame = reader.nextString();
-                    break;
-                case "twitch_yt_description":
-                    channel.twitch_yt_description = reader.nextString();
-                    break;
-                case "yt_upcoming":
-                    channel.yt_upcoming = reader.nextBoolean();
-                    break;
-                case "yt_liveurl":
-                    channel.yt_liveurl = reader.nextString();
-                    break;
-                case "imageasset":
-                    channel.imageasset = reader.nextString();
-                    try {
-                        InputStream is = (InputStream) new URL(channel.imageasset).getContent();
-                        Bitmap bitmap = ((BitmapDrawable) Drawable.createFromStream(is, "src name")).getBitmap();
-                        channel.imageassetBitmap = Bitmap.createScaledBitmap(bitmap, 300, 120, true);
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                        e.printStackTrace();
-                    }
-                    break;
-                case "imageassethd":
-                    channel.imageassethd = reader.nextString();
-                    break;
-                case "urltoplayer":
-                    channel.urltoplayer = reader.nextString();
-                    break;
-                case "channel":
-                    channel.channel = reader.nextInt();
-                    break;
-                default:
-                    reader.skipValue();
-                    break;
-            }
-        }
-        return channel;
-    }
 
     public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
         private List<DctvChannel> channelList;
@@ -169,18 +49,6 @@ public class LiveChannelsActivity extends AppCompatActivity {
 
         public ImageAdapter(List<DctvChannel> channelList) {
             this.channelList = channelList;
-        }
-
-        // Clean all elements of the recycler
-        public void clear() {
-            channelList.clear();
-            notifyDataSetChanged();
-        }
-
-        // Add a list of items
-        public void addAll(List<DctvChannel> list) {
-            channelList.addAll(list);
-            notifyDataSetChanged();
         }
 
         // Create new views (invoked by the layout manager)
@@ -236,13 +104,127 @@ public class LiveChannelsActivity extends AppCompatActivity {
     }
 
     private class BuildMainLayout extends AsyncTask<String, String, List<DctvChannel>> {
+        private final String apiURL = "http://diamondclub.tv/api/channelsv2.php";
+
         @Override
         protected List<DctvChannel> doInBackground(String... params) {
-            return fetchLiveChannels();
+            URL url;
+            HttpURLConnection urlConnection;
+            InputStream in;
+            List<DctvChannel> liveChannels = null;
+            try {
+                url = new URL(apiURL);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                in = new BufferedInputStream(urlConnection.getInputStream());
+                liveChannels = readDctvApi(in);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
+            }
+            return liveChannels;
+        }
+
+        private List<DctvChannel> readDctvApi(InputStream in) throws IOException {
+            JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+            List<DctvChannel> channels = new ArrayList<>();
+            try {
+                reader.beginObject();
+                while (reader.hasNext()) {
+                    channels.addAll(readDctvObject(reader));
+                }
+                reader.endObject();
+                return channels;
+            } finally {
+                reader.close();
+            }
+        }
+
+        private List<DctvChannel> readDctvObject(JsonReader reader) throws IOException {
+            List<DctvChannel> channels = new ArrayList<>();
+            if (!reader.nextName().isEmpty()) {
+                reader.beginArray();
+                while (reader.hasNext()) {
+                    channels.addAll(readDctvChannelsArray(reader));
+                }
+                reader.endArray();
+            }
+            return channels;
+        }
+
+        private List<DctvChannel> readDctvChannelsArray(JsonReader reader) throws IOException {
+            List<DctvChannel> channels = new ArrayList<>();
+            reader.beginObject();
+            while (reader.hasNext()) {
+                channels.add(readDctvChannel(reader));
+            }
+            reader.endObject();
+            return channels;
+        }
+
+        private DctvChannel readDctvChannel(JsonReader reader) throws IOException {
+            DctvChannel channel = new DctvChannel(null);
+            while (reader.hasNext()) {
+                switch (reader.nextName()) {
+                    case "streamid":
+                        channel.streamid = reader.nextInt();
+                        break;
+                    case "channelname":
+                        channel.channelname = reader.nextString();
+                        break;
+                    case "friendlyalias":
+                        channel.friendlyalias = reader.nextString();
+                        break;
+                    case "streamtype":
+                        channel.streamtype = reader.nextString();
+                        break;
+                    case "nowonline":
+                        channel.nowonline = reader.nextString();
+                        break;
+                    case "alerts":
+                        channel.alerts = reader.nextBoolean();
+                        break;
+                    case "twitch_currentgame":
+                        channel.twitch_currentgame = reader.nextString();
+                        break;
+                    case "twitch_yt_description":
+                        channel.twitch_yt_description = reader.nextString();
+                        break;
+                    case "yt_upcoming":
+                        channel.yt_upcoming = reader.nextBoolean();
+                        break;
+                    case "yt_liveurl":
+                        channel.yt_liveurl = reader.nextString();
+                        break;
+                    case "imageasset":
+                        channel.imageasset = reader.nextString();
+                        try {
+                            InputStream is = (InputStream) new URL(channel.imageasset).getContent();
+                            Bitmap bitmap = ((BitmapDrawable) Drawable.createFromStream(is, "src name")).getBitmap();
+                            channel.imageassetBitmap = Bitmap.createScaledBitmap(bitmap, 300, 120, true);
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                            e.printStackTrace();
+                        }
+                        break;
+                    case "imageassethd":
+                        channel.imageassethd = reader.nextString();
+                        break;
+                    case "urltoplayer":
+                        channel.urltoplayer = reader.nextString();
+                        break;
+                    case "channel":
+                        channel.channel = reader.nextInt();
+                        break;
+                    default:
+                        reader.skipValue();
+                        break;
+                }
+            }
+            return channel;
         }
 
         protected void onPostExecute(List<DctvChannel> result) {
-            mAdapter = new ImageAdapter(result);
+            RecyclerView.Adapter mAdapter = new ImageAdapter(result);
             mRecyclerView.setAdapter(mAdapter);
         }
     }
@@ -253,25 +235,6 @@ public class LiveChannelsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_live_channels);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                new AsyncTask<String, String, List<DctvChannel>>() {
-                    @Override
-                    protected List<DctvChannel> doInBackground(String... params) {
-                        mAdapter.clear();
-                        return fetchLiveChannels();
-                    }
-
-                    protected void onPostExecute(List<DctvChannel> result) {
-                        mAdapter.addAll(result);
-                        swipeContainer.setRefreshing(false);
-                    }
-                }.execute();
-            }
-        });
 
         mRecyclerView = (RecyclerView) findViewById(R.id.live_list);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getBaseContext(), null));
