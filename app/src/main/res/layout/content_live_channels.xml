@@ -8,10 +8,18 @@
     tools:context="com.example.tinnvec.dctvandroid.LiveChannelsActivity"
     tools:showIn="@layout/activity_live_channels">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/live_list"
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.tinnvec.dctv_android.LiveList" />
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/live_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.tinnvec.dctv_android.LiveList" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
