@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.tinnvec.dctvandroid.LiveChannelsActivity"
+    tools:context="com.tinnvec.dctvandroid.LiveChannelsActivity"
     tools:showIn="@layout/activity_live_channels">
 
     <android.support.v4.widget.SwipeRefreshLayout
@@ -18,7 +18,7 @@
             android:id="@+id/live_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="com.tinnvec.dctv_android.LiveList" />
+            tools:context="com.tinnvec.dctvandroid.LiveChannelsActivity" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

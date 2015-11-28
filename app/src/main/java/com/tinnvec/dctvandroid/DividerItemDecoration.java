@@ -1,4 +1,4 @@
-package com.example.tinnvec.dctvandroid;
+package com.tinnvec.dctvandroid;
 
 import android.content.Context;
 import android.content.res.TypedArray;

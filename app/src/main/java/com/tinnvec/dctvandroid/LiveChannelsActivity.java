@@ -1,4 +1,4 @@
-package com.example.tinnvec.dctvandroid;
+package com.tinnvec.dctvandroid;
 
 import android.content.Intent;
 import android.graphics.Bitmap;

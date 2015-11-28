@@ -1,4 +1,4 @@
-package com.example.tinnvec.dctvandroid;
+package com.tinnvec.dctvandroid;
 
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.ActionBar;
