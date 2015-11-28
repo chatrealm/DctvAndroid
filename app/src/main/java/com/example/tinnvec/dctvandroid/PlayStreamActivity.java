@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.MediaPlayer.OnInfoListener;
@@ -65,6 +67,12 @@ public class PlayStreamActivity extends AppCompatActivity
         MediaController mediaController = new MediaController(vidView.getContext());
         mediaController.setAnchorView(vidView);
         vidView.setMediaController(mediaController);
+
+        WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
+        WebSettings settings = chatWebview.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true);
+        chatWebview.loadUrl("http://irc.chatrealm.net");
 
         try {
             if (channel !=  null) {

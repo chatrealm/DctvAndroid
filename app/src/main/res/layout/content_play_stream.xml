@@ -13,9 +13,16 @@
     <io.vov.vitamio.widget.VideoView
         android:id="@+id/video_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="top" />
 
     <!-- Chat View -->
+    <WebView
+        android:id="@+id/chat_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom" />
+
     <!-- Chat Input -->
 
 </LinearLayout>
