@@ -4,4 +4,10 @@
     <string name="channel_art_description">Channel art</string>
     <string name="title_activity_play_stream">PlayStreamActivity</string>
     <string name="main_bg_description">Diamondclub logo</string>
+
+    <string name="title_activity_stream_only">StreamOnlyActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
 </resources>

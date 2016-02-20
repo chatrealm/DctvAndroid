@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.tinnvec.dctvandroid">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -12,36 +12,40 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon, android:label">
-
         <activity
             android:name=".LiveChannelsActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".PlayStreamActivity"
             android:label="@string/title_activity_play_stream"
             android:parentActivityName=".LiveChannelsActivity"
             android:theme="@style/AppTheme.NoActionBar">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />
-
         </activity>
-
-        <activity android:name="io.vov.vitamio.activity.InitActivity"
+        <activity
+            android:name="io.vov.vitamio.activity.InitActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden"
             android:launchMode="singleTop"
             android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="stateAlwaysHidden"
             tools:replace="android:configChanges" />
+
+        <activity
+            android:name=".StreamVideoActivity"
+            android:parentActivityName=".LiveChannelsActivity"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />
+        </activity>
     </application>
 
 </manifest>
