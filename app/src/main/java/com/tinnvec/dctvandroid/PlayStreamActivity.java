@@ -34,9 +34,6 @@ public class PlayStreamActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_play_stream);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionbar = getSupportActionBar();
-        actionbar.setDisplayHomeAsUpEnabled(true);
 
         DctvChannel channel = getIntent().getExtras().getParcelable(LiveChannelsActivity.CHANNEL_DATA);
         String title;
@@ -51,7 +48,12 @@ public class PlayStreamActivity extends AppCompatActivity
             title = "Unknown";
         }
 
-        actionbar.setTitle(title);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        if (actionbar != null) {
+            actionbar.setDisplayHomeAsUpEnabled(true);
+            actionbar.setTitle(title);
+        }
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle(title);
