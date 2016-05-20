@@ -31,8 +31,10 @@ public class StreamVideoActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!io.vov.vitamio.LibsChecker.checkVitamioLibs(this))
+        if (!io.vov.vitamio.LibsChecker.checkVitamioLibs(this)) {
+            Log.e("unable to load/initialize vitamio libraries");
             return;
+        }
         enableFullScreen(true);
         setContentView(R.layout.activity_stream_video);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -57,21 +59,20 @@ public class StreamVideoActivity extends Activity
         mediaController.setAnchorView(vidView);
         vidView.setMediaController(mediaController);
 
-        progressDialog = new ProgressDialog(this);
+/*        progressDialog = new ProgressDialog(this);
         progressDialog.setTitle(title);
         progressDialog.setMessage("Loading...");
         progressDialog.setIndeterminate(false);
-        progressDialog.setCancelable(false);
+        progressDialog.setCancelable(false);*/
 //        progressDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-        progressDialog.show();
+//        progressDialog.show();
 //        progressDialog.getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility());
 //        progressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
 
         try {
             if (channel !=  null) {
                 String urlString = String.format("http://diamondclub.tv/api/hlsredirect.php?c=%d", channel.channel);
-                Uri vidUri = Uri.parse(urlString);
-                vidView.setVideoURI(vidUri);
+                vidView.setVideoPath(urlString);
             }
         } catch (Exception e) {
             Log.e("ERROR", e.getMessage());
