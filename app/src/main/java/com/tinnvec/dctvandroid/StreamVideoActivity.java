@@ -1,15 +1,12 @@
 package com.tinnvec.dctvandroid;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.widget.MediaController;
@@ -17,7 +14,10 @@ import io.vov.vitamio.widget.VideoView;
 
 public class StreamVideoActivity extends Activity
         implements MediaPlayer.OnInfoListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, View.OnSystemUiVisibilityChangeListener, View.OnClickListener {
-    private ProgressDialog progressDialog;
+
+    private static final String TAG = StreamVideoActivity.class.getName();
+
+  //  private ProgressDialog progressDialog;
     private boolean needResume;
     private int mLastSystemUIVisibility;
     private final Handler mLeanBackHandler = new Handler();
@@ -32,7 +32,7 @@ public class StreamVideoActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (!io.vov.vitamio.LibsChecker.checkVitamioLibs(this)) {
-            Log.e("unable to load/initialize vitamio libraries");
+            Log.e(TAG, "unable to load/initialize vitamio libraries");
             return;
         }
         enableFullScreen(true);
@@ -75,15 +75,14 @@ public class StreamVideoActivity extends Activity
                 vidView.setVideoPath(urlString);
             }
         } catch (Exception e) {
-            Log.e("ERROR", e.getMessage());
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
         mp.stop();
-        progressDialog.dismiss();
+     //   progressDialog.dismiss();
         startActivity(new Intent(getBaseContext(), LiveChannelsActivity.class));
         return false;
     }
@@ -96,13 +95,13 @@ public class StreamVideoActivity extends Activity
                     mp.stop();
                     needResume = true;
                 }
-                progressDialog.setMessage("Buffering...");
-                progressDialog.show();
+              //  progressDialog.setMessage("Buffering...");
+              //  progressDialog.show();
                 break;
             case MediaPlayer.MEDIA_INFO_BUFFERING_END:
                 if (needResume)
                     mp.start();
-                progressDialog.dismiss();
+       //         progressDialog.dismiss();
                 break;
         }
         return true;
@@ -112,7 +111,7 @@ public class StreamVideoActivity extends Activity
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
-        progressDialog.dismiss();
+   //     progressDialog.dismiss();
     }
 
     protected void enableFullScreen(boolean enabled) {
