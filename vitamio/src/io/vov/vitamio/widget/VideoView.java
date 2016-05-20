@@ -27,13 +27,14 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
 import io.vov.vitamio.MediaFormat;
@@ -49,6 +50,7 @@ import io.vov.vitamio.MediaPlayer.OnVideoSizeChangedListener;
 import io.vov.vitamio.MediaPlayer.TrackInfo;
 import io.vov.vitamio.Vitamio;
 import io.vov.vitamio.utils.Log;
+import io.vov.vitamio.utils.ScreenResolution;
 
 import java.io.IOException;
 import java.util.List;
@@ -69,6 +71,7 @@ public class VideoView extends SurfaceView implements MediaController.MediaPlaye
   public static final int VIDEO_LAYOUT_SCALE = 1;
   public static final int VIDEO_LAYOUT_STRETCH = 2;
   public static final int VIDEO_LAYOUT_ZOOM = 3;
+  public static final int VIDEO_LAYOUT_FIT_PARENT = 4;
   private static final int STATE_ERROR = -1;
   private static final int STATE_IDLE = 0;
   private static final int STATE_PREPARING = 1;
@@ -94,7 +97,7 @@ public class VideoView extends SurfaceView implements MediaController.MediaPlaye
       Log.d("onPrepared");
       mCurrentState = STATE_PREPARED;
       // mTargetState = STATE_PLAYING;
-      
+
       // Get the capabilities of the player for this stream
       //TODO mCanPause
 
@@ -109,7 +112,7 @@ public class VideoView extends SurfaceView implements MediaController.MediaPlaye
       long seekToPosition = mSeekWhenPrepared;
       if (seekToPosition != 0)
         seekTo(seekToPosition);
-      
+
       if (mVideoWidth != 0 && mVideoHeight != 0) {
         setVideoLayout(mVideoLayout, mAspectRatio);
         if (mSurfaceWidth == mVideoWidth && mSurfaceHeight == mVideoHeight) {
@@ -308,13 +311,14 @@ public class VideoView extends SurfaceView implements MediaController.MediaPlaye
    *                    <li>{@link #VIDEO_LAYOUT_SCALE}
    *                    <li>{@link #VIDEO_LAYOUT_STRETCH}
    *                    <li>{@link #VIDEO_LAYOUT_ZOOM}
+   *                    <li>{@link #VIDEO_LAYOUT_FIT_PARENT}
    *                    </ul>
    * @param aspectRatio video aspect ratio, will audo detect if 0.
    */
   public void setVideoLayout(int layout, float aspectRatio) {
     LayoutParams lp = getLayoutParams();
-    DisplayMetrics disp = mContext.getResources().getDisplayMetrics();
-    int windowWidth = disp.widthPixels, windowHeight = disp.heightPixels;
+    Pair<Integer, Integer> res = ScreenResolution.getResolution(mContext);
+    int windowWidth = res.first.intValue(), windowHeight = res.second.intValue();
     float windowRatio = windowWidth / (float) windowHeight;
     float videoRatio = aspectRatio <= 0.01f ? mVideoAspectRatio : aspectRatio;
     mSurfaceHeight = mVideoHeight;
@@ -325,6 +329,11 @@ public class VideoView extends SurfaceView implements MediaController.MediaPlaye
     } else if (layout == VIDEO_LAYOUT_ZOOM) {
       lp.width = windowRatio > videoRatio ? windowWidth : (int) (videoRatio * windowHeight);
       lp.height = windowRatio < videoRatio ? windowHeight : (int) (windowWidth / videoRatio);
+    } else if (layout == VIDEO_LAYOUT_FIT_PARENT) {
+      ViewGroup parent = (ViewGroup) getParent();
+      float parentRatio = ((float) parent.getWidth()) / ((float) parent.getHeight());
+      lp.width = (parentRatio < videoRatio) ? parent.getWidth() : Math.round(((float) parent.getHeight()) * videoRatio);
+      lp.height = (parentRatio > videoRatio) ? parent.getHeight() : Math.round(((float) parent.getWidth()) / videoRatio);
     } else {
       boolean full = layout == VIDEO_LAYOUT_STRETCH;
       lp.width = (full || windowRatio < videoRatio) ? windowWidth : (int) (videoRatio * windowHeight);
@@ -360,7 +369,7 @@ public class VideoView extends SurfaceView implements MediaController.MediaPlaye
   public boolean isValid() {
     return (mSurfaceHolder != null && mSurfaceHolder.getSurface().isValid());
   }
- 
+
   public void setVideoPath(String path) {
     setVideoURI(Uri.parse(path));
   }
@@ -368,7 +377,7 @@ public class VideoView extends SurfaceView implements MediaController.MediaPlaye
   public void setVideoURI(Uri uri) {
     setVideoURI(uri, null);
   }
-  
+
   public void setVideoURI(Uri uri, Map<String, String> headers) {
     mUri = uri;
     mHeaders = headers;
@@ -387,7 +396,7 @@ public class VideoView extends SurfaceView implements MediaController.MediaPlaye
       mTargetState = STATE_IDLE;
     }
   }
-  
+
   private void openVideo() {
     if (mUri == null || mSurfaceHolder == null || !Vitamio.isInitialized(mContext))
       return;
@@ -438,7 +447,7 @@ public class VideoView extends SurfaceView implements MediaController.MediaPlaye
     mMediaController = controller;
     attachMediaController();
   }
-  
+
   public void setMediaBufferingIndicator(View mediaBufferingIndicator) {
     if (mMediaBufferingIndicator != null)
       mMediaBufferingIndicator.setVisibility(View.GONE);
@@ -640,7 +649,7 @@ public class VideoView extends SurfaceView implements MediaController.MediaPlaye
   public float getVideoAspectRatio() {
     return mVideoAspectRatio;
   }
-  
+
   /**
    * Must set before {@link #setVideoURI}
    * @param chroma
@@ -649,16 +658,16 @@ public class VideoView extends SurfaceView implements MediaController.MediaPlaye
     getHolder().setFormat(chroma == MediaPlayer.VIDEOCHROMA_RGB565 ? PixelFormat.RGB_565 : PixelFormat.RGBA_8888); // PixelFormat.RGB_565
     mVideoChroma = chroma;
   }
-  
+
   public void setHardwareDecoder(boolean hardware) {
     mHardwareDecoder= hardware;
   }
-  
+
   public void setVideoQuality(int quality) {
     if (mMediaPlayer != null)
       mMediaPlayer.setVideoQuality(quality);
   }
-  
+
   public void setBufferSize(int bufSize) {
     mBufSize = bufSize;
   }
