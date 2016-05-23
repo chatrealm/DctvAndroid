@@ -71,7 +71,7 @@ public class StreamVideoActivity extends Activity
 
         try {
             if (channel !=  null) {
-                String urlString = String.format("http://diamondclub.tv/api/hlsredirect.php?c=%d", channel.channel);
+                String urlString = String.format("%s/api/hlsredirect.php?c=%d", R.string.dctv_base_url, channel.channel);
                 vidView.setVideoPath(urlString);
             }
         } catch (Exception e) {

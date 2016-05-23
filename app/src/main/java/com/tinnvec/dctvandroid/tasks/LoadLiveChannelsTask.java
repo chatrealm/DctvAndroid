@@ -3,13 +3,14 @@ package com.tinnvec.dctvandroid.tasks;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.JsonReader;
 import android.util.Log;
-import android.os.AsyncTask;
 
 import com.tinnvec.dctvandroid.DctvChannel;
 import com.tinnvec.dctvandroid.LiveChannelsActivity;
+import com.tinnvec.dctvandroid.R;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<DctvChannel>>
         InputStream in;
         List<DctvChannel> liveChannels = null;
         try {
-            String apiURL = "http://diamondclub.tv/api/channelsv2.php";
+            String apiURL = R.string.dctv_base_url + "/api/channelsv2.php";
             url = new URL(apiURL);
             urlConnection = (HttpURLConnection) url.openConnection();
             in = new BufferedInputStream(urlConnection.getInputStream());
