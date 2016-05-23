@@ -21,7 +21,7 @@ public class DctvChannel implements Parcelable {
     public String urltoplayer;
     public int channel;
 
-    protected DctvChannel(Parcel source) {
+    public DctvChannel(Parcel source) {
         if (source != null) {
             this.streamid = source.readInt();
             this.channelname = source.readString();
