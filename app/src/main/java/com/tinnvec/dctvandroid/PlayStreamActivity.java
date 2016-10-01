@@ -25,12 +25,15 @@ public class PlayStreamActivity extends AppCompatActivity
         implements OnInfoListener, OnPreparedListener, OnErrorListener {
     private ProgressDialog progressDialog;
     private VideoView vidView;
+    private String dctvBaseUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (!io.vov.vitamio.LibsChecker.checkVitamioLibs(this))
             return;
+
+        this.dctvBaseUrl = getString(R.string.dctv_base_url);
 
         setContentView(R.layout.activity_play_stream);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -78,7 +81,7 @@ public class PlayStreamActivity extends AppCompatActivity
 
         try {
             if (channel !=  null) {
-                String urlString = String.format("http://diamondclub.tv/api/hlsredirect.php?c=%d", channel.channel);
+                String urlString = String.format("%sapi/hlsredirect.php?c=%d", dctvBaseUrl, channel.channel);
                 Uri vidUri = Uri.parse(urlString);
                 progressDialog.show();
                 vidView.setVideoURI(vidUri);

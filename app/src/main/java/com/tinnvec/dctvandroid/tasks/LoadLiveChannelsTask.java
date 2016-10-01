@@ -29,9 +29,12 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<DctvChannel>>
     private static String TAG = LoadLiveChannelsTask.class.getName();
 
     private final RecyclerView mRecyclerView;
+    private final String dctvBaseUrl;
 
     public LoadLiveChannelsTask(RecyclerView mRecyclerView) {
         this.mRecyclerView = mRecyclerView;
+        this.dctvBaseUrl = mRecyclerView.getContext().getString(R.string.dctv_base_url);
+
     }
 
     @Override
@@ -44,7 +47,9 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<DctvChannel>>
     protected void onPostExecute(List<DctvChannel> result) {
         LiveChannelsActivity.ImageAdapter adapter = (LiveChannelsActivity.ImageAdapter )mRecyclerView.getAdapter();
         adapter.clear();
-        adapter.addAll(result);
+        if (result != null && !result.isEmpty()) {
+            adapter.addAll(result);
+        }
     }
 
     private List<DctvChannel> fetchLiveChannels() {
@@ -53,8 +58,8 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<DctvChannel>>
         InputStream in;
         List<DctvChannel> liveChannels = null;
         try {
-            String apiURL = R.string.dctv_base_url + "/api/channelsv2.php";
-            url = new URL(apiURL);
+            String channelsURL = String.format("%sapi/channelsv2.php",  dctvBaseUrl);
+            url = new URL(channelsURL);
             urlConnection = (HttpURLConnection) url.openConnection();
             in = new BufferedInputStream(urlConnection.getInputStream());
             liveChannels = readDctvApi(in);

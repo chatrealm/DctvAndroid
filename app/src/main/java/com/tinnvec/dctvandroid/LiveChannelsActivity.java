@@ -39,7 +39,7 @@ public class LiveChannelsActivity extends AppCompatActivity {
 
     public static final String CHANNEL_DATA = "com.tinnvec.dctv_android.CHANNEL_MESSAGE";
     private RecyclerView mRecyclerView;
-    private ImageAdapter mAdapter;
+    //private ImageAdapter mAdapter;
     private SwipeRefreshLayout swipeContainer;
 
 
@@ -144,8 +144,11 @@ public class LiveChannelsActivity extends AppCompatActivity {
 
 
                     protected void onPostExecute(List<DctvChannel> result) {
-                        mAdapter.clear();
-                        mAdapter.addAll(result);
+                        ImageAdapter adapter = (ImageAdapter) mRecyclerView.getAdapter();
+                        adapter.clear();
+                        if (result != null && !result.isEmpty()) {
+                            adapter.addAll(result);
+                        }
                         swipeContainer.setRefreshing(false);
                     }
                 }.execute();
