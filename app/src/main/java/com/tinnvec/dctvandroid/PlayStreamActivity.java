@@ -18,6 +18,7 @@ import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.MediaPlayer.OnInfoListener;
 import io.vov.vitamio.MediaPlayer.OnPreparedListener;
 import io.vov.vitamio.MediaPlayer.OnErrorListener;
+import io.vov.vitamio.Vitamio;
 import io.vov.vitamio.widget.VideoView;
 import io.vov.vitamio.widget.MediaController;
 
@@ -30,8 +31,7 @@ public class PlayStreamActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!io.vov.vitamio.LibsChecker.checkVitamioLibs(this))
-            return;
+        Vitamio.isInitialized(getApplicationContext());
 
         this.dctvBaseUrl = getString(R.string.dctv_base_url);
 
