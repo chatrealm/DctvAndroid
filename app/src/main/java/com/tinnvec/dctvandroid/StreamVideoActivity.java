@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 
 import io.vov.vitamio.MediaPlayer;
+import io.vov.vitamio.Vitamio;
 import io.vov.vitamio.widget.MediaController;
 import io.vov.vitamio.widget.VideoView;
 
@@ -32,10 +33,8 @@ public class StreamVideoActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!io.vov.vitamio.LibsChecker.checkVitamioLibs(this)) {
-            Log.e(TAG, "unable to load/initialize vitamio libraries");
-            return;
-        }
+        Vitamio.isInitialized(getApplicationContext());
+
 
         this.dctvBaseUrl = getString(R.string.dctv_base_url);
 

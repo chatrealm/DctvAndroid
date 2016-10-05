@@ -4,12 +4,12 @@ dependencies {
 }
 
 android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+    compileSdkVersion project.ANDROID_BUILD_SDK_VERSION.toInteger()
     buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
 
     defaultConfig {
-        minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        minSdkVersion project.ANDROID_BUILD_MIN_SDK_VERSION.toInteger()
+        targetSdkVersion project.ANDROID_BUILD_TARGET_SDK_VERSION.toInteger()
     }
     sourceSets {
         main {

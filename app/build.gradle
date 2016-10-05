@@ -1,24 +1,22 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+    compileSdkVersion project.ANDROID_BUILD_SDK_VERSION.toInteger()
     buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
 
     defaultConfig {
-        minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        minSdkVersion project.ANDROID_BUILD_MIN_SDK_VERSION.toInteger()
+        targetSdkVersion project.ANDROID_BUILD_TARGET_SDK_VERSION.toInteger()
 
-        //applicationId 'com.tinnvec.dctvandroid'
-        versionCode 1
-        versionName "1.0"
+        applicationId project.GROUP
+        versionCode project.VERSION_CODE.toInteger()
+        versionName project.VERSION_NAME
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-    productFlavors {
     }
 }
 
