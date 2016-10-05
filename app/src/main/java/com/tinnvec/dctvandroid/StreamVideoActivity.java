@@ -27,6 +27,7 @@ public class StreamVideoActivity extends Activity
             enableFullScreen(true);
         }
     };
+    private String dctvBaseUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,9 @@ public class StreamVideoActivity extends Activity
             Log.e(TAG, "unable to load/initialize vitamio libraries");
             return;
         }
+
+        this.dctvBaseUrl = getString(R.string.dctv_base_url);
+
         enableFullScreen(true);
         setContentView(R.layout.activity_stream_video);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -71,7 +75,7 @@ public class StreamVideoActivity extends Activity
 
         try {
             if (channel !=  null) {
-                String urlString = String.format("%s/api/hlsredirect.php?c=%d", R.string.dctv_base_url, channel.channel);
+                String urlString = String.format("%s/api/hlsredirect.php?c=%d", this.dctvBaseUrl, channel.channel);
                 vidView.setVideoPath(urlString);
             }
         } catch (Exception e) {
