@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class DctvChannel implements Parcelable {
+
     public int streamid;
     public String channelname;
     public String friendlyalias;

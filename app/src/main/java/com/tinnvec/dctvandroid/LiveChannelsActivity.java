@@ -1,17 +1,12 @@
 package com.tinnvec.dctvandroid;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.JsonReader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
@@ -19,15 +14,9 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.util.Log;
 import android.widget.TextView;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,18 +28,19 @@ public class LiveChannelsActivity extends AppCompatActivity {
 
     public static final String CHANNEL_DATA = "com.tinnvec.dctv_android.CHANNEL_MESSAGE";
     private RecyclerView mRecyclerView;
-    //private ImageAdapter mAdapter;
+    private ImageAdapter mAdapter;
     private SwipeRefreshLayout swipeContainer;
 
-
     public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
-        private final List<DctvChannel> channelList = new ArrayList<>();
+        private final ArrayList<DctvChannel> channelList = new ArrayList<>();
+
         // Provide a reference to the views for each data item
         // Complex data items may need more than one view per item, and
         // you provide access to all the views for a data item in a view holder
         public class ViewHolder extends RecyclerView.ViewHolder {
             // each data item is just a string in this case
             public LinearLayout mLinearLayout;
+
             public ViewHolder(LinearLayout v) {
                 super(v);
                 mLinearLayout = v;
@@ -72,9 +62,16 @@ public class LiveChannelsActivity extends AppCompatActivity {
             notifyDataSetChanged();
         }
 
+        /**
+         *
+         */
+        private ArrayList<DctvChannel> getChannelList() {
+            return this.channelList;
+        }
+
         // Create new views (invoked by the layout manager)
         @Override
-        public ImageAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             // create a new view
             LinearLayout v = (LinearLayout) LayoutInflater
                     .from(parent.getContext())
@@ -134,7 +131,8 @@ public class LiveChannelsActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.live_list);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getBaseContext(), null));
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setAdapter(new ImageAdapter());
+        mAdapter = new ImageAdapter();
+        mRecyclerView.setAdapter(mAdapter);
 
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -158,7 +156,15 @@ public class LiveChannelsActivity extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        new LoadLiveChannelsTask(mRecyclerView).execute();
+        ArrayList<DctvChannel> savedChannels = null;
+        if (savedInstanceState != null) {
+            savedChannels = savedInstanceState.getParcelableArrayList("CHANNEL_LIST");
+        }
+        if (savedChannels != null) {
+            mAdapter.addAll(savedChannels);
+        } else {
+            new LoadLiveChannelsTask(mRecyclerView).execute();
+        }
     }
 
     @Override
@@ -181,5 +187,11 @@ public class LiveChannelsActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("CHANNEL_LIST", mAdapter.getChannelList());
     }
 }
