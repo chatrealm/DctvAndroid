@@ -10,9 +10,13 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingEnd="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/list_item_vertical_padding"
+    android:minHeight="75dp"
     android:paddingBottom="@dimen/list_item_vertical_padding"
     android:background="@color/liveListItemBg">
-
+  <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="fill_parent"
+      android:layout_height="match_parent">
     <ImageView
         android:id="@+id/live_item_art"
         android:layout_width="wrap_content"
@@ -34,7 +38,7 @@
             android:gravity="center"
             android:textSize="@dimen/text_lead_size"
             android:ellipsize="marquee"
-            android:singleLine="true"
+            android:maxLines="1"
             android:scrollHorizontally="true" />
 
         <TextView
@@ -44,10 +48,10 @@
             android:gravity="center"
             android:textSize="@dimen/text_size"
             android:ellipsize="marquee"
-            android:singleLine="true"
+            android:maxLines="1"
             android:scrollHorizontally="true"
             android:marqueeRepeatLimit="marquee_forever" />
 
     </LinearLayout>
-
+  </LinearLayout>
 </LinearLayout>
