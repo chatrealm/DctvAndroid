@@ -1,6 +1,8 @@
 package com.tinnvec.dctvandroid;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +22,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.tinnvec.dctvandroid.tasks.ImageDownloaderTask;
 import com.tinnvec.dctvandroid.tasks.LoadLiveChannelsTask;
 
 public class LiveChannelsActivity extends AppCompatActivity {
@@ -30,6 +37,47 @@ public class LiveChannelsActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
     private SwipeRefreshLayout swipeContainer;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("LiveChannels Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
+    }
 
     public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
         private final ArrayList<DctvChannel> channelList = new ArrayList<>();
@@ -84,7 +132,15 @@ public class LiveChannelsActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             ImageView channelArt = (ImageView) holder.mLinearLayout.findViewById(R.id.live_item_art);
-            channelArt.setImageBitmap(channelList.get(position).imageassetBitmap);
+            DctvChannel chan = channelList.get(position);
+
+            if (chan.hasLocalChannelArt()) {
+                Bitmap bitMap = chan.getImageBitmap(holder.mLinearLayout.getContext());
+                channelArt.setImageBitmap(bitMap);
+
+            } else {
+                new ImageDownloaderTask(channelArt).execute(chan.getChannelArtUrl());
+            }
 
             TextView channelName = (TextView) holder.mLinearLayout.findViewById(R.id.live_item_name);
             channelName.setText(channelList.get(position).friendlyalias);
@@ -165,6 +221,9 @@ public class LiveChannelsActivity extends AppCompatActivity {
         } else {
             new LoadLiveChannelsTask(mRecyclerView).execute();
         }
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     @Override

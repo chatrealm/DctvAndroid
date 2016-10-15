@@ -28,15 +28,12 @@ public class StreamVideoActivity extends Activity
             enableFullScreen(true);
         }
     };
-    private String dctvBaseUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Vitamio.isInitialized(getApplicationContext());
 
-
-        this.dctvBaseUrl = getString(R.string.dctv_base_url);
 
         enableFullScreen(true);
         setContentView(R.layout.activity_stream_video);
@@ -74,8 +71,7 @@ public class StreamVideoActivity extends Activity
 
         try {
             if (channel !=  null) {
-                String urlString = String.format("%s/api/hlsredirect.php?c=%d", this.dctvBaseUrl, channel.channel);
-                vidView.setVideoPath(urlString);
+                vidView.setVideoPath(channel.getStreamUrl(this));
             }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
@@ -86,7 +82,7 @@ public class StreamVideoActivity extends Activity
     public boolean onError(MediaPlayer mp, int what, int extra) {
         mp.stop();
      //   progressDialog.dismiss();
-        startActivity(new Intent(getBaseContext(), LiveChannelsActivity.class));
+        this.finish();
         return false;
     }
 

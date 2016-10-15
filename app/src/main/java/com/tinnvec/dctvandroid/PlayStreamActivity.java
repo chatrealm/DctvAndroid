@@ -43,7 +43,7 @@ public class PlayStreamActivity extends AppCompatActivity
         if (channel != null) {
             title = channel.friendlyalias;
 
-            Bitmap resizedBitmap = Bitmap.createScaledBitmap(channel.imageassetBitmap, 200, 80, true);
+            Bitmap resizedBitmap = channel.getImageBitmap(this);
             Drawable smallerArt = new BitmapDrawable(getResources(), resizedBitmap);
             toolbar.setLogo(smallerArt);
             toolbar.setLogoDescription(R.string.channel_art_description);

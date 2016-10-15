@@ -1,12 +1,8 @@
 package com.tinnvec.dctvandroid.tasks;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.JsonReader;
-import android.util.Log;
 
 import com.tinnvec.dctvandroid.DctvChannel;
 import com.tinnvec.dctvandroid.LiveChannelsActivity;
@@ -56,13 +52,14 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<DctvChannel>>
         URL url;
         HttpURLConnection urlConnection;
         InputStream in;
-        List<DctvChannel> liveChannels = null;
+        List<DctvChannel> liveChannels = new ArrayList<>();
+        liveChannels.add(DctvChannel.get247Channel(mRecyclerView.getContext()));
         try {
             String channelsURL = String.format("%sapi/channelsv2.php",  dctvBaseUrl);
             url = new URL(channelsURL);
             urlConnection = (HttpURLConnection) url.openConnection();
             in = new BufferedInputStream(urlConnection.getInputStream());
-            liveChannels = readDctvApi(in);
+            liveChannels.addAll(readDctvApi(in));
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -143,13 +140,6 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<DctvChannel>>
                     break;
                 case "imageasset":
                     channel.imageasset = reader.nextString();
-                    try {
-                        InputStream is = (InputStream) new URL(channel.imageasset).getContent();
-                        Bitmap bitmap = ((BitmapDrawable) Drawable.createFromStream(is, "src name")).getBitmap();
-                        channel.imageassetBitmap = Bitmap.createScaledBitmap(bitmap, 300, 120, true);
-                    } catch (Exception e) {
-                        Log.e(TAG, "problem loading image for channel ", e);
-                    }
                     break;
                 case "imageassethd":
                     channel.imageassethd = reader.nextString();

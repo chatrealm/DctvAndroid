@@ -1,10 +1,22 @@
 package com.tinnvec.dctvandroid;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.content.Context;
+import android.util.Log;
+
+import com.tinnvec.dctvandroid.tasks.LoadLiveChannelsTask;
+
+import java.io.InputStream;
+import java.net.URL;
 
 public class DctvChannel implements Parcelable {
+
+    private static String TAG = DctvChannel.class.getName();
 
     public int streamid;
     public String channelname;
@@ -17,10 +29,13 @@ public class DctvChannel implements Parcelable {
     public boolean yt_upcoming;
     public String yt_liveurl;
     public String imageasset;
-    public Bitmap imageassetBitmap;
     public String imageassethd;
     public String urltoplayer;
     public int channel;
+
+    private DctvChannel() {
+        this(null);
+    }
 
     public DctvChannel(Parcel source) {
         if (source != null) {
@@ -35,7 +50,6 @@ public class DctvChannel implements Parcelable {
             this.yt_upcoming = source.readByte() != 0;
             this.yt_liveurl = source.readString();
             this.imageasset = source.readString();
-            this.imageassetBitmap = (Bitmap) source.readValue(Bitmap.class.getClassLoader());
             this.imageassethd = source.readString();
             this.urltoplayer = source.readString();
             this.channel = source.readInt();
@@ -60,10 +74,44 @@ public class DctvChannel implements Parcelable {
         dest.writeByte((byte) (this.yt_upcoming ? 1 : 0));
         dest.writeString(this.yt_liveurl);
         dest.writeString(this.imageasset);
-        dest.writeValue(this.imageassetBitmap);
         dest.writeString(this.imageassethd);
         dest.writeString(this.urltoplayer);
         dest.writeInt(this.channel);
+    }
+
+    public Bitmap getImageBitmap(Context context) {
+        if (this.channelname.equals("dctv")) {
+            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dctv_247_channel);
+            return Bitmap.createScaledBitmap(bitmap, 300, 120, true);
+        } else {
+            return null;
+
+        }
+    }
+
+    public boolean hasLocalChannelArt() {
+        return this.channelname.equals("dctv");
+    }
+
+    public String getChannelArtUrl() {
+        return this.imageasset;
+    }
+
+
+    public boolean isAlerts() {
+        return alerts;
+    }
+
+    public String getStreamUrl(Context context) {
+        if (this.channelname.equals("dctv")) {
+            String baseUrl = context.getString(R.string.dctv_ingest_base_url);
+
+            return String.format("%shls2/dctv.m3u8", baseUrl);
+        } else {
+            String baseUrl = context.getString(R.string.dctv_base_url);
+
+            return String.format("%sapi/hlsredirect.php?c=%d", baseUrl, this.channel);
+        }
     }
 
     public static final Creator<DctvChannel> CREATOR = new Creator<DctvChannel>() {
@@ -75,4 +123,13 @@ public class DctvChannel implements Parcelable {
             return new DctvChannel[size];
         }
     };
+
+    public static final DctvChannel get247Channel(Context context) {
+        DctvChannel chan = new DctvChannel();
+        chan.friendlyalias = "DCTV 24/7";
+        chan.channelname = "dctv";
+        chan.channel = 0;
+        chan.twitch_yt_description = "All Diamondclub, all the time.";
+        return chan;
+    }
 }
