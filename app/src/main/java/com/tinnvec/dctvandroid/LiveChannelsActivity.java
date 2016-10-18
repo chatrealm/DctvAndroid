@@ -22,6 +22,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.android.gms.cast.framework.CastContext;
 import com.tinnvec.dctvandroid.tasks.ImageDownloaderTask;
 import com.tinnvec.dctvandroid.tasks.LoadLiveChannelsTask;
 
@@ -33,6 +34,7 @@ public class LiveChannelsActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
     private SwipeRefreshLayout swipeContainer;
+    private CastContext mCastContext;
 
 
     public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
@@ -139,6 +141,8 @@ public class LiveChannelsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_live_channels);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mCastContext = CastContext.getSharedInstance(this); // initialises castcontext
 
         mRecyclerView = (RecyclerView) findViewById(R.id.live_list);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getBaseContext(), null));

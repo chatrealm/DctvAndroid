@@ -14,6 +14,8 @@ import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import com.google.android.gms.cast.framework.CastContext;
+
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.MediaPlayer.OnInfoListener;
 import io.vov.vitamio.MediaPlayer.OnPreparedListener;
@@ -28,6 +30,7 @@ public class PlayStreamActivity extends AppCompatActivity
     private VideoView vidView;
     private String dctvBaseUrl;
     private static final String TAG = PlayStreamActivity.class.getName();
+    private CastContext mCastContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,8 @@ public class PlayStreamActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_play_stream);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        mCastContext = CastContext.getSharedInstance(this); // initialises castcontext
 
         DctvChannel channel = getIntent().getExtras().getParcelable(LiveChannelsActivity.CHANNEL_DATA);
         String title;
