@@ -22,6 +22,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
 import com.tinnvec.dctvandroid.tasks.ImageDownloaderTask;
 import com.tinnvec.dctvandroid.tasks.LoadLiveChannelsTask;
@@ -34,7 +35,10 @@ public class LiveChannelsActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
     private SwipeRefreshLayout swipeContainer;
+
+// added for cast SDK v3
     private CastContext mCastContext;
+    private MenuItem mediaRouteMenuItem;
 
 
     public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
@@ -187,6 +191,10 @@ public class LiveChannelsActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_live_channels, menu);
+
+        // add media router button for cast
+        mediaRouteMenuItem = CastButtonFactory.setUpMediaRouteButton(getApplicationContext(), menu, R.id.media_route_menu_item);
+
         return true;
     }
 

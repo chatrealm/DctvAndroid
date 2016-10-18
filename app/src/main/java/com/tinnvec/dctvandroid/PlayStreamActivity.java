@@ -11,9 +11,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
 
 import io.vov.vitamio.MediaPlayer;
@@ -30,7 +33,10 @@ public class PlayStreamActivity extends AppCompatActivity
     private VideoView vidView;
     private String dctvBaseUrl;
     private static final String TAG = PlayStreamActivity.class.getName();
+
+    // added for cast SDK v3
     private CastContext mCastContext;
+    private MenuItem mediaRouteMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +99,33 @@ public class PlayStreamActivity extends AppCompatActivity
             Log.e(TAG, e.getMessage(), e);
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_play_stream, menu);
+
+        // add media router button for cast
+        mediaRouteMenuItem = CastButtonFactory.setUpMediaRouteButton(getApplicationContext(), menu, R.id.media_route_menu_item);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
