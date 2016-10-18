@@ -115,7 +115,7 @@ public class LiveChannelsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     int position = mRecyclerView.getChildAdapterPosition(v);
-                    Intent intent = new Intent(getBaseContext(), StreamVideoActivity.class);
+                    Intent intent = new Intent(getBaseContext(), PlayStreamActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putParcelable(CHANNEL_DATA, channelList.get(position));
                     intent.putExtras(bundle);

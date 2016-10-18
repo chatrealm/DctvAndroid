@@ -27,6 +27,7 @@ public class PlayStreamActivity extends AppCompatActivity
     private ProgressDialog progressDialog;
     private VideoView vidView;
     private String dctvBaseUrl;
+    private static final String TAG = PlayStreamActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,14 +82,10 @@ public class PlayStreamActivity extends AppCompatActivity
 
         try {
             if (channel !=  null) {
-                String urlString = String.format("%sapi/hlsredirect.php?c=%d", dctvBaseUrl, channel.channel);
-                Uri vidUri = Uri.parse(urlString);
-                progressDialog.show();
-                vidView.setVideoURI(vidUri);
+                vidView.setVideoPath(channel.getStreamUrl(this));
             }
         } catch (Exception e) {
-            Log.e("ERROR", e.getMessage());
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 
