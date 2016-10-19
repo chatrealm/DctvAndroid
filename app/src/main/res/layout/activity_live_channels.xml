@@ -7,6 +7,7 @@
     android:fitsSystemWindows="true"
     tools:context="com.tinnvec.dctvandroid.LiveChannelsActivity">
 
+
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -32,8 +33,9 @@
         android:id="@+id/castMiniController"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_gravity="end|bottom"
         android:visibility="gone"
         class="com.google.android.gms.cast.framework.media.widget.MiniControllerFragment" />
 
 </android.support.design.widget.CoordinatorLayout>
+
