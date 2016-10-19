@@ -233,7 +233,7 @@ public class PlayStreamActivity extends AppCompatActivity
         else {
             if (!channel.getChannelname().equals("dctv") && channel.getStreamtype().equals("rtmp-hls")) {
                 if (channel.getChannelname().equals("frogpantsstudios") && channel.getStreamtype().equals("rtmp-hls")) {
-                    streamUrl = "http://ingest.diamondclub.tv/high/" + "scottjohnson" + ".m3u8";
+                    streamUrl = "http://ingest.diamondclub.tv/high/" + "scottjohnson" + ".m3u8"; // choosing for the high quality stream here, because some streamer's source ones don;t seem to cast well
                 } else {
                     streamUrl = "http://ingest.diamondclub.tv/high/" + channel.getChannelname() + ".m3u8";
                 }

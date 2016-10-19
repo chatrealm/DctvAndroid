@@ -8,11 +8,11 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
+        android:logo="@drawable/ic_dctvlogo_padding"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon, android:label">
-
         <meta-data
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
             android:value="com.tinnvec.dctvandroid.cast.CastOptionsProvider" />
@@ -23,6 +23,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -42,11 +43,18 @@
             android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="stateAlwaysHidden"
             tools:replace="android:configChanges" />
-
         <activity
             android:name=".StreamVideoActivity"
             android:parentActivityName=".LiveChannelsActivity"
             android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />
+        </activity>
+        <activity
+            android:name=".JustChatActivity"
+            android:parentActivityName=".LiveChannelsActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />

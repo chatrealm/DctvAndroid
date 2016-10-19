@@ -224,6 +224,10 @@ public class LiveChannelsActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
+        if (id == R.id.action_chat) {
+            Intent intent = new Intent(getBaseContext(), JustChatActivity.class);
+            startActivity(intent);
+        }
 
         return super.onOptionsItemSelected(item);
     }
