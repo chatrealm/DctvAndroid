@@ -24,7 +24,6 @@ public class CastOptionsProvider implements OptionsProvider {
                 .build();
         CastMediaOptions mediaOptions = new CastMediaOptions.Builder()
                 .setNotificationOptions(notificationOptions)
-                .setExpandedControllerActivityClassName(JustChatActivity.class.getName())
                 .build();
 
         return new CastOptions.Builder()
