@@ -1,23 +1,23 @@
 package com.tinnvec.dctvandroid;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.content.Context;
-import android.util.Log;
-
-import com.tinnvec.dctvandroid.tasks.LoadLiveChannelsTask;
-
-import java.io.InputStream;
-import java.net.URL;
 
 public class DctvChannel implements Parcelable {
 
-    private static String TAG = DctvChannel.class.getName();
+    public static final Creator<DctvChannel> CREATOR = new Creator<DctvChannel>() {
+        public DctvChannel createFromParcel(Parcel in) {
+            return new DctvChannel(in);
+        }
 
+        public DctvChannel[] newArray(int size) {
+            return new DctvChannel[size];
+        }
+    };
+    private static String TAG = DctvChannel.class.getName();
     public int streamid;
     public String channelname;
     public String friendlyalias;
@@ -54,6 +54,15 @@ public class DctvChannel implements Parcelable {
             this.urltoplayer = source.readString();
             this.channel = source.readInt();
         }
+    }
+
+    public static final DctvChannel get247Channel(Context context) {
+        DctvChannel chan = new DctvChannel();
+        chan.friendlyalias = "DCTV 24/7";
+        chan.channelname = "dctv";
+        chan.channel = 0;
+        chan.twitch_yt_description = "All Diamondclub, all the time.";
+        return chan;
     }
 
     @Override
@@ -94,9 +103,38 @@ public class DctvChannel implements Parcelable {
     }
 
     public String getChannelArtUrl() {
-        return this.imageasset;
+        if (this.channelname.equals("dctv")) {
+            return "http://i.imgur.com/GVeytTB.png";
+        } else {
+            return this.imageasset;
+        }
+    }
+    // for Cast MediaInfobuilder
+    public String getBigChannelArtUrl() {
+        if (this.channelname.equals("dctv")) {
+            return "http://i.imgur.com/GVeytTB.png";
+        }
+        else {
+            return this.imageassethd;
+        }
     }
 
+    public String getStreamtype() {
+        if (this.channelname.equals("dctv")) {
+            return "rtmp-hls";
+        }
+        else {
+            return this.streamtype;
+        }
+    }
+
+    public String getFriendlyAlias() {
+        return this.friendlyalias;
+    }
+
+    public String getChannelname() {
+        return this.channelname;
+    }
 
     public boolean isAlerts() {
         return alerts;
@@ -112,24 +150,5 @@ public class DctvChannel implements Parcelable {
 
             return String.format("%sapi/hlsredirect.php?c=%d", baseUrl, this.channel);
         }
-    }
-
-    public static final Creator<DctvChannel> CREATOR = new Creator<DctvChannel>() {
-        public DctvChannel createFromParcel(Parcel in) {
-            return new DctvChannel(in);
-        }
-
-        public DctvChannel[] newArray(int size) {
-            return new DctvChannel[size];
-        }
-    };
-
-    public static final DctvChannel get247Channel(Context context) {
-        DctvChannel chan = new DctvChannel();
-        chan.friendlyalias = "DCTV 24/7";
-        chan.channelname = "dctv";
-        chan.channel = 0;
-        chan.twitch_yt_description = "All Diamondclub, all the time.";
-        return chan;
     }
 }

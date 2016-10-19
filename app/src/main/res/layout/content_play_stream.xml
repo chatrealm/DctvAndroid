@@ -9,12 +9,17 @@
     tools:context="com.tinnvec.dctvandroid.PlayStreamActivity"
     tools:showIn="@layout/activity_play_stream">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linear_layout_video">
     <!-- Video -->
     <io.vov.vitamio.widget.VideoView
         android:id="@+id/video_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top" />
+    </LinearLayout>
 
     <!-- Chat View -->
     <WebView
