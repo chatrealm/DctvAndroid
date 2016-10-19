@@ -10,7 +10,7 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
     <string name="title_activity_fullscreen">FullscreenActivity</string>
-
+    <string name="media_route_menu_title">Play on...</string>
 
 
 </resources>
