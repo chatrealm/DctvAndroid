@@ -1,11 +1,13 @@
 package com.tinnvec.dctvandroid;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -38,6 +40,12 @@ import io.vov.vitamio.MediaPlayer.OnPreparedListener;
 import io.vov.vitamio.Vitamio;
 import io.vov.vitamio.widget.MediaController;
 import io.vov.vitamio.widget.VideoView;
+
+import static android.R.attr.screenOrientation;
+import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 
 public class PlayStreamActivity extends AppCompatActivity
         implements OnPreparedListener, OnErrorListener, MediaPlayer.OnInfoListener {
@@ -133,6 +141,11 @@ public class PlayStreamActivity extends AppCompatActivity
             }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
+        }
+        if (this.getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
+            hideSysUi();
+        }   else if(this.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT && mLocation == PlaybackLocation.LOCAL) {
+            showSysUi();
         }
     }
 
@@ -410,57 +423,67 @@ public class PlayStreamActivity extends AppCompatActivity
         } else {
             updatePlaybackLocation(PlaybackLocation.LOCAL);
         }
+        if (this.getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
+            hideSysUi();
+        }   else if(this.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT && mLocation == PlaybackLocation.LOCAL) {
+            showSysUi();
+        }
         super.onResume();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
         // Checks the orientation of the screen
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
-            getSupportActionBar().hide();
+        if (newConfig.orientation == ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
+            hideSysUi();
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT && mLocation == PlaybackLocation.LOCAL) {
+            showSysUi();
+        }
+    }
 
-            View decorView = getWindow().getDecorView();
+    public void hideSysUi(){
+        getSupportActionBar().hide();
+
+        View decorView = getWindow().getDecorView();
 // Hide both the navigation bar and the status bar.
 // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
 // a general rule, you should design your app to hide the status bar whenever you
 // hide the navigation bar.
-            int uiOptions =  View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-            decorView.setSystemUiVisibility(uiOptions);
-            findViewById(R.id.root_coordinator).setFitsSystemWindows(false);
-            findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT));
+        int uiOptions =  View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        decorView.setSystemUiVisibility(uiOptions);
+        findViewById(R.id.root_coordinator).setFitsSystemWindows(false);
+        findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
 
-            vidView.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT));
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT && mLocation == PlaybackLocation.LOCAL) {
-            getSupportActionBar().show();
-            View decorView = getWindow().getDecorView();
-            int uiOptions =     View.SYSTEM_UI_FLAG_VISIBLE;
-            decorView.setSystemUiVisibility(uiOptions);
+        vidView.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+    }
 
-            findViewById(R.id.root_coordinator).setFitsSystemWindows(true);
+    public void showSysUi(){
+        getSupportActionBar().show();
+        View decorView = getWindow().getDecorView();
+        int uiOptions =     View.SYSTEM_UI_FLAG_VISIBLE;
+        decorView.setSystemUiVisibility(uiOptions);
 
-            findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
+        findViewById(R.id.root_coordinator).setFitsSystemWindows(true);
 
-            // getting the videoview to be 16:9
-            DisplayMetrics displaymetrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-            float h = displaymetrics.heightPixels;
-            float w = displaymetrics.widthPixels;
-            float floatHeight = (float) (w * 0.5625);
-            int intHeight = Math.round(floatHeight);
-            int intWidth = (int) w;
-            vidView.setLayoutParams(new RelativeLayout.LayoutParams(intWidth, intHeight));
+        findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
 
-
-        }
+        // getting the videoview to be 16:9
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        float h = displaymetrics.heightPixels;
+        float w = displaymetrics.widthPixels;
+        float floatHeight = (float) (w * 0.5625);
+        int intHeight = Math.round(floatHeight);
+        int intWidth = (int) w;
+        vidView.setLayoutParams(new RelativeLayout.LayoutParams(intWidth, intHeight));
     }
 
     /**
