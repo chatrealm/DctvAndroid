@@ -9,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -116,7 +118,7 @@ public class PlayStreamActivity extends AppCompatActivity
         vidView.setOnErrorListener(this);
 
         MediaController mediaController = new MediaController(vidView.getContext());
-        mediaController.setAnchorView(vidView);
+        mediaController.setAnchorView(findViewById(R.id.mediacontroller_anchor));
         vidView.setMediaController(mediaController);
 
         WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
@@ -294,6 +296,7 @@ public class PlayStreamActivity extends AppCompatActivity
             }
         } else {
             hideVideoView();
+            showSysUi();
 //            stopControllersTimer();
 //            setCoverArtStatus(mSelectedMedia.getImage(0));
 //            updateControllersVisibility(false);
@@ -386,6 +389,7 @@ public class PlayStreamActivity extends AppCompatActivity
         if (mLocation == PlaybackLocation.REMOTE) {
             vidView.pause();
             mp.stop();
+            showSysUi();
             if (mCastSession != null && mCastSession.isConnected()) loadRemoteMedia(true);
         }
     }
@@ -456,11 +460,13 @@ public class PlayStreamActivity extends AppCompatActivity
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
-        findViewById(R.id.root_coordinator).setFitsSystemWindows(false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            findViewById(R.id.root_coordinator).setFitsSystemWindows(false);
+        }
         findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
 
-        vidView.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+        vidView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
@@ -470,7 +476,9 @@ public class PlayStreamActivity extends AppCompatActivity
         int uiOptions =     View.SYSTEM_UI_FLAG_VISIBLE;
         decorView.setSystemUiVisibility(uiOptions);
 
-        findViewById(R.id.root_coordinator).setFitsSystemWindows(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            findViewById(R.id.root_coordinator).setFitsSystemWindows(true);
+        }
 
         findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -483,7 +491,7 @@ public class PlayStreamActivity extends AppCompatActivity
         float floatHeight = (float) (w * 0.5625);
         int intHeight = Math.round(floatHeight);
         int intWidth = (int) w;
-        vidView.setLayoutParams(new RelativeLayout.LayoutParams(intWidth, intHeight));
+        vidView.setLayoutParams(new FrameLayout.LayoutParams(intWidth, intHeight));
     }
 
     /**

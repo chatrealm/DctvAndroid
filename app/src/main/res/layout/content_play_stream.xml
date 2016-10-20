@@ -8,7 +8,7 @@
     tools:context="com.tinnvec.dctvandroid.PlayStreamActivity"
     tools:showIn="@layout/activity_play_stream">
 
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/view_group_video"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -18,7 +18,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top" />
-    </RelativeLayout>
+
+        <FrameLayout
+            android:id="@+id/mediacontroller_anchor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true">
+
+        </FrameLayout>
+    </FrameLayout>
 
     <!-- Chat View -->
     <WebView
