@@ -253,7 +253,7 @@ public class PlayStreamActivity extends AppCompatActivity
                 if (channel.getChannelname().equals("frogpantsstudios") && channel.getStreamtype().equals("rtmp-hls")) {
                     streamUrl = "http://ingest.diamondclub.tv/high/" + "scottjohnson" + ".m3u8";
                 }
-                if (channel.getChannelname().equals("sgtmuffin") && channel.getStreamtype().equals("rtmp-hls")) {
+                else if (channel.getChannelname().equals("sgtmuffin") && channel.getStreamtype().equals("rtmp-hls")) {
                     streamUrl = "http://ingest.diamondclub.tv/high/" + "muffin" + ".m3u8";
                 } else {
                     streamUrl = "http://ingest.diamondclub.tv/high/" + channel.getChannelname() + ".m3u8";
