@@ -266,7 +266,7 @@ public class MediaPlayer {
     mContext = ctx;
 
     String LIB_ROOT;
-    if(VERSION.SDK_INT > 20) {
+    if(VERSION.SDK_INT > 20 && VERSION.SDK_INT < 24) {
         LIB_ROOT = "";
     }
     else{
@@ -308,7 +308,7 @@ public class MediaPlayer {
 
   static {
 	String LIB_ROOT;
-    if(VERSION.SDK_INT > 20) {
+    if(VERSION.SDK_INT > 20 && VERSION.SDK_INT < 24) {
         LIB_ROOT = "";
     }
     else{
