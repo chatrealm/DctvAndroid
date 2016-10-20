@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.tinnvec.dctvandroid.PlayStreamActivity"
     tools:showIn="@layout/activity_play_stream">
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/view_group_video"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/linear_layout_video">
-    <!-- Video -->
-    <io.vov.vitamio.widget.VideoView
-        android:id="@+id/video_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top" />
-    </LinearLayout>
+        android:layout_height="wrap_content">
+        <!-- Video -->
+        <io.vov.vitamio.widget.VideoView
+            android:id="@+id/video_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top" />
+    </RelativeLayout>
 
     <!-- Chat View -->
     <WebView
         android:id="@+id/chat_webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/view_group_video"
         android:layout_gravity="bottom" />
 
     <!-- Chat Input -->
 
-</LinearLayout>
+</RelativeLayout>

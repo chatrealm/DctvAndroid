@@ -31,7 +31,9 @@
             android:name=".PlayStreamActivity"
             android:label="@string/title_activity_play_stream"
             android:parentActivityName=".LiveChannelsActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenSize"
+            android:uiOptions="">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />
@@ -54,7 +56,8 @@
         <activity
             android:name=".JustChatActivity"
             android:parentActivityName=".LiveChannelsActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />

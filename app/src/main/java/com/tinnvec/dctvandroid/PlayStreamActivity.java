@@ -2,7 +2,7 @@ package com.tinnvec.dctvandroid;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -11,12 +11,16 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.cast.MediaInfo;
@@ -28,19 +32,10 @@ import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Objects;
-
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.MediaPlayer.OnErrorListener;
 import io.vov.vitamio.MediaPlayer.OnPreparedListener;
 import io.vov.vitamio.Vitamio;
-import io.vov.vitamio.utils.IOUtils;
 import io.vov.vitamio.widget.MediaController;
 import io.vov.vitamio.widget.VideoView;
 
@@ -66,6 +61,8 @@ public class PlayStreamActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Vitamio.isInitialized(getApplicationContext());
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         this.dctvBaseUrl = getString(R.string.dctv_base_url);
 
@@ -236,16 +233,14 @@ public class PlayStreamActivity extends AppCompatActivity
         String streamUrl = null;
         if (channel.getChannelname().equals("dctv")) {
             streamUrl = channel.getStreamUrl(this);
-        }
-        else {
+        } else {
             if (!channel.getChannelname().equals("dctv") && channel.getStreamtype().equals("rtmp-hls")) {
                 if (channel.getChannelname().equals("frogpantsstudios") && channel.getStreamtype().equals("rtmp-hls")) {
                     streamUrl = "http://ingest.diamondclub.tv/high/" + "scottjohnson" + ".m3u8";
                 }
                 if (channel.getChannelname().equals("sgtmuffin") && channel.getStreamtype().equals("rtmp-hls")) {
                     streamUrl = "http://ingest.diamondclub.tv/high/" + "muffin" + ".m3u8";
-                }
-                else {
+                } else {
                     streamUrl = "http://ingest.diamondclub.tv/high/" + channel.getChannelname() + ".m3u8";
                 }
             } else {
@@ -293,14 +288,14 @@ public class PlayStreamActivity extends AppCompatActivity
     }
 
     private void hideVideoView() {
-        if (findViewById(R.id.linear_layout_video).getVisibility() == View.VISIBLE) {
-            findViewById(R.id.linear_layout_video).setVisibility(View.GONE);
+        if (findViewById(R.id.view_group_video).getVisibility() == View.VISIBLE) {
+            findViewById(R.id.view_group_video).setVisibility(View.GONE);
         }
     }
 
     private void showVideoView() {
-        if (findViewById(R.id.linear_layout_video).getVisibility() != View.VISIBLE) {
-            findViewById(R.id.linear_layout_video).setVisibility(View.VISIBLE);
+        if (findViewById(R.id.view_group_video).getVisibility() != View.VISIBLE) {
+            findViewById(R.id.view_group_video).setVisibility(View.VISIBLE);
         }
 
     }
@@ -361,7 +356,7 @@ public class PlayStreamActivity extends AppCompatActivity
 
                     break;
             }
-            }
+        }
 
         return true;
 //        return false;
@@ -378,7 +373,7 @@ public class PlayStreamActivity extends AppCompatActivity
         if (mLocation == PlaybackLocation.REMOTE) {
             vidView.pause();
             mp.stop();
-            if (mCastSession != null && mCastSession.isConnected())loadRemoteMedia(true);
+            if (mCastSession != null && mCastSession.isConnected()) loadRemoteMedia(true);
         }
     }
 
@@ -418,6 +413,55 @@ public class PlayStreamActivity extends AppCompatActivity
         super.onResume();
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
+            getSupportActionBar().hide();
+
+            View decorView = getWindow().getDecorView();
+// Hide both the navigation bar and the status bar.
+// SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
+// a general rule, you should design your app to hide the status bar whenever you
+// hide the navigation bar.
+            int uiOptions =  View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            decorView.setSystemUiVisibility(uiOptions);
+            findViewById(R.id.root_coordinator).setFitsSystemWindows(false);
+            findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+
+            vidView.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT && mLocation == PlaybackLocation.LOCAL) {
+            getSupportActionBar().show();
+            View decorView = getWindow().getDecorView();
+            int uiOptions =     View.SYSTEM_UI_FLAG_VISIBLE;
+            decorView.setSystemUiVisibility(uiOptions);
+
+            findViewById(R.id.root_coordinator).setFitsSystemWindows(true);
+
+            findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            // getting the videoview to be 16:9
+            DisplayMetrics displaymetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+            float h = displaymetrics.heightPixels;
+            float w = displaymetrics.widthPixels;
+            float floatHeight = (float) (w * 0.5625);
+            int intHeight = Math.round(floatHeight);
+            int intWidth = (int) w;
+            vidView.setLayoutParams(new RelativeLayout.LayoutParams(intWidth, intHeight));
+
+
+        }
+    }
 
     /**
      * indicates whether we are doing a local or a remote playback
