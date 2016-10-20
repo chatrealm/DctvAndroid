@@ -28,12 +28,19 @@ import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Objects;
 
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.MediaPlayer.OnErrorListener;
 import io.vov.vitamio.MediaPlayer.OnPreparedListener;
 import io.vov.vitamio.Vitamio;
+import io.vov.vitamio.utils.IOUtils;
 import io.vov.vitamio.widget.MediaController;
 import io.vov.vitamio.widget.VideoView;
 
@@ -226,15 +233,19 @@ public class PlayStreamActivity extends AppCompatActivity
         movieMetadata.addImage(new WebImage(Uri.parse(channel.getBigChannelArtUrl())));
         movieMetadata.addImage(new WebImage(Uri.parse(channel.getChannelArtUrl())));
 
-        String streamUrl;
+        String streamUrl = null;
         if (channel.getChannelname().equals("dctv")) {
             streamUrl = channel.getStreamUrl(this);
         }
         else {
             if (!channel.getChannelname().equals("dctv") && channel.getStreamtype().equals("rtmp-hls")) {
                 if (channel.getChannelname().equals("frogpantsstudios") && channel.getStreamtype().equals("rtmp-hls")) {
-                    streamUrl = "http://ingest.diamondclub.tv/high/" + "scottjohnson" + ".m3u8"; // choosing for the high quality stream here, because some streamer's source ones don;t seem to cast well
-                } else {
+                    streamUrl = "http://ingest.diamondclub.tv/high/" + "scottjohnson" + ".m3u8";
+                }
+                if (channel.getChannelname().equals("sgtmuffin") && channel.getStreamtype().equals("rtmp-hls")) {
+                    streamUrl = "http://ingest.diamondclub.tv/high/" + "muffin" + ".m3u8";
+                }
+                else {
                     streamUrl = "http://ingest.diamondclub.tv/high/" + channel.getChannelname() + ".m3u8";
                 }
             } else {
