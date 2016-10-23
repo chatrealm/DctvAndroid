@@ -12,6 +12,9 @@
     <string name="title_activity_fullscreen">FullscreenActivity</string>
     <string name="media_route_menu_title">Play on...</string>
     <string name="chat">Open Chat</string>
+    <string name="video_error_media_load_timeout">Limout loading video</string>
+    <string name="video_error_server_unaccessible">Stream server not accessible</string>
+    <string name="video_error_unknown_error">Unknown Error</string>
 
 
 </resources>

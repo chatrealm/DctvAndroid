@@ -8,10 +8,17 @@
     tools:context="com.tinnvec.dctvandroid.PlayStreamActivity"
     tools:showIn="@layout/activity_play_stream">
 
+    <LinearLayout
+        android:id="@+id/actionbarspacer"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:visibility="visible"></LinearLayout>
+
     <FrameLayout
         android:id="@+id/view_group_video"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/actionbarspacer">
         <!-- Video -->
         <io.vov.vitamio.widget.VideoView
             android:id="@+id/video_view"
@@ -19,18 +26,52 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top" />
 
-        <FrameLayout
-            android:id="@+id/mediacontroller_anchor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true">
-
-        </FrameLayout>
     </FrameLayout>
 
     <!-- Chat View -->
+    <RelativeLayout
+        android:id="@+id/mediacontroller_anchor"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@id/view_group_video"
+        android:layout_alignLeft="@id/view_group_video"
+        android:layout_alignRight="@id/view_group_video"
+        android:layout_alignTop="@id/view_group_video">
+
+        <ImageView
+            android:id="@+id/bgImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/player_bg" />
+
+        <ImageButton
+            android:id="@+id/play_pause_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@color/transparent"
+            android:padding="16dp"
+            android:src="@drawable/big_play_button" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/buffer_circle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@id/view_group_video"
+        android:layout_alignLeft="@id/view_group_video"
+        android:layout_alignRight="@id/view_group_video"
+        android:layout_alignTop="@id/view_group_video">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
+
     <WebView
         android:id="@+id/chat_webview"
         android:layout_width="match_parent"
