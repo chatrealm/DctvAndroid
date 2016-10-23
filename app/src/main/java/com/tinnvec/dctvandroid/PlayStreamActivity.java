@@ -213,10 +213,12 @@ public class PlayStreamActivity extends AppCompatActivity {
                 if (null != channel) {
 
                     if (mPlaybackState == PlaybackState.PLAYING) {
-                        vidView.pause();
-//                        mediaPlayer.stop();
                         loadRemoteMedia(true);
-                        finish();
+                        vidView.stopPlayback();
+                        updatePlaybackLocation(PlaybackLocation.REMOTE);
+                        mPlaybackState = PlaybackState.IDLE;
+//                        mediaPlayer.stop();
+//                        finish();
                         return;
                     } else {
                         mPlaybackState = PlaybackState.IDLE;
