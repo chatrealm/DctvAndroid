@@ -79,6 +79,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private boolean mControllersVisible;
     private Timer mControllersTimer;
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,9 +107,14 @@ public class PlayStreamActivity extends AppCompatActivity {
 
             ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
             String urlChannelart = channel.getBigChannelArtUrl();
-            Picasso.with(this)
-                    .load(urlChannelart)
-                    .into(channelArtView);
+
+            if (!Objects.equals(urlChannelart, "")){
+                Picasso.with(this)
+                        .load(urlChannelart)
+                        .into(channelArtView);
+            }else {
+                channelArtView.setImageDrawable(getResources().getDrawable(R.drawable.dctv_bg));
+            }
 
 
    /*         Bitmap resizedBitmap = channel.getImageBitmap(this);
@@ -286,6 +292,8 @@ public class PlayStreamActivity extends AppCompatActivity {
                     streamUrl = "http://ingest.diamondclub.tv/high/" + "scottjohnson" + ".m3u8";
                 } else if (channel.getChannelname().equals("sgtmuffin") && channel.getStreamtype().equals("rtmp-hls")) {
                     streamUrl = "http://ingest.diamondclub.tv/high/" + "muffin" + ".m3u8";
+                } else if (channel.getChannelname().equals("musicnews") && channel.getStreamtype().equals("rtmp-hls")) {
+                    streamUrl = "http://ingest.diamondclub.tv/high/" + "kristikates" + ".m3u8";
                 } else {
                     streamUrl = "http://ingest.diamondclub.tv/high/" + channel.getChannelname() + ".m3u8";
                 }
