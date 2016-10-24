@@ -1,8 +1,11 @@
 package com.tinnvec.dctvandroid;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -25,6 +28,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -36,7 +40,11 @@ import com.google.android.gms.cast.framework.CastSession;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
+import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -95,6 +103,13 @@ public class PlayStreamActivity extends AppCompatActivity {
         String title;
         if (channel != null) {
             title = channel.friendlyalias;
+
+            ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
+            String urlChannelart = channel.getBigChannelArtUrl();
+            Picasso.with(this)
+                    .load(urlChannelart)
+                    .into(channelArtView);
+
 
    /*         Bitmap resizedBitmap = channel.getImageBitmap(this);
             Drawable smallerArt = new BitmapDrawable(getResources(), resizedBitmap);
@@ -385,6 +400,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private void setupControlsCallbacks() {
         vidView.setOnErrorListener(new io.vov.vitamio.MediaPlayer.OnErrorListener() {
 
+            @SuppressLint("NewApi")
             @Override
             public boolean onError(io.vov.vitamio.MediaPlayer mp, int what, int extra) {
                 Log.e(TAG, "OnErrorListener.onError(): VideoView encountered an " +
@@ -443,13 +459,16 @@ public class PlayStreamActivity extends AppCompatActivity {
                             mPlaybackState = PlaybackState.BUFFERING;
                             updatePlayButton(mPlaybackState);
                             updateControllersVisibility(true);
+                            ImageView channelart = (ImageView) findViewById(R.id.channelart);
+                            channelart.setVisibility(View.VISIBLE);
                             break;
                         case android.media.MediaPlayer.MEDIA_INFO_BUFFERING_END:
                             mLocation = PlaybackLocation.LOCAL;
                             mp.start();
                             mPlaybackState = PlaybackState.PLAYING;
                             updatePlayButton(mPlaybackState);
-
+                            channelart = (ImageView) findViewById(R.id.channelart);
+                            channelart.setVisibility(View.GONE);
                             break;
                     }
                 }

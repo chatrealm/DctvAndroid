@@ -12,13 +12,15 @@
         android:id="@+id/actionbarspacer"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:visibility="visible"></LinearLayout>
+        android:visibility="visible"
+        android:orientation="horizontal"></LinearLayout>
 
     <FrameLayout
         android:id="@+id/view_group_video"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/actionbarspacer">
+
         <!-- Video -->
         <io.vov.vitamio.widget.VideoView
             android:id="@+id/video_view"
@@ -29,6 +31,29 @@
     </FrameLayout>
 
     <!-- Chat View -->
+    <RelativeLayout
+        android:id="@+id/buffer_circle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@id/view_group_video"
+        android:layout_alignLeft="@id/view_group_video"
+        android:layout_alignRight="@id/view_group_video"
+        android:layout_alignTop="@id/view_group_video">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/channelart"
+            android:scaleType="fitCenter"
+            android:background="@color/colorPrimary" />
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/mediacontroller_anchor"
         android:layout_width="match_parent"
@@ -54,22 +79,6 @@
             android:src="@drawable/big_play_button" />
 
 
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/buffer_circle"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignBottom="@id/view_group_video"
-        android:layout_alignLeft="@id/view_group_video"
-        android:layout_alignRight="@id/view_group_video"
-        android:layout_alignTop="@id/view_group_video">
-
-        <ProgressBar
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
     </RelativeLayout>
 
     <WebView

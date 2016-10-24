@@ -33,4 +33,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.2.1'
     compile 'com.google.android.gms:play-services-cast-framework:9.6.1'
     compile 'com.googlecode.android-query:android-query:0.25.9'
+    compile 'com.squareup.picasso:picasso:2.5.2'
 }
