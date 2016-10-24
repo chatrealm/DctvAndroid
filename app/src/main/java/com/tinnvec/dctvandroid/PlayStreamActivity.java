@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -36,6 +37,7 @@ import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
 
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -43,6 +45,7 @@ import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
 import io.vov.vitamio.widget.VideoView;
 
+import static android.R.attr.duration;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 
@@ -391,11 +394,16 @@ public class PlayStreamActivity extends AppCompatActivity {
                     msg = getString(R.string.video_error_media_load_timeout);
                 } else if (what == android.media.MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
                     msg = getString(R.string.video_error_server_unaccessible);
+                } else if (Objects.equals(channel.getStreamtype(), "youtube")) {
+                    msg = getString(R.string.video_error_youtube);
                 } else {
                     msg = getString(R.string.video_error_unknown_error);
                 }
-                progressDialog.dismiss();
-                progressDialog.setMessage("Error:" + msg);
+                Context context = getApplicationContext();
+                int duration = Toast.LENGTH_LONG;
+                String text = "Error: "+ msg;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
                 vidView.stopPlayback();
                 mPlaybackState = PlaybackState.IDLE;
                 updatePlayButton(mPlaybackState);
