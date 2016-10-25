@@ -8,6 +8,13 @@
     android:fitsSystemWindows="true"
     tools:context="com.tinnvec.dctvandroid.LiveChannelsActivity">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/main_bg_description"
+        android:src="@drawable/dctv_bg"
+        />
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -22,12 +29,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:contentDescription="@string/main_bg_description"
-        android:src="@drawable/dctv_bg" />
+
 
     <include layout="@layout/content_live_channels" />
 
