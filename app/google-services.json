@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "197089307871",
+    "project_id": "dctvandrold"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:197089307871:android:448598008d5f7027",
+        "android_client_info": {
+          "package_name": "com.tinnvec.dctvandroid"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZVVC32s6UrY4fbK6JafPS5zg2mQ47J6U"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
