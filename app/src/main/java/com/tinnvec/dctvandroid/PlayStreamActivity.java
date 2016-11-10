@@ -323,20 +323,21 @@ public class PlayStreamActivity extends AppCompatActivity {
     private void updatePlaybackLocation(PlaybackLocation location) {
         mLocation = location;
         if (location == PlaybackLocation.LOCAL) {
+            showVideoView();
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#00000000")));
+            findViewById(R.id.actionbarspacer).setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT);
+
+            p.addRule(RelativeLayout.BELOW, R.id.view_group_video);
+
+            findViewById(R.id.chat_webview).setLayoutParams(p);
+
+            //               setCoverArtStatus(null);
             if (mPlaybackState == PlaybackState.PLAYING
                     || mPlaybackState == PlaybackState.BUFFERING) {
-                showVideoView();
-                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#00000000")));
-                findViewById(R.id.actionbarspacer).setVisibility(View.GONE);
 
-                RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT);
-
-                p.addRule(RelativeLayout.BELOW, R.id.view_group_video);
-
-                findViewById(R.id.chat_webview).setLayoutParams(p);
-
-                //               setCoverArtStatus(null);
                 startControllersTimer();
             } else {
 
@@ -348,7 +349,9 @@ public class PlayStreamActivity extends AppCompatActivity {
             showSysUi();
             getSupportActionBar().show();
 
+
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#212121")));
+            getSupportActionBar().setElevation(getResources().getDimensionPixelSize(R.dimen.actionbar_elevation));
 
             findViewById(R.id.actionbarspacer).setVisibility(View.VISIBLE);
             RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -477,6 +480,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                             updatePlayButton(mPlaybackState);
                             channelart = (ImageView) findViewById(R.id.channelart);
                             channelart.setVisibility(View.GONE);
+                            startControllersTimer();
                             break;
                     }
                 }
@@ -493,7 +497,9 @@ public class PlayStreamActivity extends AppCompatActivity {
                 if (!mControllersVisible) {
                     updateControllersVisibility(true);
                 }
-                startControllersTimer();
+                if (mPlaybackState == PlaybackState.PLAYING) {
+                    startControllersTimer();
+                }
                 return false;
             }
         });

@@ -6,14 +6,17 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.tinnvec.dctvandroid.PlayStreamActivity"
-    tools:showIn="@layout/activity_play_stream">
+    tools:showIn="@layout/activity_play_stream"
+    android:animateLayoutChanges="true">
 
     <LinearLayout
         android:id="@+id/actionbarspacer"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:visibility="visible"
-        android:orientation="horizontal"></LinearLayout>
+        android:orientation="horizontal"
+        android:elevation="5dp"
+        android:background="@color/colorPrimary"></LinearLayout>
 
     <FrameLayout
         android:id="@+id/view_group_video"
@@ -38,7 +41,8 @@
         android:layout_alignBottom="@id/view_group_video"
         android:layout_alignLeft="@id/view_group_video"
         android:layout_alignRight="@id/view_group_video"
-        android:layout_alignTop="@id/view_group_video">
+        android:layout_alignTop="@id/view_group_video"
+        android:animateLayoutChanges="true">
 
         <ImageView
             android:layout_width="match_parent"
@@ -61,7 +65,8 @@
         android:layout_alignBottom="@id/view_group_video"
         android:layout_alignLeft="@id/view_group_video"
         android:layout_alignRight="@id/view_group_video"
-        android:layout_alignTop="@id/view_group_video">
+        android:layout_alignTop="@id/view_group_video"
+        android:animateLayoutChanges="true">
 
         <ImageView
             android:id="@+id/bgImage"
@@ -87,6 +92,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/view_group_video"
         android:layout_gravity="bottom" />
+
 
     <!-- Chat Input -->
 
