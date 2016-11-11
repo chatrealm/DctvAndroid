@@ -15,7 +15,7 @@
         android:layout_height="?attr/actionBarSize"
         android:visibility="visible"
         android:orientation="horizontal"
-        android:elevation="5dp"
+        android:elevation="@dimen/actionbar_elevation"
         android:background="@color/colorPrimary"></LinearLayout>
 
     <FrameLayout
