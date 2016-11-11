@@ -25,6 +25,7 @@ import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastState;
 import com.google.android.gms.cast.framework.CastStateListener;
 import com.google.android.gms.cast.framework.IntroductoryOverlay;
+import com.tinnvec.dctvandroid.channel.AbstractChannel;
 import com.tinnvec.dctvandroid.tasks.ImageDownloaderTask;
 import com.tinnvec.dctvandroid.tasks.LoadLiveChannelsTask;
 
@@ -78,7 +79,7 @@ public class LiveChannelsActivity extends AppCompatActivity {
                 new LoadLiveChannelsTask(mRecyclerView) {
 
 
-                    protected void onPostExecute(List<DctvChannel> result) {
+                    protected void onPostExecute(List<AbstractChannel> result) {
                         ImageAdapter adapter = (ImageAdapter) mRecyclerView.getAdapter();
                         adapter.clear();
                         if (result != null && !result.isEmpty()) {
@@ -93,7 +94,7 @@ public class LiveChannelsActivity extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        ArrayList<DctvChannel> savedChannels = null;
+        ArrayList<AbstractChannel> savedChannels = null;
         if (savedInstanceState != null) {
             savedChannels = savedInstanceState.getParcelableArrayList("CHANNEL_LIST");
         }
@@ -179,7 +180,7 @@ public class LiveChannelsActivity extends AppCompatActivity {
     }
 
     public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
-        private final ArrayList<DctvChannel> channelList = new ArrayList<>();
+        private final ArrayList<AbstractChannel> channelList = new ArrayList<>();
 
         public ImageAdapter() {
         }
@@ -191,15 +192,12 @@ public class LiveChannelsActivity extends AppCompatActivity {
         }
 
         // Add a list of items
-        public void addAll(List<DctvChannel> list) {
+        public void addAll(List<AbstractChannel> list) {
             channelList.addAll(list);
             notifyDataSetChanged();
         }
 
-        /**
-         *
-         */
-        private ArrayList<DctvChannel> getChannelList() {
+        private ArrayList<AbstractChannel> getChannelList() {
             return this.channelList;
         }
 
@@ -217,28 +215,20 @@ public class LiveChannelsActivity extends AppCompatActivity {
         // Replace the contents of a view (invoked by the layout manager)
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            ImageView channelArt = (ImageView) holder.mLinearLayout.findViewById(R.id.live_item_art);
-            DctvChannel chan = channelList.get(position);
+            final AbstractChannel chan = channelList.get(position);
 
-            if (chan.hasLocalChannelArt()) {
-                Bitmap bitMap = chan.getImageBitmap(holder.mLinearLayout.getContext());
-                channelArt.setImageBitmap(bitMap);
+            new ImageDownloaderTask(holder.channelArt).execute(chan.getImageAssetUrl());
 
+            holder.channelName.setText(chan.getFriendlyAlias());
+            holder.channelName.setSelected(true);
+
+
+            if (chan.getDescription().isEmpty()) {
+                holder.channelDescription.setVisibility(View.GONE);
             } else {
-                new ImageDownloaderTask(channelArt).execute(chan.getChannelArtUrl());
-            }
-
-            TextView channelName = (TextView) holder.mLinearLayout.findViewById(R.id.live_item_name);
-            channelName.setText(channelList.get(position).friendlyalias);
-            channelName.setSelected(true);
-
-            TextView channelDescription = (TextView) holder.mLinearLayout.findViewById(R.id.live_item_description);
-            if (channelList.get(position).twitch_yt_description.equals("")) {
-                channelDescription.setVisibility(View.GONE);
-            } else {
-                channelDescription.setVisibility(View.VISIBLE);
-                channelDescription.setText(channelList.get(position).twitch_yt_description);
-                channelDescription.setSelected(true);
+                holder.channelDescription.setVisibility(View.VISIBLE);
+                holder.channelDescription.setText(chan.getDescription());
+                holder.channelDescription.setSelected(true);
             }
 
             holder.mLinearLayout.setOnClickListener(new View.OnClickListener() {
@@ -247,7 +237,7 @@ public class LiveChannelsActivity extends AppCompatActivity {
                     int position = mRecyclerView.getChildAdapterPosition(v);
                     Intent intent = new Intent(getBaseContext(), PlayStreamActivity.class);
                     Bundle bundle = new Bundle();
-                    bundle.putParcelable(CHANNEL_DATA, channelList.get(position));
+                    bundle.putParcelable(CHANNEL_DATA, chan);
                     intent.putExtras(bundle);
                     startActivity(intent);
                 }
@@ -278,12 +268,16 @@ public class LiveChannelsActivity extends AppCompatActivity {
         // Complex data items may need more than one view per item, and
         // you provide access to all the views for a data item in a view holder
         public class ViewHolder extends RecyclerView.ViewHolder {
-            // each data item is just a string in this case
-            public LinearLayout mLinearLayout;
+            LinearLayout mLinearLayout;
+            TextView channelName, channelDescription;
+            ImageView channelArt;
 
             public ViewHolder(LinearLayout v) {
                 super(v);
                 mLinearLayout = v;
+                channelName = (TextView) v.findViewById(R.id.live_item_name);
+                channelDescription = (TextView) v.findViewById(R.id.live_item_description);
+                channelArt = (ImageView) v.findViewById(R.id.live_item_art);
             }
         }
     }

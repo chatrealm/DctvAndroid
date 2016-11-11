@@ -1,10 +1,11 @@
 package com.tinnvec.dctvandroid.tasks;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.JsonReader;
 
-import com.tinnvec.dctvandroid.DctvChannel;
+import com.tinnvec.dctvandroid.channel.*;
 import com.tinnvec.dctvandroid.LiveChannelsActivity;
 import com.tinnvec.dctvandroid.R;
 
@@ -20,27 +21,30 @@ import java.util.List;
 /**
  * Created by kev on 5/22/16.
  */
-public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<DctvChannel>> {
+public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<AbstractChannel>> {
 
     private static String TAG = LoadLiveChannelsTask.class.getName();
 
     private final RecyclerView mRecyclerView;
-    private final String dctvBaseUrl;
+    private final Context context;
+    private final String dctvChannelsUrl;
 
     public LoadLiveChannelsTask(RecyclerView mRecyclerView) {
         this.mRecyclerView = mRecyclerView;
-        this.dctvBaseUrl = mRecyclerView.getContext().getString(R.string.dctv_base_url);
+        this.context = mRecyclerView.getContext();
+        String dctvBaseUrl = context.getString(R.string.dctv_base_url);
+        this.dctvChannelsUrl = String.format(context.getString(R.string.dctv_channels_url),  dctvBaseUrl);
 
     }
 
     @Override
-    protected List<DctvChannel> doInBackground(Void... voids) {
+    protected List<AbstractChannel> doInBackground(Void... voids) {
         return fetchLiveChannels();
     }
 
 
     @Override
-    protected void onPostExecute(List<DctvChannel> result) {
+    protected void onPostExecute(List<AbstractChannel> result) {
         LiveChannelsActivity.ImageAdapter adapter = (LiveChannelsActivity.ImageAdapter )mRecyclerView.getAdapter();
         adapter.clear();
         if (result != null && !result.isEmpty()) {
@@ -48,15 +52,14 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<DctvChannel>>
         }
     }
 
-    private List<DctvChannel> fetchLiveChannels() {
+    private List<AbstractChannel> fetchLiveChannels() {
         URL url;
         HttpURLConnection urlConnection;
         InputStream in;
-        List<DctvChannel> liveChannels = new ArrayList<>();
-        liveChannels.add(DctvChannel.get247Channel(mRecyclerView.getContext()));
+        List<AbstractChannel> liveChannels = new ArrayList<>();
+        liveChannels.add(DctvChannel.get247Channel(context));
         try {
-            String channelsURL = String.format("%sapi/channelsv2.php",  dctvBaseUrl);
-            url = new URL(channelsURL);
+            url = new URL(dctvChannelsUrl);
             urlConnection = (HttpURLConnection) url.openConnection();
             in = new BufferedInputStream(urlConnection.getInputStream());
             liveChannels.addAll(readDctvApi(in));
@@ -67,9 +70,9 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<DctvChannel>>
         return liveChannels;
     }
 
-    private List<DctvChannel> readDctvApi(InputStream in) throws IOException {
+    private List<AbstractChannel> readDctvApi(InputStream in) throws IOException {
         JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
-        List<DctvChannel> channels = new ArrayList<>();
+        List<AbstractChannel> channels = new ArrayList<>();
         try {
             reader.beginObject();
             while (reader.hasNext()) {
@@ -82,8 +85,8 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<DctvChannel>>
         }
     }
 
-    private List<DctvChannel> readDctvObject(JsonReader reader) throws IOException {
-        List<DctvChannel> channels = new ArrayList<>();
+    private List<AbstractChannel> readDctvObject(JsonReader reader) throws IOException {
+        List<AbstractChannel> channels = new ArrayList<>();
         if (!reader.nextName().isEmpty()) {
             reader.beginArray();
             while (reader.hasNext()) {
@@ -94,8 +97,8 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<DctvChannel>>
         return channels;
     }
 
-    private List<DctvChannel> readDctvChannelsArray(JsonReader reader) throws IOException {
-        List<DctvChannel> channels = new ArrayList<>();
+    private List<AbstractChannel> readDctvChannelsArray(JsonReader reader) throws IOException {
+        List<AbstractChannel> channels = new ArrayList<>();
         reader.beginObject();
         while (reader.hasNext()) {
             channels.add(readDctvChannel(reader));
@@ -104,58 +107,58 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<DctvChannel>>
         return channels;
     }
 
-    private DctvChannel readDctvChannel(JsonReader reader) throws IOException {
-        DctvChannel channel = new DctvChannel(null);
+    private AbstractChannel readDctvChannel(JsonReader reader) throws IOException {
+        ChannelReader channelReader = new ChannelReader();
         while (reader.hasNext()) {
             switch (reader.nextName()) {
                 case "streamid":
-                    channel.streamid = reader.nextInt();
+                    channelReader.setStreamid(reader.nextInt());
                     break;
                 case "channelname":
-                    channel.channelname = reader.nextString();
+                    channelReader.setChannelname(reader.nextString());
                     break;
                 case "friendlyalias":
-                    channel.friendlyalias = reader.nextString();
+                    channelReader.setFriendlyalias(reader.nextString());
                     break;
                 case "streamtype":
-                    channel.streamtype = reader.nextString();
+                    channelReader.setStreamtype(reader.nextString());
                     break;
                 case "nowonline":
-                    channel.nowonline = reader.nextString();
+                    channelReader.setNowonline(reader.nextString());
                     break;
                 case "alerts":
-                    channel.alerts = reader.nextBoolean();
+                    channelReader.setAlerts(reader.nextBoolean());
                     break;
                 case "twitch_currentgame":
-                    channel.twitch_currentgame = reader.nextString();
+                    channelReader.setTwitch_currentgame(reader.nextString());
                     break;
                 case "twitch_yt_description":
-                    channel.twitch_yt_description = reader.nextString();
+                    channelReader.setTwitch_yt_description(reader.nextString());
                     break;
                 case "yt_upcoming":
-                    channel.yt_upcoming = reader.nextBoolean();
+                    channelReader.setYt_upcoming(reader.nextBoolean());
                     break;
                 case "yt_liveurl":
-                    channel.yt_liveurl = reader.nextString();
+                    channelReader.setYt_liveurl(reader.nextString());
                     break;
                 case "imageasset":
-                    channel.imageasset = reader.nextString();
+                    channelReader.setImageasset(reader.nextString());
                     break;
                 case "imageassethd":
-                    channel.imageassethd = reader.nextString();
+                    channelReader.setImageassethd(reader.nextString());
                     break;
                 case "urltoplayer":
-                    channel.urltoplayer = reader.nextString();
+                    channelReader.setUrltoplayer(reader.nextString());
                     break;
                 case "channel":
-                    channel.channel = reader.nextInt();
+                    channelReader.setChannel(reader.nextInt());
                     break;
                 default:
                     reader.skipValue();
                     break;
             }
         }
-        return channel;
+        return channelReader.getChannelInstance();
     }
 
 }
