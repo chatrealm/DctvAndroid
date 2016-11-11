@@ -5,8 +5,8 @@ import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.JsonReader;
 
+import com.tinnvec.dctvandroid.ChannelListAdapter;
 import com.tinnvec.dctvandroid.channel.*;
-import com.tinnvec.dctvandroid.LiveChannelsActivity;
 import com.tinnvec.dctvandroid.R;
 
 import java.io.BufferedInputStream;
@@ -45,7 +45,7 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<AbstractChann
 
     @Override
     protected void onPostExecute(List<AbstractChannel> result) {
-        LiveChannelsActivity.ImageAdapter adapter = (LiveChannelsActivity.ImageAdapter )mRecyclerView.getAdapter();
+        ChannelListAdapter adapter = (ChannelListAdapter) mRecyclerView.getAdapter();
         adapter.clear();
         if (result != null && !result.isEmpty()) {
             adapter.addAll(result);
