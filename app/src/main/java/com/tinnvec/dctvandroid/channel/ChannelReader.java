@@ -50,12 +50,14 @@ public class ChannelReader {
 
     private TwitchChannel getTwitchChannel() {
         TwitchChannel chan = new TwitchChannel();
+        setCommonProperties(chan);
         chan.setCurrentGame(twitch_currentgame);
         return chan;
     }
 
     private YoutubeChannel getYoutubeChannel() {
         YoutubeChannel chan = new YoutubeChannel();
+        setCommonProperties(chan);
         chan.setLiveUrl(yt_liveurl);
         chan.setUpcoming(yt_upcoming);
         return chan;
