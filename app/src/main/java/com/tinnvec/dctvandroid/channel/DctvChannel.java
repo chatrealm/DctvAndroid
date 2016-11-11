@@ -17,7 +17,7 @@ public class DctvChannel extends AbstractChannel {
         }
     };
 
-    public DctvChannel() { this(null); }
+    public DctvChannel() { }
 
     public DctvChannel(Parcel in) {
         super(in);

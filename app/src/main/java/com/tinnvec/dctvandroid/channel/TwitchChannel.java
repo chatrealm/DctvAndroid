@@ -19,7 +19,7 @@ public class TwitchChannel extends AbstractChannel {
 
     private String currentGame;
 
-    public TwitchChannel() { this(null); }
+    public TwitchChannel() { }
 
     public TwitchChannel(Parcel in) {
         super(in);

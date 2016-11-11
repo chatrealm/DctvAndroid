@@ -20,7 +20,7 @@ public class YoutubeChannel extends AbstractChannel {
     private String liveUrl;
     private boolean isUpcoming;
 
-    public YoutubeChannel() { this(null); }
+    public YoutubeChannel() { }
 
     public YoutubeChannel(Parcel in) {
         super(in);

@@ -17,6 +17,8 @@ public abstract class AbstractChannel implements Parcelable {
     String urlToPlayer;
     String streamUrl;
 
+    public AbstractChannel() {};
+
     public AbstractChannel(Parcel in) {
         channelID = in.readInt();
         streamID = in.readInt();
