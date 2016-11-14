@@ -6,8 +6,6 @@
     <string name="title_activity_play_stream">PlayStreamActivity</string>
     <string name="main_bg_description">Diamondclub logo</string>
 
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
 
     <string name="media_route_menu_title">Play on...</string>
     <string name="chat">Open Chat</string>
@@ -18,5 +16,7 @@
 
     <string name="pref_notify">Enable Notifications</string>
     <string name="pref_notify_summary">Enable Notifications</string>
+    <string name="pref_chat_name">IRC Chat Name</string>
+    <string name="pref_chat_name_summary">IRC Chat Name</string>
 
 </resources>

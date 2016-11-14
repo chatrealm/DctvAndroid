@@ -1,5 +1,7 @@
 package com.tinnvec.dctvandroid;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +15,8 @@ import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastState;
 import com.google.android.gms.cast.framework.CastStateListener;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Properties;
 
 
@@ -27,6 +31,7 @@ public class JustChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         PropertyReader pReader = new PropertyReader(this);
         appConfig = pReader.getMyProperties("app.properties");
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         setContentView(R.layout.activity_just_chat);
 
@@ -42,7 +47,16 @@ public class JustChatActivity extends AppCompatActivity {
         WebSettings settings = chatWebview.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
-        chatWebview.loadUrl(appConfig.getProperty("irc.web_url"));
+
+        String url = appConfig.getProperty("irc.web_url");
+        String nick = "";
+        try {
+            nick = URLEncoder.encode(sharedPreferences.getString("chat_name", ""), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+
+        }
+        url = url + "?nick=" + nick;
+        chatWebview.loadUrl(url);
     }
 
     @Override

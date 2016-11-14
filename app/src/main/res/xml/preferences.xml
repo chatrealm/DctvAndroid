@@ -5,4 +5,8 @@
         android:title="@string/pref_notify"
         android:summary="@string/pref_notify_summary"
         android:defaultValue="true" />
+    <EditTextPreference android:title="@string/pref_chat_name"
+        android:key="chat_name"
+        android:summary="@string/pref_chat_name_summary" />
+
 </PreferenceScreen>

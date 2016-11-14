@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -47,6 +48,8 @@ import com.tinnvec.dctvandroid.channel.AbstractChannel;
 import com.tinnvec.dctvandroid.channel.DctvChannel;
 import com.tinnvec.dctvandroid.channel.YoutubeChannel;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Timer;
@@ -93,6 +96,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         PropertyReader pReader = new PropertyReader(this);
         appConfig = pReader.getMyProperties("app.properties");
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
@@ -170,7 +174,15 @@ public class PlayStreamActivity extends AppCompatActivity {
         WebSettings settings = chatWebview.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
-        chatWebview.loadUrl(appConfig.getProperty("irc.web_url"));
+        String url = appConfig.getProperty("irc.web_url");
+        String nick = "";
+        try {
+            nick = URLEncoder.encode(sharedPreferences.getString("chat_name", ""), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+
+        }
+        url = url + "?nick=" + nick;
+        chatWebview.loadUrl(url);
 
         try {
             vidView.setVideoPath(channel.getStreamUrl(appConfig));
