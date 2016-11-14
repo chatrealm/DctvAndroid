@@ -31,7 +31,7 @@ public class DctvChannel extends AbstractChannel {
         chan.setName("dctv_247");
         chan.setChannelID(0);
         chan.setDescription("All Diamondclub, all the time.");
-        chan.setImageAssetUrl("http://i.imgur.com/GVeytTB.png");
+        chan.setImageAssetUrl("http://i.imgur.com/6hsN55B.png");
         chan.setImageAssetHDUrl("http://i.imgur.com/GVeytTB.png");
 
         String baseUrl = app_config.getProperty("api.dctv.ingest_url");
