@@ -25,7 +25,8 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:contentDescription="@string/channel_art_description" />
+            android:contentDescription="@string/channel_art_description"
+            android:layout_gravity="center_vertical" />
 
         <LinearLayout
             android:layout_width="match_parent"
