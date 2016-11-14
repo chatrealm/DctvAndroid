@@ -1,7 +1,6 @@
 package com.tinnvec.dctvandroid;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,34 +8,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastState;
 import com.google.android.gms.cast.framework.CastStateListener;
 import com.google.android.gms.cast.framework.IntroductoryOverlay;
-import com.tinnvec.dctvandroid.tasks.ImageDownloaderTask;
+import com.tinnvec.dctvandroid.channel.AbstractChannel;
 import com.tinnvec.dctvandroid.tasks.LoadLiveChannelsTask;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LiveChannelsActivity extends AppCompatActivity {
+public class LiveChannelsActivity extends AppCompatActivity implements ChannelListCallback {
 
     public static final String CHANNEL_DATA = "com.tinnvec.dctv_android.CHANNEL_MESSAGE";
     private static final String TAG = LiveChannelsActivity.class.getName();
     private RecyclerView mRecyclerView;
-    private ImageAdapter mAdapter;
+    private ChannelListAdapter mAdapter;
     private SwipeRefreshLayout swipeContainer;
 
     // added for cast SDK v3
@@ -44,7 +35,6 @@ public class LiveChannelsActivity extends AppCompatActivity {
     private MenuItem mediaRouteMenuItem;
     private IntroductoryOverlay mIntroductoryOverlay;
     private CastStateListener mCastStateListener;
-    private int lastPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +57,7 @@ public class LiveChannelsActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.live_list);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getBaseContext(), null));
         mRecyclerView.setHasFixedSize(true);
-        mAdapter = new ImageAdapter();
+        mAdapter = new ChannelListAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
@@ -77,13 +67,9 @@ public class LiveChannelsActivity extends AppCompatActivity {
 
                 new LoadLiveChannelsTask(mRecyclerView) {
 
-
-                    protected void onPostExecute(List<DctvChannel> result) {
-                        ImageAdapter adapter = (ImageAdapter) mRecyclerView.getAdapter();
-                        adapter.clear();
-                        if (result != null && !result.isEmpty()) {
-                            adapter.addAll(result);
-                        }
+                    @Override
+                    protected void onPostExecute(List<AbstractChannel> result) {
+                        super.onPostExecute(result);
                         swipeContainer.setRefreshing(false);
                     }
                 }.execute();
@@ -93,7 +79,7 @@ public class LiveChannelsActivity extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        ArrayList<DctvChannel> savedChannels = null;
+        ArrayList<AbstractChannel> savedChannels = null;
         if (savedInstanceState != null) {
             savedChannels = savedInstanceState.getParcelableArrayList("CHANNEL_LIST");
         }
@@ -161,6 +147,15 @@ public class LiveChannelsActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onChannelClicked(AbstractChannel channel) {
+        Intent intent = new Intent(this, PlayStreamActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(CHANNEL_DATA, channel);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    @Override
     protected void onResume() {
         mCastContext.addCastStateListener(mCastStateListener);
         super.onResume();
@@ -175,116 +170,7 @@ public class LiveChannelsActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("CHANNEL_LIST", mAdapter.getChannelList());
-    }
-
-    public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
-        private final ArrayList<DctvChannel> channelList = new ArrayList<>();
-
-        public ImageAdapter() {
-        }
-
-        // Clean all elements of the recycler
-        public void clear() {
-            channelList.clear();
-            notifyDataSetChanged();
-        }
-
-        // Add a list of items
-        public void addAll(List<DctvChannel> list) {
-            channelList.addAll(list);
-            notifyDataSetChanged();
-        }
-
-        /**
-         *
-         */
-        private ArrayList<DctvChannel> getChannelList() {
-            return this.channelList;
-        }
-
-        // Create new views (invoked by the layout manager)
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            // create a new view
-            LinearLayout v = (LinearLayout) LayoutInflater
-                    .from(parent.getContext())
-                    .inflate(R.layout.live_list_item, parent, false);
-
-            return new ViewHolder(v);
-        }
-
-        // Replace the contents of a view (invoked by the layout manager)
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            ImageView channelArt = (ImageView) holder.mLinearLayout.findViewById(R.id.live_item_art);
-            DctvChannel chan = channelList.get(position);
-
-            if (chan.hasLocalChannelArt()) {
-                Bitmap bitMap = chan.getImageBitmap(holder.mLinearLayout.getContext());
-                channelArt.setImageBitmap(bitMap);
-
-            } else {
-                new ImageDownloaderTask(channelArt).execute(chan.getChannelArtUrl());
-            }
-
-            TextView channelName = (TextView) holder.mLinearLayout.findViewById(R.id.live_item_name);
-            channelName.setText(channelList.get(position).friendlyalias);
-            channelName.setSelected(true);
-
-            TextView channelDescription = (TextView) holder.mLinearLayout.findViewById(R.id.live_item_description);
-            if (channelList.get(position).twitch_yt_description.equals("")) {
-                channelDescription.setVisibility(View.GONE);
-            } else {
-                channelDescription.setVisibility(View.VISIBLE);
-                channelDescription.setText(channelList.get(position).twitch_yt_description);
-                channelDescription.setSelected(true);
-            }
-
-            holder.mLinearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = mRecyclerView.getChildAdapterPosition(v);
-                    Intent intent = new Intent(getBaseContext(), PlayStreamActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable(CHANNEL_DATA, channelList.get(position));
-                    intent.putExtras(bundle);
-                    startActivity(intent);
-                }
-            });
-
-            setAnimation(holder.mLinearLayout, position);
-        }
-
-        private void setAnimation(View viewToAnimate, int position) {
-            // If the bound view wasn't previously displayed on screen, it's animated
-            if (position > lastPosition) {
-                Animation animation = AnimationUtils.loadAnimation(viewToAnimate.getContext(), android.R.anim.slide_in_left);
-                viewToAnimate.startAnimation(animation);
-                animation.setStartOffset(position * 75);
-                lastPosition = position;
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            if (channelList == null) {
-                return 0;
-            }
-            return channelList.size();
-        }
-
-        // Provide a reference to the views for each data item
-        // Complex data items may need more than one view per item, and
-        // you provide access to all the views for a data item in a view holder
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            // each data item is just a string in this case
-            public LinearLayout mLinearLayout;
-
-            public ViewHolder(LinearLayout v) {
-                super(v);
-                mLinearLayout = v;
-            }
-        }
+        outState.putParcelableArrayList(
+                "CHANNEL_LIST", (ArrayList<AbstractChannel>) mAdapter.getChannelList());
     }
 }

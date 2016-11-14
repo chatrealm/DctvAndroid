@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 
+import com.tinnvec.dctvandroid.channel.AbstractChannel;
+
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
 import io.vov.vitamio.widget.MediaController;
@@ -41,10 +43,10 @@ public class StreamVideoActivity extends Activity
 
         getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(this);
 
-        DctvChannel channel = getIntent().getExtras().getParcelable(LiveChannelsActivity.CHANNEL_DATA);
+        AbstractChannel channel = getIntent().getExtras().getParcelable(LiveChannelsActivity.CHANNEL_DATA);
         String title;
         if (channel != null) {
-            title = channel.friendlyalias;
+            title = channel.getFriendlyAlias();
         } else {
             title = "Unknown";
         }

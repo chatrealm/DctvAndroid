@@ -16,6 +16,7 @@
     <string name="video_error_server_unaccessible">Stream server not accessible</string>
     <string name="video_error_unknown_error">Unknown Error</string>
     <string name="video_error_youtube">Sorry, we can\'t play YouTube streams in this app yet. Please try the DCTV 24/7 channel.</string>
+    <string name="dctv_channels_url">%sapi/channelsv2.php</string>
 
 
 </resources>
