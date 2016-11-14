@@ -13,16 +13,21 @@ import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastState;
 import com.google.android.gms.cast.framework.CastStateListener;
 
+import java.util.Properties;
 
 
 public class JustChatActivity extends AppCompatActivity {
 
     private MenuItem mediaRouteMenuItem;
     private CastContext mCastContext;
+    private Properties appConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PropertyReader pReader = new PropertyReader(this);
+        appConfig = pReader.getMyProperties("app.properties");
+
         setContentView(R.layout.activity_just_chat);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -37,7 +42,7 @@ public class JustChatActivity extends AppCompatActivity {
         WebSettings settings = chatWebview.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
-        chatWebview.loadUrl("http://irc.chatrealm.net");
+        chatWebview.loadUrl(appConfig.getProperty("irc.web_url"));
     }
 
     @Override

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="youtube_api_key">AIzaSyCn_S7jGw365whP0LUnVdP0M1Ipx2s5IEE</string>
-    <string name="dctv_base_url">http://diamondclub.tv/</string>
-    <string name="dctv_ingest_base_url">http://ingest.diamondclub.tv/</string>
-
-
-</resources>

@@ -17,6 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by kev on 5/22/16.
@@ -28,12 +29,13 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<AbstractChann
     private final RecyclerView mRecyclerView;
     private final Context context;
     private final String dctvChannelsUrl;
+    private final Properties appConfig;
 
-    public LoadLiveChannelsTask(RecyclerView mRecyclerView) {
+    public LoadLiveChannelsTask(RecyclerView mRecyclerView, Properties app_config) {
         this.mRecyclerView = mRecyclerView;
+        this.appConfig = app_config;
         this.context = mRecyclerView.getContext();
-        String dctvBaseUrl = context.getString(R.string.dctv_base_url);
-        this.dctvChannelsUrl = String.format(context.getString(R.string.dctv_channels_url),  dctvBaseUrl);
+        this.dctvChannelsUrl = app_config.getProperty("api.dctv.channels_url");
 
     }
 
@@ -57,7 +59,7 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<AbstractChann
         HttpURLConnection urlConnection;
         InputStream in;
         List<AbstractChannel> liveChannels = new ArrayList<>();
-        liveChannels.add(DctvChannel.get247Channel(context));
+        liveChannels.add(DctvChannel.get247Channel(appConfig));
         try {
             url = new URL(dctvChannelsUrl);
             urlConnection = (HttpURLConnection) url.openConnection();

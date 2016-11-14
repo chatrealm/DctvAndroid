@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Properties;
+
 public abstract class AbstractChannel implements Parcelable {
     int channelID;
     int streamID;
@@ -33,7 +35,7 @@ public abstract class AbstractChannel implements Parcelable {
         streamUrl = in.readString();
     }
 
-    public abstract String getStreamUrl(Context context);
+    public abstract String getStreamUrl(Properties app_conf);
 
     public int getChannelID() {
         return channelID;

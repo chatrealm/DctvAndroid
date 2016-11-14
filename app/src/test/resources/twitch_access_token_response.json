@@ -1,0 +1,5 @@
+{
+  "token": "{\"adblock\":false,\"player_type\":null,\"platform\":null,\"user_id\":null,\"channel\":\"omgchad\",\"expires\":1479101293,\"chansub\":{\"view_until\":1924905600,\"restricted_bitrates\":[]},\"private\":{\"allowed_to_view\":true},\"privileged\":false,\"source_restricted\":false,\"https_required\":false,\"show_ads\":true,\"device_id\":\"b15533cf8c094e5f\"}",
+  "sig": "3b58919411ab56ce04980a42b4eb56f2ba311985",
+  "mobile_restricted": false
+}

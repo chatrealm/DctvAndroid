@@ -19,9 +19,4 @@
     <string name="pref_notify">Enable Notifications</string>
     <string name="pref_notify_summary">Enable Notifications</string>
 
-    <!-- app properties -->
-    <!-- TODO: consider moving to separate file -->
-    <string name="dctv_channels_url">%sapi/channelsv2.php</string>
-
-
 </resources>

@@ -8,6 +8,7 @@ import com.google.android.youtube.player.YouTubePlayerView;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 
 import java.security.Provider;
+import java.util.Properties;
 
 
 /**
@@ -15,14 +16,19 @@ import java.security.Provider;
  */
 public class YoutubeStreamActivity extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener {
 
+    private Properties appConfig;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PropertyReader pReader = new PropertyReader(this);
+        appConfig = pReader.getMyProperties("app.properties");
+
         setContentView(R.layout.activity_youtube_stream);
 
         YouTubePlayerView youTubeView = (YouTubePlayerView)
                 findViewById(R.id.yt_view);
-        String key = getResources().getString(R.string.youtube_api_key);
+        String key = appConfig.getProperty("api.youtube.api_key");
         youTubeView.initialize(key, this);
     }
 

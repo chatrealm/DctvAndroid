@@ -22,11 +22,13 @@ import com.tinnvec.dctvandroid.tasks.LoadLiveChannelsTask;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class LiveChannelsActivity extends AppCompatActivity implements ChannelListCallback {
 
     public static final String CHANNEL_DATA = "com.tinnvec.dctv_android.CHANNEL_MESSAGE";
     private static final String TAG = LiveChannelsActivity.class.getName();
+    private Properties appConfig;
     private RecyclerView mRecyclerView;
     private ChannelListAdapter mAdapter;
     private SwipeRefreshLayout swipeContainer;
@@ -41,6 +43,8 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        PropertyReader pReader = new PropertyReader(this);
+        appConfig = pReader.getMyProperties("app.properties");
         setContentView(R.layout.activity_live_channels);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -67,7 +71,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
             @Override
             public void onRefresh() {
 
-                new LoadLiveChannelsTask(mRecyclerView) {
+                new LoadLiveChannelsTask(mRecyclerView, appConfig) {
 
                     @Override
                     protected void onPostExecute(List<AbstractChannel> result) {
@@ -88,7 +92,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
         if (savedChannels != null) {
             mAdapter.addAll(savedChannels);
         } else {
-            new LoadLiveChannelsTask(mRecyclerView).execute();
+            new LoadLiveChannelsTask(mRecyclerView, appConfig).execute();
         }
     }
 

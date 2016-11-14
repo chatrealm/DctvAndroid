@@ -5,6 +5,8 @@ import android.os.Parcel;
 
 import com.tinnvec.dctvandroid.R;
 
+import java.util.Properties;
+
 public class DctvChannel extends AbstractChannel {
 
     public static final Creator<DctvChannel> CREATOR = new Creator<DctvChannel>() {
@@ -23,7 +25,7 @@ public class DctvChannel extends AbstractChannel {
         super(in);
     }
 
-    public static DctvChannel get247Channel(Context context) {
+    public static DctvChannel get247Channel(Properties app_config) {
         DctvChannel chan = new DctvChannel();
         chan.setFriendlyAlias("DCTV 24/7");
         chan.setName("dctv_247");
@@ -32,16 +34,16 @@ public class DctvChannel extends AbstractChannel {
         chan.setImageAssetUrl("http://i.imgur.com/GVeytTB.png");
         chan.setImageAssetHDUrl("http://i.imgur.com/GVeytTB.png");
 
-        String baseUrl = context.getString(R.string.dctv_ingest_base_url);
+        String baseUrl = app_config.getProperty("api.dctv.ingest_url");
         chan.setStreamUrl(String.format("%shls2/dctv.m3u8", baseUrl));
         return chan;
     }
 
     @Override
-    public String getStreamUrl(Context context) {
+    public String getStreamUrl(Properties app_config) {
         if (streamUrl != null) return streamUrl;
 
-        String baseUrl = context.getString(R.string.dctv_base_url);
+        String baseUrl = app_config.getProperty("api.dctv.base_url");
         return String.format("%sapi/hlsredirect.php?c=%d", baseUrl, channelID);
     }
 }

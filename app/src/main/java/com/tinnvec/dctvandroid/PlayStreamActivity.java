@@ -48,6 +48,7 @@ import com.tinnvec.dctvandroid.channel.DctvChannel;
 import com.tinnvec.dctvandroid.channel.YoutubeChannel;
 
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -80,6 +81,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private View mControllers;
     private boolean mControllersVisible;
     private Timer mControllersTimer;
+    private Properties appConfig;
 
     @SuppressLint("NewApi")
     @Override
@@ -88,11 +90,14 @@ public class PlayStreamActivity extends AppCompatActivity {
         Vitamio.isInitialized(getApplicationContext());
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        PropertyReader pReader = new PropertyReader(this);
+        appConfig = pReader.getMyProperties("app.properties");
+
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 
-        this.dctvBaseUrl = getString(R.string.dctv_base_url);
+        this.dctvBaseUrl = appConfig.getProperty("api.dctv.base_url");
 
         setContentView(R.layout.activity_play_stream);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -165,11 +170,11 @@ public class PlayStreamActivity extends AppCompatActivity {
         WebSettings settings = chatWebview.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
-        chatWebview.loadUrl("http://irc.chatrealm.net");
+        chatWebview.loadUrl(appConfig.getProperty("irc.web_url"));
 
         try {
-            vidView.setVideoPath(channel.getStreamUrl(this));
-            Log.d(TAG, "Setting url of the VideoView to: " + channel.getStreamUrl(this));
+            vidView.setVideoPath(channel.getStreamUrl(appConfig));
+            Log.d(TAG, "Setting url of the VideoView to: " + channel.getStreamUrl(appConfig));
             mPlaybackState = PlaybackState.PLAYING;
             updatePlayButton(mPlaybackState);
             if (mCastSession != null && mCastSession.isConnected()) {
@@ -297,7 +302,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         */
 
         if (channel.getName().equals("dctv_247")) {
-            streamUrl = channel.getStreamUrl(this);
+            streamUrl = channel.getStreamUrl(appConfig);
         } else {
             if (!channel.getName().equals("dctv") && channel instanceof DctvChannel) {
                 if (channel.getName().equals("frogpantsstudios") && channel instanceof DctvChannel) {
@@ -588,7 +593,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                 break;
 
             case IDLE:
-                vidView.setVideoURI(Uri.parse(channel.getStreamUrl(this)));
+                vidView.setVideoURI(Uri.parse(channel.getStreamUrl(appConfig)));
                 vidView.start();
                 mPlaybackState = PlaybackState.PLAYING;
                 break;

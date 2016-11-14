@@ -5,6 +5,8 @@ import android.os.Parcel;
 
 import com.tinnvec.dctvandroid.R;
 
+import java.util.Properties;
+
 public class YoutubeChannel extends AbstractChannel {
 
     public static final Creator<YoutubeChannel> CREATOR = new Creator<YoutubeChannel>() {
@@ -29,10 +31,10 @@ public class YoutubeChannel extends AbstractChannel {
 
     }
     @Override
-    public String getStreamUrl(Context context) {
+    public String getStreamUrl(Properties app_config) {
         if (streamUrl != null) return streamUrl;
 
-        String baseUrl = context.getString(R.string.dctv_base_url);
+        String baseUrl = app_config.getProperty("api.dctv.base_url");
         return String.format("%sapi/hlsredirect.php?c=%d", baseUrl, channelID);
     }
 
