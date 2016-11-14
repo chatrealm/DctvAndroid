@@ -4,16 +4,15 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -41,11 +40,9 @@ import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
 import com.squareup.picasso.Picasso;
+import com.tinnvec.dctvandroid.channel.AbstractChannel;
+import com.tinnvec.dctvandroid.channel.YoutubeChannel;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -53,7 +50,6 @@ import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
 import io.vov.vitamio.widget.VideoView;
 
-import static android.R.attr.duration;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 
@@ -64,7 +60,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private VideoView vidView;
     private String dctvBaseUrl;
     //converted to global for interaction with cast methods
-    private DctvChannel channel;
+    private AbstractChannel channel;
     // added for cast SDK v3
     private CastContext mCastContext;
     private MenuItem mediaRouteMenuItem;
@@ -101,30 +97,31 @@ public class PlayStreamActivity extends AppCompatActivity {
         mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
 
         channel = getIntent().getExtras().getParcelable(LiveChannelsActivity.CHANNEL_DATA);
-        String title;
-        if (channel != null) {
-            title = channel.friendlyalias;
+        if (channel == null)
+            throw new NullPointerException("No Channel passed to PlayStreamActivity");
+        String title = channel.getFriendlyAlias();
+        title = title != null ? title : "Unknown";
 
-            ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
-            String urlChannelart = channel.getBigChannelArtUrl();
+        ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
+        String urlChannelart = channel.getImageAssetHDUrl();
 
-            if (!Objects.equals(urlChannelart, "")){
-                Picasso.with(this)
-                        .load(urlChannelart)
-                        .into(channelArtView);
-            }else {
-                channelArtView.setImageDrawable(getResources().getDrawable(R.drawable.dctv_bg));
-            }
+        if (urlChannelart != null) {
+            Picasso.with(this)
+                    .load(urlChannelart)
+                    .into(channelArtView);
+        } else {
+            Drawable defaultArt = ResourcesCompat.getDrawable(getResources(), R.drawable.dctv_bg, null);
+            channelArtView.setImageDrawable(defaultArt);
+        }
 
 
    /*         Bitmap resizedBitmap = channel.getImageBitmap(this);
             Drawable smallerArt = new BitmapDrawable(getResources(), resizedBitmap);
             toolbar.setLogo(smallerArt);
             toolbar.setLogoDescription(R.string.channel_art_description);
+
+
  */
-        } else {
-            title = "Unknown";
-        }
 
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
@@ -163,27 +160,28 @@ public class PlayStreamActivity extends AppCompatActivity {
         chatWebview.loadUrl("http://irc.chatrealm.net");
 
         try {
-            if (channel != null) {
-                vidView.setVideoPath(channel.getStreamUrl(this));
-                Log.d(TAG, "Setting url of the VideoView to: " + channel.getStreamUrl(this));
-                mPlaybackState = PlaybackState.PLAYING;
-                updatePlayButton(mPlaybackState);
-                if (mCastSession != null && mCastSession.isConnected()) {
-                    updatePlaybackLocation(PlaybackLocation.REMOTE);
-                    loadRemoteMedia(true);
+            vidView.setVideoPath(channel.getStreamUrl(this));
+            Log.d(TAG, "Setting url of the VideoView to: " + channel.getStreamUrl(this));
+            mPlaybackState = PlaybackState.PLAYING;
+            updatePlayButton(mPlaybackState);
+            if (mCastSession != null && mCastSession.isConnected()) {
+                updatePlaybackLocation(PlaybackLocation.REMOTE);
+                loadRemoteMedia(true);
 //                    vidView.pause();
-                } else {
-                    updatePlaybackLocation(PlaybackLocation.LOCAL);
-                    vidView.setVideoPath(channel.getStreamUrl(this));
-                }
+            } else {
+                updatePlaybackLocation(PlaybackLocation.LOCAL);
             }
+
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
+            throw e;
         }
-        if (this.getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
-            hideSysUi();
-        } else if (this.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT && mLocation == PlaybackLocation.LOCAL) {
-            showSysUi();
+        if (mLocation == PlaybackLocation.LOCAL) {
+            if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
+                hideSysUi();
+            } else if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
+                showSysUi();
+            }
         }
     }
 
@@ -234,21 +232,20 @@ public class PlayStreamActivity extends AppCompatActivity {
 
             private void onApplicationConnected(CastSession castSession) {
                 mCastSession = castSession;
-                if (null != channel) {
 
-                    if (mPlaybackState == PlaybackState.PLAYING) {
-                        loadRemoteMedia(true);
-                        vidView.stopPlayback();
-                        updatePlaybackLocation(PlaybackLocation.REMOTE);
-                        mPlaybackState = PlaybackState.IDLE;
+                if (mPlaybackState == PlaybackState.PLAYING) {
+                    loadRemoteMedia(true);
+                    vidView.stopPlayback();
+                    updatePlaybackLocation(PlaybackLocation.REMOTE);
+                    mPlaybackState = PlaybackState.IDLE;
 //                        mediaPlayer.stop();
 //                        finish();
-                        return;
-                    } else {
-                        mPlaybackState = PlaybackState.IDLE;
-                        updatePlaybackLocation(PlaybackLocation.REMOTE);
-                    }
+                    return;
+                } else {
+                    mPlaybackState = PlaybackState.IDLE;
+                    updatePlaybackLocation(PlaybackLocation.REMOTE);
                 }
+
                 updatePlayButton(mPlaybackState);
                 invalidateOptionsMenu();
             }
@@ -278,38 +275,13 @@ public class PlayStreamActivity extends AppCompatActivity {
     private MediaInfo buildMediaInfo() {
         MediaMetadata movieMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
 
-        movieMetadata.putString(MediaMetadata.KEY_SUBTITLE, channel.getChannelname());
+        movieMetadata.putString(MediaMetadata.KEY_SUBTITLE, channel.getName());
         movieMetadata.putString(MediaMetadata.KEY_TITLE, channel.getFriendlyAlias());
-        movieMetadata.addImage(new WebImage(Uri.parse(channel.getBigChannelArtUrl())));
-        movieMetadata.addImage(new WebImage(Uri.parse(channel.getChannelArtUrl())));
+        movieMetadata.addImage(new WebImage(Uri.parse(channel.getImageAssetHDUrl())));
+        movieMetadata.addImage(new WebImage(Uri.parse(channel.getImageAssetUrl())));
 
-        String streamUrl = null;
-        if (channel.getChannelname().equals("dctv")) {
-            streamUrl = channel.getStreamUrl(this);
-        } else {
-            if (!channel.getChannelname().equals("dctv") && channel.getStreamtype().equals("rtmp-hls")) {
-                if (channel.getChannelname().equals("frogpantsstudios") && channel.getStreamtype().equals("rtmp-hls")) {
-                    streamUrl = "http://ingest.diamondclub.tv/high/" + "scottjohnson" + ".m3u8";
-                } else if (channel.getChannelname().equals("sgtmuffin") && channel.getStreamtype().equals("rtmp-hls")) {
-                    streamUrl = "http://ingest.diamondclub.tv/high/" + "muffin" + ".m3u8";
-                } else if (channel.getChannelname().equals("musicnews") && channel.getStreamtype().equals("rtmp-hls")) {
-                    streamUrl = "http://ingest.diamondclub.tv/high/" + "kristikates" + ".m3u8";
-                } else {
-                    streamUrl = "http://ingest.diamondclub.tv/high/" + channel.getChannelname() + ".m3u8";
-                }
-            } else {
-                Context context = getApplicationContext();
-                CharSequence text = "Sorry, we can't cast this stream for now. Maybe the 24/7 channel shows your show?";
-                int duration = Toast.LENGTH_LONG;
+        String streamUrl = channel.getStreamUrl(this);
 
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-
-                updatePlaybackLocation(PlaybackLocation.LOCAL);
-
-                return null;
-            }
-        }
         Log.d(TAG, "Passing this url to cast: " + streamUrl);
 
         return new MediaInfo.Builder(streamUrl)
@@ -421,7 +393,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                     msg = getString(R.string.video_error_media_load_timeout);
                 } else if (what == android.media.MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
                     msg = getString(R.string.video_error_server_unaccessible);
-                } else if (Objects.equals(channel.getStreamtype(), "youtube")) {
+                } else if (channel instanceof YoutubeChannel) {
                     msg = getString(R.string.video_error_youtube);
                 } else {
                     msg = getString(R.string.video_error_unknown_error);
@@ -520,19 +492,14 @@ public class PlayStreamActivity extends AppCompatActivity {
                 mLoading.setVisibility(View.INVISIBLE);
                 mPlayPause.setVisibility(View.VISIBLE);
                 mPlayPause.setImageDrawable(
-                        getResources().getDrawable(R.drawable.big_pause_button));
+                        ResourcesCompat.getDrawable(getResources(), R.drawable.big_pause_button, null));
                 break;
             case PAUSED:
-                mLoading.setVisibility(View.INVISIBLE);
-                mPlayPause.setVisibility(View.VISIBLE);
-                mPlayPause.setImageDrawable(
-                        getResources().getDrawable(R.drawable.big_play_button));
-                break;
             case IDLE:
                 mLoading.setVisibility(View.INVISIBLE);
                 mPlayPause.setVisibility(View.VISIBLE);
                 mPlayPause.setImageDrawable(
-                        getResources().getDrawable(R.drawable.big_play_button));
+                        ResourcesCompat.getDrawable(getResources(), R.drawable.big_play_button, null));
                 break;
             case BUFFERING:
                 mPlayPause.setVisibility(View.INVISIBLE);
