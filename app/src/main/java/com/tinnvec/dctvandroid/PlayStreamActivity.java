@@ -423,9 +423,11 @@ public class PlayStreamActivity extends AppCompatActivity {
                 builder.setItems(qualities, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // the user clicked on colors[which]
-                        currentQuality = channel.getAllowedQualities()[which];
-                        videoQualityChanged();
+                        Quality newQuality = channel.getAllowedQualities()[which];
+                        if (newQuality != currentQuality) {
+                            currentQuality = newQuality;
+                            videoQualityChanged();
+                        }
                     }
                 });
                 builder.show();
