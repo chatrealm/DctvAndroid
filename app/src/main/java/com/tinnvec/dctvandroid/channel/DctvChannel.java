@@ -6,6 +6,7 @@ import android.os.Parcel;
 import com.tinnvec.dctvandroid.R;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import static android.R.attr.format;
@@ -37,14 +38,23 @@ public class DctvChannel extends AbstractChannel {
         chan.setImageAssetUrl("http://i.imgur.com/6hsN55B.png");
         chan.setImageAssetHDUrl("http://i.imgur.com/GVeytTB.png");
 
-        String baseUrl = app_config.getProperty("api.dctv.ingest_url");
-        chan.setStreamUrl(String.format("%shls2/dctv.m3u8", baseUrl));
+        chan.setStreamUrl(String.format("dctv.m3u8"));
         return chan;
     }
 
     @Override
     public String getStreamUrl(Properties app_config, Quality quality) {
-        if (streamUrl != null) return streamUrl;
+        if (streamUrl != null) {
+            String quality247;
+            if (quality.toString().equals("source")) {
+                quality247 = "hls2";
+            } else {
+                quality247 = quality.toString();
+            }
+            String baseUrl = app_config.getProperty("api.dctv.ingest_url");
+            String url247 = String.format("%s%s/%s", baseUrl, quality247, streamUrl);
+            return url247;
+        }
         String baseUrl = app_config.getProperty("api.dctv.base_url");
         String url = String.format("%sapi/hlsredirect.php?c=%d&q=%s", baseUrl, channelID, quality.toString());
         return url;
