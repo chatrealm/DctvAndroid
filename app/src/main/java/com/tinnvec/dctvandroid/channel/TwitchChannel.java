@@ -31,7 +31,7 @@ public class TwitchChannel extends AbstractChannel {
     public String getStreamUrl(Properties app_config, Quality quality) {
         if (streamUrl != null) return streamUrl;
         String baseUrl = app_config.getProperty("api.dctv.base_url");
-        String url = String.format("%sapi/hlsredirect.php?c=%d&q=%s", baseUrl, channelID, quality.toString());
+        String url = String.format("%sapi/hlsredirect.php?c=%d&q=%s", baseUrl, channelID, quality.toString().toLowerCase());
         return url;
     }
 
