@@ -36,7 +36,7 @@ public class ResolveStreamUrlTask  extends AsyncTask<String, Void, String> {
             String redirectUrl = urlConnection.getHeaderField("Location");
             return resolveStreamUrl(redirectUrl);
         }
-        return streamUrl;
+        return urlConnection.getURL().toString();
     }
 
     @Override
