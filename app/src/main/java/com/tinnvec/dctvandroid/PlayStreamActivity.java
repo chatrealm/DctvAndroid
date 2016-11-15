@@ -198,9 +198,14 @@ public class PlayStreamActivity extends AppCompatActivity {
             if (mCastSession != null && mCastSession.isConnected()) {
                 updatePlaybackLocation(PlaybackLocation.REMOTE);
                 RemoteMediaClient remoteMediaClient = mCastSession.getRemoteMediaClient();
-                if (!remoteMediaClient.getMediaInfo().getMetadata().getString(MediaMetadata.KEY_TITLE).equals(channel.getFriendlyAlias())) {
+                if (remoteMediaClient.getMediaInfo() == null)
+                {
                     loadRemoteMedia(true);
-//                    vidView.pause();
+                }
+                else if (remoteMediaClient.getMediaInfo() != null){
+                    if (!remoteMediaClient.getMediaInfo().getMetadata().getString(MediaMetadata.KEY_TITLE).equals(channel.getFriendlyAlias())) {
+                        loadRemoteMedia(true);
+                    }
                 }
             } else {
                 updatePlaybackLocation(PlaybackLocation.LOCAL);
