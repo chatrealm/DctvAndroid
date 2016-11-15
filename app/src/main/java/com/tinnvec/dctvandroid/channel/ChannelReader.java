@@ -37,8 +37,8 @@ public class ChannelReader {
         chan.setNowOnline(nowonline.equals("yes"));
         chan.setHasAlerts(alerts);
         chan.setDescription(twitch_yt_description);
-        chan.setImageAssetUrl(imageasset);
-        chan.setImageAssetHDUrl(imageassethd);
+        chan.setImageAssetUrl(imageasset.isEmpty() ? null : imageasset);
+        chan.setImageAssetHDUrl(imageassethd.isEmpty() ? null : imageassethd);
         chan.setUrlToPlayer(urltoplayer);
     }
 

@@ -109,7 +109,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         setContentView(R.layout.activity_play_stream);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        currentQuality = Quality.valueOf(sharedPreferences.getString("stream_quality", "high"));
+        currentQuality = Quality.valueOf(sharedPreferences.getString("stream_quality", "high").toUpperCase());
 
         // for cast SDK v3
 //        setupControlsCallbacks();
@@ -127,7 +127,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
         String urlChannelart = channel.getImageAssetHDUrl();
 
-        if (!Objects.equals(urlChannelart, "")) {
+        if (urlChannelart != null) {
             Picasso.with(this)
                     .load(urlChannelart)
                     .into(channelArtView);
@@ -309,8 +309,10 @@ public class PlayStreamActivity extends AppCompatActivity {
 
         movieMetadata.putString(MediaMetadata.KEY_SUBTITLE, channel.getName());
         movieMetadata.putString(MediaMetadata.KEY_TITLE, channel.getFriendlyAlias());
-        movieMetadata.addImage(new WebImage(Uri.parse(channel.getImageAssetHDUrl())));
-        movieMetadata.addImage(new WebImage(Uri.parse(channel.getImageAssetUrl())));
+        if (channel.getImageAssetHDUrl() != null)
+            movieMetadata.addImage(new WebImage(Uri.parse(channel.getImageAssetHDUrl())));
+        if (channel.getImageAssetUrl() != null)
+            movieMetadata.addImage(new WebImage(Uri.parse(channel.getImageAssetUrl())));
 
         String streamUrl;
 
