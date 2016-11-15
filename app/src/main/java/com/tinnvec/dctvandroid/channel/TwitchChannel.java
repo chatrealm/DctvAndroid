@@ -1,12 +1,7 @@
 package com.tinnvec.dctvandroid.channel;
 
 
-import android.content.Context;
 import android.os.Parcel;
-
-import com.tinnvec.dctvandroid.R;
-
-import java.util.Properties;
 
 public class TwitchChannel extends AbstractChannel {
     public static final Creator<TwitchChannel> CREATOR = new Creator<TwitchChannel>() {
@@ -26,13 +21,6 @@ public class TwitchChannel extends AbstractChannel {
     public TwitchChannel(Parcel in) {
         super(in);
         currentGame = in.readString();
-    }
-    @Override
-    public String getStreamUrl(Properties app_config, Quality quality) {
-        if (streamUrl != null) return streamUrl;
-        String baseUrl = app_config.getProperty("api.dctv.base_url");
-        String url = String.format("%sapi/hlsredirect.php?c=%d&q=%s", baseUrl, channelID, quality.toString().toLowerCase());
-        return url;
     }
 
     @Override

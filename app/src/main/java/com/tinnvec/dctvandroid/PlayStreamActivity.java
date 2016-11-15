@@ -55,6 +55,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
@@ -70,7 +71,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private final Handler mHandler = new Handler();
     private ProgressDialog progressDialog;
     private VideoView vidView;
-    private String dctvBaseUrl;
+    private String streamUrl;
     //converted to global for interaction with cast methods
     private AbstractChannel channel;
     // added for cast SDK v3
@@ -95,6 +96,10 @@ public class PlayStreamActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Vitamio.isInitialized(getApplicationContext());
 
+        channel = getIntent().getExtras().getParcelable(LiveChannelsActivity.CHANNEL_DATA);
+        if (channel == null)
+            throw new NullPointerException("No Channel passed to PlayStreamActivity");
+
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         PropertyReader pReader = new PropertyReader(this);
         appConfig = pReader.getMyProperties("app.properties");
@@ -104,12 +109,11 @@ public class PlayStreamActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 
-        this.dctvBaseUrl = appConfig.getProperty("api.dctv.base_url");
-
         setContentView(R.layout.activity_play_stream);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         currentQuality = Quality.valueOf(sharedPreferences.getString("stream_quality", "high").toUpperCase());
+        this.streamUrl = channel.getStreamUrl(appConfig, currentQuality);
 
         // for cast SDK v3
 //        setupControlsCallbacks();
@@ -118,9 +122,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
         mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
 
-        channel = getIntent().getExtras().getParcelable(LiveChannelsActivity.CHANNEL_DATA);
-        if (channel == null)
-            throw new NullPointerException("No Channel passed to PlayStreamActivity");
         String title = channel.getFriendlyAlias();
         title = title != null ? title : "Unknown";
 
@@ -190,8 +191,8 @@ public class PlayStreamActivity extends AppCompatActivity {
         chatWebview.loadUrl(url);
 
         try {
-            vidView.setVideoPath(channel.getStreamUrl(appConfig, currentQuality));
-            Log.d(TAG, "Setting url of the VideoView to: " + channel.getStreamUrl(appConfig, currentQuality));
+            vidView.setVideoPath(streamUrl);
+            Log.d(TAG, "Setting url of the VideoView to: " + streamUrl);
             mPlaybackState = PLAYING;
             updatePlayButton(mPlaybackState);
             if (mCastSession != null && mCastSession.isConnected()) {
@@ -314,41 +315,16 @@ public class PlayStreamActivity extends AppCompatActivity {
         if (channel.getImageAssetUrl() != null)
             movieMetadata.addImage(new WebImage(Uri.parse(channel.getImageAssetUrl())));
 
-        String streamUrl;
-
-        /*
-        // constructing the direct stream url, as the redirect api doesn't work for chromecast
-        */
-
-        if (channel.getName().equals("dctv_247")) {
-            streamUrl = channel.getStreamUrl(appConfig, currentQuality);
-        } else {
-            if (!channel.getName().equals("dctv") && channel instanceof DctvChannel) {
-                if (channel.getName().equals("frogpantsstudios") && channel instanceof DctvChannel) {
-                    streamUrl = "http://ingest.diamondclub.tv/high/" + "scottjohnson" + ".m3u8";
-                } else if (channel.getName().equals("sgtmuffin") && channel instanceof DctvChannel) {
-                    streamUrl = "http://ingest.diamondclub.tv/high/" + "muffin" + ".m3u8";
-                } else if (channel.getName().equals("musicnews") && channel instanceof DctvChannel) {
-                    streamUrl = "http://ingest.diamondclub.tv/high/" + "kristikates" + ".m3u8";
-                } else {
-                    streamUrl = "http://ingest.diamondclub.tv/high/" + channel.getName() + ".m3u8";
-                }
-            } else {
-                Context context = getApplicationContext();
-                CharSequence text = "Sorry, we can't cast this stream for now. Maybe the 24/7 channel shows it?";
-                int duration = Toast.LENGTH_LONG;
-
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-                updatePlaybackLocation(PlaybackLocation.LOCAL);
-
-                return null;
-            }
+        String resolvedStreamUrl = "";
+        try {
+            resolvedStreamUrl = channel.getResolvedStreamUrl(streamUrl);
+        } catch (InterruptedException | ExecutionException ex) {
+            Log.e(TAG, "Exception when trying to get full Stream URL", ex);
         }
 
-        Log.d(TAG, "Passing this url to ChromeCast: " + streamUrl);
+        Log.d(TAG, "Passing this url to ChromeCast: " + resolvedStreamUrl);
 
-        return new MediaInfo.Builder(streamUrl)
+        return new MediaInfo.Builder(resolvedStreamUrl)
                 .setStreamType(MediaInfo.STREAM_TYPE_LIVE)
                 .setContentType("videos/m3u8")
                 .setMetadata(movieMetadata)
@@ -594,7 +570,8 @@ public class PlayStreamActivity extends AppCompatActivity {
     private void videoQualityChanged() {
         if (mLocation.equals(PlaybackLocation.LOCAL) && mPlaybackState.equals(PlaybackState.PLAYING)) {
             vidView.pause();
-            vidView.setVideoURI(Uri.parse(channel.getStreamUrl(appConfig, currentQuality)));
+            this.streamUrl = channel.getStreamUrl(appConfig, currentQuality);
+            vidView.setVideoURI(Uri.parse(this.streamUrl));
             vidView.start();
         }
     }
@@ -622,7 +599,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                 break;
 
             case IDLE:
-                vidView.setVideoURI(Uri.parse(channel.getStreamUrl(appConfig, currentQuality)));
+                vidView.setVideoURI(Uri.parse(streamUrl));
                 vidView.start();
                 mPlaybackState = PLAYING;
                 break;
