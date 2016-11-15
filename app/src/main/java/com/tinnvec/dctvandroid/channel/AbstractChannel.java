@@ -21,7 +21,10 @@ public abstract class AbstractChannel implements Parcelable {
     String urlToPlayer;
     String streamUrl;
 
-    public AbstractChannel() {};
+    public AbstractChannel() {
+    }
+
+    ;
 
     public AbstractChannel(Parcel in) {
         channelID = in.readInt();
@@ -38,7 +41,7 @@ public abstract class AbstractChannel implements Parcelable {
     }
 
     public String getStreamUrl(Properties app_config, Quality quality) {
-        if (streamUrl.equals("dctv.m3u8")) {
+        if (streamUrl != null) {
             String quality247;
             if (quality.toString().equals("SOURCE")) {
                 quality247 = "hls2";
@@ -48,13 +51,14 @@ public abstract class AbstractChannel implements Parcelable {
             String baseUrl = app_config.getProperty("api.dctv.ingest_url");
             String url247 = String.format("%s%s/%s", baseUrl, quality247, streamUrl);
             return url247;
+        } else {
+            String baseUrl = app_config.getProperty("api.dctv.base_url");
+            String url = String.format("%sapi/hlsredirect.php?c=%d&q=%s", baseUrl, channelID, quality.toString().toLowerCase());
+            return url;
         }
-        String baseUrl = app_config.getProperty("api.dctv.base_url");
-        String url = String.format("%sapi/hlsredirect.php?c=%d&q=%s", baseUrl, channelID, quality.toString().toLowerCase());
-        return url;
     }
 
-    public String getResolvedStreamUrl(String url) throws ExecutionException, InterruptedException{
+    public String getResolvedStreamUrl(String url) throws ExecutionException, InterruptedException {
         ResolveStreamUrlTask task = new ResolveStreamUrlTask();
         return task.execute(url).get();
     }
@@ -65,20 +69,40 @@ public abstract class AbstractChannel implements Parcelable {
         return channelID;
     }
 
+    public void setChannelID(int channelID) {
+        this.channelID = channelID;
+    }
+
     public int getStreamID() {
         return streamID;
+    }
+
+    public void setStreamID(int streamID) {
+        this.streamID = streamID;
     }
 
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getFriendlyAlias() {
         return friendlyAlias;
     }
 
+    public void setFriendlyAlias(String friendlyAlias) {
+        this.friendlyAlias = friendlyAlias;
+    }
+
     public boolean isNowOnline() {
         return nowOnline;
+    }
+
+    public void setNowOnline(boolean nowOnline) {
+        this.nowOnline = nowOnline;
     }
 
     public boolean hasAlerts() {
@@ -89,29 +113,29 @@ public abstract class AbstractChannel implements Parcelable {
         return imageAssetUrl;
     }
 
+    public void setImageAssetUrl(String imageAssetUrl) {
+        this.imageAssetUrl = imageAssetUrl;
+    }
+
     public String getImageAssetHDUrl() {
         return imageAssetHDUrl;
+    }
+
+    public void setImageAssetHDUrl(String imageAssetHDUrl) {
+        this.imageAssetHDUrl = imageAssetHDUrl;
     }
 
     public String getUrlToPlayer() {
         return urlToPlayer;
     }
 
+    public void setUrlToPlayer(String urlToPlayer) {
+        this.urlToPlayer = urlToPlayer;
+    }
+
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    public void setChannelID(int channelID) {
-        this.channelID = channelID;
-    }
-
-    public void setStreamID(int streamID) {
-        this.streamID = streamID;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDescription() {
@@ -122,28 +146,8 @@ public abstract class AbstractChannel implements Parcelable {
         this.description = description;
     }
 
-    public void setFriendlyAlias(String friendlyAlias) {
-        this.friendlyAlias = friendlyAlias;
-    }
-
-    public void setNowOnline(boolean nowOnline) {
-        this.nowOnline = nowOnline;
-    }
-
     public void setHasAlerts(boolean hasAlerts) {
         this.hasAlerts = hasAlerts;
-    }
-
-    public void setImageAssetUrl(String imageAssetUrl) {
-        this.imageAssetUrl = imageAssetUrl;
-    }
-
-    public void setImageAssetHDUrl(String imageAssetHDUrl) {
-        this.imageAssetHDUrl = imageAssetHDUrl;
-    }
-
-    public void setUrlToPlayer(String urlToPlayer) {
-        this.urlToPlayer = urlToPlayer;
     }
 
     public void setStreamUrl(String streamUrl) {
