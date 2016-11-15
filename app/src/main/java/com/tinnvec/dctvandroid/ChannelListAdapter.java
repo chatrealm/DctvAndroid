@@ -57,8 +57,8 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     @Override
     public void onBindViewHolder(ChannelViewHolder holder, int position) {
         final AbstractChannel chan = channelList.get(position);
-
-        new ImageDownloaderTask(holder.channelArt).execute(chan.getImageAssetUrl());
+        if (chan.getImageAssetUrl() != null)
+            new ImageDownloaderTask(holder.channelArt).execute(chan.getImageAssetUrl());
 
         holder.channelName.setText(chan.getFriendlyAlias());
         holder.channelName.setSelected(true);

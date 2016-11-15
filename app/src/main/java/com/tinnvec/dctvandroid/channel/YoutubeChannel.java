@@ -40,7 +40,7 @@ public class YoutubeChannel extends AbstractChannel {
 
     @Override
     public Quality[] getAllowedQualities() {
-        return new Quality[] {Quality.high};
+        return new Quality[] {Quality.HIGH};
     }
 
     @Override

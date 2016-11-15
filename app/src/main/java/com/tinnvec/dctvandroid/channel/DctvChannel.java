@@ -1,14 +1,8 @@
 package com.tinnvec.dctvandroid.channel;
 
-import android.content.Context;
 import android.os.Parcel;
 
-import com.tinnvec.dctvandroid.R;
-
-import java.util.List;
 import java.util.Properties;
-
-import static android.R.attr.format;
 
 public class DctvChannel extends AbstractChannel {
 
@@ -42,13 +36,6 @@ public class DctvChannel extends AbstractChannel {
         return chan;
     }
 
-    @Override
-    public String getStreamUrl(Properties app_config, Quality quality) {
-        if (streamUrl != null) return streamUrl;
-        String baseUrl = app_config.getProperty("api.dctv.base_url");
-        String url = String.format("%sapi/hlsredirect.php?c=%d&q=%s", baseUrl, channelID, quality.toString());
-        return url;
-    }
 
     @Override
     public Quality[] getAllowedQualities() {

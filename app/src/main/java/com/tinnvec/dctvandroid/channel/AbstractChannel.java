@@ -1,11 +1,12 @@
 package com.tinnvec.dctvandroid.channel;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.List;
+import com.tinnvec.dctvandroid.tasks.ResolveStreamUrlTask;
+
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
 public abstract class AbstractChannel implements Parcelable {
     int channelID;
@@ -36,13 +37,17 @@ public abstract class AbstractChannel implements Parcelable {
         streamUrl = in.readString();
     }
 
-    public abstract String getStreamUrl(Properties app_conf, Quality quality);
-
-    public String getDirectStreamUrl(Properties app_config, Quality quality) {
-        String url = getStreamUrl(app_config, quality);
-        throw new UnsupportedOperationException("need to implement method");
+    public String getStreamUrl(Properties app_config, Quality quality) {
+        if (streamUrl != null) return streamUrl;
+        String baseUrl = app_config.getProperty("api.dctv.base_url");
+        String url = String.format("%sapi/hlsredirect.php?c=%d&q=%s", baseUrl, channelID, quality.toString().toLowerCase());
+        return url;
     }
 
+    public String getResolvedStreamUrl(String url) throws ExecutionException, InterruptedException{
+        ResolveStreamUrlTask task = new ResolveStreamUrlTask();
+        return task.execute(url).get();
+    }
 
     public abstract Quality[] getAllowedQualities();
 

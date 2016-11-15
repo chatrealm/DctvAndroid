@@ -28,7 +28,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
         // Set summary to be the user-description for the selected value
         String chatName = sharedPreferences.getString("chat_name", "");
-        if (chatName != null && !"".equals(chatName)) {
+        if (!chatName.isEmpty()) {
             connectionPref.setSummary(chatName);
         }
 
@@ -38,7 +38,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         qualityPreference.setEntryValues(Quality.allAsStrings());
 
         String streamQuality = sharedPreferences.getString("stream_quality", "");
-        if (streamQuality != null && !"".equals(streamQuality)) {
+        if (!streamQuality.isEmpty()) {
             qualityPreference.setSummary(streamQuality);
         }
     }

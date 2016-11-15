@@ -6,9 +6,9 @@ package com.tinnvec.dctvandroid.channel;
  * Created by kev on 11/14/16.
  */
 public enum Quality {
-    source,
-    high,
-    low;
+    SOURCE,
+    HIGH,
+    LOW;
 
     public static String[] allAsStrings() {
         return allAsStrings(values());
@@ -21,7 +21,7 @@ public enum Quality {
     public static String[] allAsStrings(Quality[] enums) {
         String[] vals = new String[enums.length];
         for (int i = 0; i < enums.length; i++) {
-            vals[i] = enums[i].toString();
+            vals[i] = enums[i].toString().toLowerCase();
         }
         return vals;
     }
