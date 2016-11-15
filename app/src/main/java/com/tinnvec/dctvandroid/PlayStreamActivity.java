@@ -569,10 +569,8 @@ public class PlayStreamActivity extends AppCompatActivity {
 
     private void videoQualityChanged() {
         this.streamUrl = channel.getStreamUrl(appConfig, currentQuality);
-        if (mLocation == PlaybackLocation.LOCAL && mPlaybackState == PlaybackState.PLAYING) {
-            vidView.pause();
-            vidView.setVideoURI(Uri.parse(this.streamUrl));
-            vidView.start();
+        if (mLocation == PlaybackLocation.LOCAL) {
+            vidView.setVideoPath(this.streamUrl);
         } else if (mCastSession != null && mCastSession.isConnected()) {
             // reload chromecast
             loadRemoteMedia(true);
@@ -602,7 +600,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                 break;
 
             case IDLE:
-                vidView.setVideoURI(Uri.parse(streamUrl));
+                vidView.setVideoPath(streamUrl);
                 vidView.start();
                 mPlaybackState = PLAYING;
                 break;
