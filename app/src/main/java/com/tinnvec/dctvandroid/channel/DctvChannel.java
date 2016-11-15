@@ -31,8 +31,7 @@ public class DctvChannel extends AbstractChannel {
         chan.setImageAssetUrl("http://i.imgur.com/6hsN55B.png");
         chan.setImageAssetHDUrl("http://i.imgur.com/GVeytTB.png");
 
-        String baseUrl = app_config.getProperty("api.dctv.ingest_url");
-        chan.setStreamUrl(String.format("%shls2/dctv.m3u8", baseUrl));
+        chan.setStreamUrl(String.format("dctv.m3u8"));
         return chan;
     }
 

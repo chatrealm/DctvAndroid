@@ -38,7 +38,17 @@ public abstract class AbstractChannel implements Parcelable {
     }
 
     public String getStreamUrl(Properties app_config, Quality quality) {
-        if (streamUrl != null) return streamUrl;
+        if (streamUrl.equals("dctv.m3u8")) {
+            String quality247;
+            if (quality.toString().equals("SOURCE")) {
+                quality247 = "hls2";
+            } else {
+                quality247 = quality.toString().toLowerCase();
+            }
+            String baseUrl = app_config.getProperty("api.dctv.ingest_url");
+            String url247 = String.format("%s%s/%s", baseUrl, quality247, streamUrl);
+            return url247;
+        }
         String baseUrl = app_config.getProperty("api.dctv.base_url");
         String url = String.format("%sapi/hlsredirect.php?c=%d&q=%s", baseUrl, channelID, quality.toString().toLowerCase());
         return url;
