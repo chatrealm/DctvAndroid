@@ -31,11 +31,16 @@ public class YoutubeChannel extends AbstractChannel {
 
     }
     @Override
-    public String getStreamUrl(Properties app_config) {
+    public String getStreamUrl(Properties app_config, Quality quality) {
         if (streamUrl != null) return streamUrl;
 
         String baseUrl = app_config.getProperty("api.dctv.base_url");
         return String.format("%sapi/hlsredirect.php?c=%d", baseUrl, channelID);
+    }
+
+    @Override
+    public Quality[] getAllowedQualities() {
+        return new Quality[] {Quality.high};
     }
 
     @Override

@@ -5,7 +5,10 @@ import android.os.Parcel;
 
 import com.tinnvec.dctvandroid.R;
 
+import java.util.List;
 import java.util.Properties;
+
+import static android.R.attr.format;
 
 public class DctvChannel extends AbstractChannel {
 
@@ -40,10 +43,15 @@ public class DctvChannel extends AbstractChannel {
     }
 
     @Override
-    public String getStreamUrl(Properties app_config) {
+    public String getStreamUrl(Properties app_config, Quality quality) {
         if (streamUrl != null) return streamUrl;
-
         String baseUrl = app_config.getProperty("api.dctv.base_url");
-        return String.format("%sapi/hlsredirect.php?c=%d", baseUrl, channelID);
+        String url = String.format("%sapi/hlsredirect.php?c=%d&q=%s", baseUrl, channelID, quality.toString());
+        return url;
+    }
+
+    @Override
+    public Quality[] getAllowedQualities() {
+        return Quality.values();
     }
 }

@@ -2,9 +2,12 @@ package com.tinnvec.dctvandroid;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+
+import com.tinnvec.dctvandroid.channel.Quality;
 
 import static android.R.attr.key;
 import static android.R.attr.y;
@@ -28,6 +31,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if (chatName != null && !"".equals(chatName)) {
             connectionPref.setSummary(chatName);
         }
+
+        // set quality list from Quality enum
+        ListPreference qualityPreference = (ListPreference) findPreference("stream_quality");
+        qualityPreference.setEntries(Quality.allAsStrings());
+        qualityPreference.setEntryValues(Quality.allAsStrings());
+
+        String streamQuality = sharedPreferences.getString("stream_quality", "");
+        if (streamQuality != null && !"".equals(streamQuality)) {
+            qualityPreference.setSummary(streamQuality);
+        }
     }
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
@@ -36,6 +49,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             Preference connectionPref = findPreference(key);
             // Set summary to be the user-description for the selected value
             connectionPref.setSummary(sharedPreferences.getString(key, ""));
+        } else if (key.equals("stream_quality")) {
+            Preference qualityPref = findPreference("stream_quality");
+            qualityPref.setSummary(sharedPreferences.getString(key, ""));
         }
     }
 

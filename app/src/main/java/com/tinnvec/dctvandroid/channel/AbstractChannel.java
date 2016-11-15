@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.List;
 import java.util.Properties;
 
 public abstract class AbstractChannel implements Parcelable {
@@ -35,7 +36,15 @@ public abstract class AbstractChannel implements Parcelable {
         streamUrl = in.readString();
     }
 
-    public abstract String getStreamUrl(Properties app_conf);
+    public abstract String getStreamUrl(Properties app_conf, Quality quality);
+
+    public String getDirectStreamUrl(Properties app_config, Quality quality) {
+        String url = getStreamUrl(app_config, quality);
+        throw new UnsupportedOperationException("need to implement method");
+    }
+
+
+    public abstract Quality[] getAllowedQualities();
 
     public int getChannelID() {
         return channelID;

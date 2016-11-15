@@ -28,11 +28,16 @@ public class TwitchChannel extends AbstractChannel {
         currentGame = in.readString();
     }
     @Override
-    public String getStreamUrl(Properties app_config) {
+    public String getStreamUrl(Properties app_config, Quality quality) {
         if (streamUrl != null) return streamUrl;
-
         String baseUrl = app_config.getProperty("api.dctv.base_url");
-        return String.format("%sapi/hlsredirect.php?c=%d", baseUrl, channelID);
+        String url = String.format("%sapi/hlsredirect.php?c=%d&q=%s", baseUrl, channelID, quality.toString());
+        return url;
+    }
+
+    @Override
+    public Quality[] getAllowedQualities() {
+        return Quality.values();
     }
 
     @Override

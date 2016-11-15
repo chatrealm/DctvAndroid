@@ -46,6 +46,7 @@ import com.google.android.gms.common.images.WebImage;
 import com.squareup.picasso.Picasso;
 import com.tinnvec.dctvandroid.channel.AbstractChannel;
 import com.tinnvec.dctvandroid.channel.DctvChannel;
+import com.tinnvec.dctvandroid.channel.Quality;
 import com.tinnvec.dctvandroid.channel.YoutubeChannel;
 
 import java.io.UnsupportedEncodingException;
@@ -62,6 +63,7 @@ import io.vov.vitamio.widget.VideoView;
 import static android.R.drawable.ic_menu_sort_by_size;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
+import static com.tinnvec.dctvandroid.PlayStreamActivity.PlaybackState.PLAYING;
 
 public class PlayStreamActivity extends AppCompatActivity {
     private static final String TAG = PlayStreamActivity.class.getName();
@@ -85,6 +87,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private boolean mControllersVisible;
     private Timer mControllersTimer;
     private Properties appConfig;
+    private Quality currentQuality;
 
     @SuppressLint("NewApi")
     @Override
@@ -105,6 +108,8 @@ public class PlayStreamActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_play_stream);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        currentQuality = Quality.valueOf(sharedPreferences.getString("stream_quality", "high"));
 
         // for cast SDK v3
 //        setupControlsCallbacks();
@@ -185,9 +190,9 @@ public class PlayStreamActivity extends AppCompatActivity {
         chatWebview.loadUrl(url);
 
         try {
-            vidView.setVideoPath(channel.getStreamUrl(appConfig));
-            Log.d(TAG, "Setting url of the VideoView to: " + channel.getStreamUrl(appConfig));
-            mPlaybackState = PlaybackState.PLAYING;
+            vidView.setVideoPath(channel.getStreamUrl(appConfig, currentQuality));
+            Log.d(TAG, "Setting url of the VideoView to: " + channel.getStreamUrl(appConfig, currentQuality));
+            mPlaybackState = PLAYING;
             updatePlayButton(mPlaybackState);
             if (mCastSession != null && mCastSession.isConnected()) {
                 updatePlaybackLocation(PlaybackLocation.REMOTE);
@@ -258,7 +263,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             private void onApplicationConnected(CastSession castSession) {
                 mCastSession = castSession;
 
-                if (mPlaybackState == PlaybackState.PLAYING) {
+                if (mPlaybackState == PLAYING) {
                     loadRemoteMedia(true);
                     vidView.stopPlayback();
                     updatePlaybackLocation(PlaybackLocation.REMOTE);
@@ -314,7 +319,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         */
 
         if (channel.getName().equals("dctv_247")) {
-            streamUrl = channel.getStreamUrl(appConfig);
+            streamUrl = channel.getStreamUrl(appConfig, currentQuality);
         } else {
             if (!channel.getName().equals("dctv") && channel instanceof DctvChannel) {
                 if (channel.getName().equals("frogpantsstudios") && channel instanceof DctvChannel) {
@@ -364,7 +369,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             findViewById(R.id.chat_webview).setLayoutParams(p);
 
             //               setCoverArtStatus(null);
-            if (mPlaybackState == PlaybackState.PLAYING
+            if (mPlaybackState == PLAYING
                     || mPlaybackState == PlaybackState.BUFFERING) {
 
                 startControllersTimer();
@@ -433,14 +438,16 @@ public class PlayStreamActivity extends AppCompatActivity {
             case R.id.action_settings:
                 return true;
             case R.id.action_quality:
-                CharSequence colors[] = new CharSequence[] {"Source", "High", "Low", "Mobile", "Potato"};
+                String qualities[] = Quality.allAsStrings(channel.getAllowedQualities());
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Pick a stream quality");
-                builder.setItems(colors, new DialogInterface.OnClickListener() {
+                builder.setItems(qualities, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // the user clicked on colors[which]
+                        currentQuality = channel.getAllowedQualities()[which];
+                        videoQualityChanged();
                     }
                 });
                 builder.show();
@@ -489,7 +496,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                 if (mLocation == PlaybackLocation.LOCAL) {
                     vidView.requestFocus();
                     mp.start();
-                    mPlaybackState = PlaybackState.PLAYING;
+                    mPlaybackState = PLAYING;
                     updatePlayButton(mPlaybackState);
                 }
                 if (mLocation == PlaybackLocation.REMOTE) {
@@ -520,7 +527,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                         case android.media.MediaPlayer.MEDIA_INFO_BUFFERING_END:
                             mLocation = PlaybackLocation.LOCAL;
                             mp.start();
-                            mPlaybackState = PlaybackState.PLAYING;
+                            mPlaybackState = PLAYING;
                             updatePlayButton(mPlaybackState);
                             channelart = (ImageView) findViewById(R.id.channelart);
                             channelart.setVisibility(View.GONE);
@@ -541,7 +548,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                 if (!mControllersVisible) {
                     updateControllersVisibility(true);
                 }
-                if (mPlaybackState == PlaybackState.PLAYING) {
+                if (mPlaybackState == PLAYING) {
                     startControllersTimer();
                 }
                 return false;
@@ -582,6 +589,14 @@ public class PlayStreamActivity extends AppCompatActivity {
         }
     }
 
+    private void videoQualityChanged() {
+        if (mLocation.equals(PlaybackLocation.LOCAL) && mPlaybackState.equals(PlaybackState.PLAYING)) {
+            vidView.pause();
+            vidView.setVideoURI(Uri.parse(channel.getStreamUrl(appConfig, currentQuality)));
+            vidView.start();
+        }
+    }
+
     private void togglePlayback() {
         stopControllersTimer();
         switch (mPlaybackState) {
@@ -589,7 +604,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                 switch (mLocation) {
                     case LOCAL:
                         vidView.start();
-                        mPlaybackState = PlaybackState.PLAYING;
+                        mPlaybackState = PLAYING;
                         startControllersTimer();
                         break;
                     case REMOTE:
@@ -605,9 +620,9 @@ public class PlayStreamActivity extends AppCompatActivity {
                 break;
 
             case IDLE:
-                vidView.setVideoURI(Uri.parse(channel.getStreamUrl(appConfig)));
+                vidView.setVideoURI(Uri.parse(channel.getStreamUrl(appConfig, currentQuality)));
                 vidView.start();
-                mPlaybackState = PlaybackState.PLAYING;
+                mPlaybackState = PLAYING;
                 break;
 
             default:
