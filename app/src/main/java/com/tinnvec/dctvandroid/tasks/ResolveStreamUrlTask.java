@@ -27,16 +27,19 @@ public class ResolveStreamUrlTask  extends AsyncTask<String, Void, String> {
     private String resolveStreamUrl(String streamUrl) throws IOException {
         URL url = new URL(streamUrl);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setInstanceFollowRedirects(true);
-        urlConnection.connect();
-        urlConnection.getHeaderFields();
-        int responseCode = urlConnection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_MOVED_PERM
-                || responseCode == HttpURLConnection.HTTP_MOVED_TEMP) {
-            String redirectUrl = urlConnection.getHeaderField("Location");
-            return resolveStreamUrl(redirectUrl);
+        try {
+            urlConnection.setInstanceFollowRedirects(true);
+            urlConnection.connect();
+            urlConnection.getHeaderFields();
+
+            if (urlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new IOException("Video ressource at " + streamUrl + " is not available");
+            }
+
+            return urlConnection.getURL().toString();
+        } finally {
+            urlConnection.disconnect();
         }
-        return urlConnection.getURL().toString();
     }
 
     @Override
