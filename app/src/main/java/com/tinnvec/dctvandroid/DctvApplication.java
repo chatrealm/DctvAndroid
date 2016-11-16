@@ -5,6 +5,8 @@ import android.app.Application;
 import com.onesignal.OneSignal;
 import com.tinnvec.dctvandroid.notifications.DctvNotificationOpenedHandler;
 
+import io.vov.vitamio.Vitamio;
+
 
 /**
  * Created by kev on 11/7/16.
@@ -19,6 +21,8 @@ public class DctvApplication extends Application {
         OneSignal.Builder ob = OneSignal.startInit(this);
         ob.setNotificationOpenedHandler(new DctvNotificationOpenedHandler());
         ob.init();
+
+        Vitamio.isInitialized(this);
     }
 
 }
