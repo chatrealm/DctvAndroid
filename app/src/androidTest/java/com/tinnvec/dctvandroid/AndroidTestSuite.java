@@ -1,6 +1,5 @@
 package com.tinnvec.dctvandroid;
 
-import com.tinnvec.dctvandroid.remoting.TwitchStreamTest;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -10,6 +9,6 @@ import org.junit.runners.Suite;
  */
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({TwitchStreamTest.class})
+@Suite.SuiteClasses({})
 public class AndroidTestSuite {
 }
