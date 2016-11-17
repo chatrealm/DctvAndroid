@@ -51,7 +51,6 @@ import com.tinnvec.dctvandroid.channel.YoutubeChannel;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
