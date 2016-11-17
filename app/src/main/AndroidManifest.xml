@@ -64,6 +64,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />
         </activity>
+
+        <service
+            android:name=".notifications.DctvNotificationExtender"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.onesignal.NotificationExtender" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

@@ -11,6 +11,8 @@ import org.json.JSONObject;
 
 /**
  * Created by kev on 11/10/16.
+ *
+ * TODO: this is a placeholder for when sgtmuffin sends useful data in additionalData playload
  */
 
 public class DctvNotificationOpenedHandler implements OneSignal.NotificationOpenedHandler {
