@@ -1,8 +1,5 @@
 package com.tinnvec.dctvandroid;
 
-import android.animation.AnimatorSet;
-import android.animation.LayoutTransition;
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -33,7 +30,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -51,12 +47,9 @@ import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
 import com.squareup.picasso.Picasso;
 import com.tinnvec.dctvandroid.channel.AbstractChannel;
-import com.tinnvec.dctvandroid.channel.DctvChannel;
 import com.tinnvec.dctvandroid.channel.Quality;
 import com.tinnvec.dctvandroid.channel.YoutubeChannel;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -66,7 +59,6 @@ import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
 import io.vov.vitamio.widget.VideoView;
 
-import static android.R.drawable.ic_menu_sort_by_size;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.tinnvec.dctvandroid.PlayStreamActivity.PlaybackState.PLAYING;
@@ -91,13 +83,13 @@ public class PlayStreamActivity extends AppCompatActivity {
     private ImageButton mFullscreenSwitch;
     private ImageButton mChatrealmRevealer;
     private LandscapeChatState mLandscapeChatState;
-    private WebView chatWebview;
     private RelativeLayout mLoading;
     private View mControllers;
     private boolean mControllersVisible;
     private Timer mControllersTimer;
     private Properties appConfig;
     private Quality currentQuality;
+    private RelativeLayout chatContainer;
 
     @SuppressLint("NewApi")
     @Override
@@ -193,6 +185,8 @@ public class PlayStreamActivity extends AppCompatActivity {
                 .beginTransaction()
                 .add(R.id.chat_fragment, chatFragment)
                 .commit();
+
+        chatContainer = (RelativeLayout) findViewById(R.id.chat_fragment);
 
         try {
             vidView.setVideoPath(streamUrl);
@@ -358,7 +352,7 @@ public class PlayStreamActivity extends AppCompatActivity {
 
             p.addRule(RelativeLayout.BELOW, R.id.view_group_video);
 
-            findViewById(R.id.chat_fragment).setLayoutParams(p);
+            chatContainer.setLayoutParams(p);
 
             //               setCoverArtStatus(null);
             if (mPlaybackState == PLAYING
@@ -786,7 +780,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         vidView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
 
-        chatWebview.setVisibility(View.INVISIBLE);
+        chatContainer.setVisibility(View.INVISIBLE);
 
         mLandscapeChatState = LandscapeChatState.HIDDEN;
         mChatrealmRevealer.setVisibility(View.VISIBLE);
@@ -794,10 +788,10 @@ public class PlayStreamActivity extends AppCompatActivity {
 
     public void setPortraitMode() {
         if (mLandscapeChatState == LandscapeChatState.SHOWING){
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)chatWebview.getLayoutParams();
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) chatContainer.getLayoutParams();
             params.addRule(RelativeLayout.RIGHT_OF, 0);
             params.addRule(RelativeLayout.BELOW, R.id.view_group_video);
-            chatWebview.setLayoutParams(params);
+            chatContainer.setLayoutParams(params);
 
             RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams)findViewById(R.id.toolbar_layout).getLayoutParams();
             params2.addRule(RelativeLayout.ALIGN_RIGHT,0);
@@ -809,7 +803,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             mLandscapeChatState = LandscapeChatState.HIDDEN;
             mChatrealmRevealer.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_chatrealm_reveal, null));
         }
-        chatWebview.setVisibility(View.VISIBLE);
+        chatContainer.setVisibility(View.VISIBLE);
 
         mChatrealmRevealer.setVisibility(View.GONE);
 
@@ -841,11 +835,11 @@ public class PlayStreamActivity extends AppCompatActivity {
     }
 
     public void revealChat(){
-        chatWebview.setVisibility(View.VISIBLE);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)chatWebview.getLayoutParams();
+        chatContainer.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) chatContainer.getLayoutParams();
         params.addRule(RelativeLayout.BELOW, 0);
         params.addRule(RelativeLayout.RIGHT_OF, R.id.view_group_video);
-        chatWebview.setLayoutParams(params);
+        chatContainer.setLayoutParams(params);
 
         RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams)findViewById(R.id.toolbar_layout).getLayoutParams();
         params2.addRule(RelativeLayout.ALIGN_RIGHT, R.id.view_group_video);
@@ -923,17 +917,17 @@ public class PlayStreamActivity extends AppCompatActivity {
         anim.setDuration(500);
         anim.start();
 
-        chatWebview.postDelayed(new Runnable() {
+        chatContainer.postDelayed(new Runnable() {
             @Override
             public void run() {
                 ImageView artFillView = (ImageView) findViewById(R.id.art_fill);
                 artFillView.setVisibility(View.GONE);
 
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)chatWebview.getLayoutParams();
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) chatContainer.getLayoutParams();
                 params.addRule(RelativeLayout.RIGHT_OF, 0);
                 params.addRule(RelativeLayout.BELOW, R.id.view_group_video);
-                chatWebview.setLayoutParams(params);
-                chatWebview.setVisibility(View.INVISIBLE);
+                chatContainer.setLayoutParams(params);
+                chatContainer.setVisibility(View.INVISIBLE);
             }
         }, 500);
 
