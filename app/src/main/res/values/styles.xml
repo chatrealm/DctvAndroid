@@ -1,17 +1,17 @@
 <resources>
 
-    <style name="AppTheme" parent="@style/Theme.AppCompat">
+    <style name="AppTheme" parent="Theme.AppCompat">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-        <style name="AppTheme.NoActionBar" parent="Theme.AppCompat">
+        <style name="AppTheme.NoActionBar" parent="AppTheme">
             <item name="windowActionBar">false</item>
             <item name="windowNoTitle">true</item>
 
         </style>
-    <style name="AppTheme.NoActionBar.Launcher" parent="Theme.AppCompat">
+    <style name="AppTheme.NoActionBar.Launcher" parent="AppTheme.NoActionBar">
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 

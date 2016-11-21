@@ -53,10 +53,12 @@
             android:background="@color/colorPrimary" />
 
         <ProgressBar
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
+            android:layout_centerInParent="true"
+            android:theme="@style/AppTheme"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="96dp"
+            android:layout_height="96dp" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -116,15 +118,23 @@
         android:layout_below="@id/view_group_video"
         android:id="@+id/chat_fragment">
     </RelativeLayout>
-
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/art_fill_container"
+    android:visibility="gone"
+    android:layout_below="@id/view_group_video"
+    android:layout_toLeftOf="@id/chat_fragment"
+    android:background="@color/colorPrimary"
+    android:animateLayoutChanges="false">
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/view_group_video"
-        android:layout_toLeftOf="@id/chat_fragment"
+        android:layout_alignParentLeft="false"
         android:id="@+id/art_fill"
-        android:visibility="gone" />
-
+        android:padding="16dp"
+        android:scaleType="fitStart" />
+</RelativeLayout>
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/toolbar_layout"

@@ -62,6 +62,7 @@ import io.vov.vitamio.widget.VideoView;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.tinnvec.dctvandroid.PlayStreamActivity.PlaybackState.PLAYING;
+import static com.tinnvec.dctvandroid.channel.Quality.HIGH;
 
 public class PlayStreamActivity extends AppCompatActivity {
     private static final String TAG = PlayStreamActivity.class.getName();
@@ -74,6 +75,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     // added for cast SDK v3
     private CastContext mCastContext;
     private MenuItem mediaRouteMenuItem;
+    private Menu menu;
     private CastSession mCastSession;
     private SessionManagerListener<CastSession> mSessionManagerListener;
     private PlaybackLocation mLocation;
@@ -410,9 +412,12 @@ public class PlayStreamActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_play_stream, menu);
+        this.menu = menu;
 
         // add media router button for cast
         mediaRouteMenuItem = CastButtonFactory.setUpMediaRouteButton(getApplicationContext(), menu, R.id.media_route_menu_item);
+
+        updateQualityButton(currentQuality);
 
         return true;
     }
@@ -612,12 +617,31 @@ public class PlayStreamActivity extends AppCompatActivity {
 
     private void videoQualityChanged() {
         this.streamUrl = channel.getStreamUrl(appConfig, currentQuality);
+        updateQualityButton(currentQuality);
         if (mLocation == PlaybackLocation.LOCAL) {
             vidView.setVideoPath(this.streamUrl);
         } else if (mCastSession != null && mCastSession.isConnected()) {
             // reload chromecast
             loadRemoteMedia(true);
         }
+    }
+
+    private void updateQualityButton(Quality currentQuality) {
+        switch (currentQuality) {
+            case HIGH:
+                menu.findItem(R.id.action_quality).setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.settings_hq_white, null));
+                break;
+            case LOW:
+                menu.findItem(R.id.action_quality).setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.settings_lq_white, null));
+                break;
+            case SOURCE:
+                menu.findItem(R.id.action_quality).setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.settings_src_white, null));
+                break;
+            default:
+                menu.findItem(R.id.action_quality).setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.settings_white, null));
+                break;
+        }
+
     }
 
     private void togglePlayback() {
@@ -797,7 +821,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             params2.addRule(RelativeLayout.ALIGN_RIGHT,0);
             findViewById(R.id.toolbar_layout).setLayoutParams(params2);
 
-            ImageView artFillView = (ImageView) findViewById(R.id.art_fill);
+            RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
             artFillView.setVisibility(View.GONE);
 
             mLandscapeChatState = LandscapeChatState.HIDDEN;
@@ -875,16 +899,17 @@ public class PlayStreamActivity extends AppCompatActivity {
         anim.setDuration(500);
         anim.start();
 
-        ImageView artFillView = (ImageView) findViewById(R.id.art_fill);
+        RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
+        ImageView artFillImg = (ImageView) findViewById(R.id.art_fill);
         String urlChannelart = channel.getImageAssetHDUrl();
 
         if (urlChannelart != null) {
             Picasso.with(this)
                     .load(urlChannelart)
-                    .into(artFillView);
+                    .into(artFillImg);
         } else {
             Drawable defaultArt = ResourcesCompat.getDrawable(getResources(), R.drawable.dctv_bg, null);
-            artFillView.setImageDrawable(defaultArt);
+            artFillImg.setImageDrawable(defaultArt);
         }
         artFillView.setVisibility(View.VISIBLE);
 
@@ -920,7 +945,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         chatContainer.postDelayed(new Runnable() {
             @Override
             public void run() {
-                ImageView artFillView = (ImageView) findViewById(R.id.art_fill);
+                RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
                 artFillView.setVisibility(View.GONE);
 
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) chatContainer.getLayoutParams();
