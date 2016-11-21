@@ -385,7 +385,7 @@ public class PlayStreamActivity extends AppCompatActivity {
 
             p.addRule(RelativeLayout.BELOW, R.id.actionbarspacer);
 
-            findViewById(R.id.chat_webview).setLayoutParams(p);
+            findViewById(R.id.chat_fragment).setLayoutParams(p);
 
 
             stopControllersTimer();

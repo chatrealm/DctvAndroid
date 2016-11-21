@@ -3,155 +3,159 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.tinnvec.dctvandroid.PlayStreamActivity"
-    tools:showIn="@layout/activity_play_stream"
-    android:animateLayoutChanges="true">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/actionbarspacer"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:visibility="visible"
-        android:orientation="horizontal"
-        android:elevation="@dimen/actionbar_elevation"
-        android:background="@color/colorPrimary"></LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/view_group_video"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/actionbarspacer"
-        android:animateLayoutChanges="true">
-
-        <!-- Video -->
-        <io.vov.vitamio.widget.VideoView
-            android:id="@+id/video_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top" />
-
-    </FrameLayout>
-
-    <!-- Chat View -->
     <RelativeLayout
-        android:id="@+id/buffer_circle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignBottom="@id/view_group_video"
-        android:layout_alignLeft="@id/view_group_video"
-        android:layout_alignRight="@id/view_group_video"
-        android:layout_alignTop="@id/view_group_video"
-        android:animateLayoutChanges="true">
+        android:animateLayoutChanges="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="com.tinnvec.dctvandroid.PlayStreamActivity"
+        tools:showIn="@layout/activity_play_stream">
 
-        <ImageView
+        <LinearLayout
+            android:id="@+id/actionbarspacer"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            android:elevation="@dimen/actionbar_elevation"
+            android:orientation="horizontal"
+            android:visibility="visible" />
+
+        <FrameLayout
+            android:id="@+id/view_group_video"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/actionbarspacer"
+            android:animateLayoutChanges="true">
+
+            <!-- Video -->
+            <io.vov.vitamio.widget.VideoView
+                android:id="@+id/video_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top" />
+
+        </FrameLayout>
+
+        <!-- Chat View -->
+        <RelativeLayout
+            android:id="@+id/buffer_circle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/channelart"
-            android:scaleType="fitCenter"
-            android:background="@color/colorPrimary" />
+            android:layout_alignBottom="@id/view_group_video"
+            android:layout_alignLeft="@id/view_group_video"
+            android:layout_alignRight="@id/view_group_video"
+            android:layout_alignTop="@id/view_group_video"
+            android:animateLayoutChanges="true">
 
-        <ProgressBar
-            android:layout_centerInParent="true"
-            android:theme="@style/AppTheme"
-            style="@style/Widget.AppCompat.ProgressBar"
-            android:layout_width="96dp"
-            android:layout_height="96dp" />
+            <ImageView
+                android:id="@+id/channelart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="24dp"
+                android:scaleType="fitCenter" />
 
-    </RelativeLayout>
+            <ProgressBar
+                style="@style/Widget.AppCompat.ProgressBar"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_centerInParent="true"
+                android:theme="@style/AppTheme" />
 
-    <RelativeLayout
-        android:id="@+id/mediacontroller_anchor"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignBottom="@id/view_group_video"
-        android:layout_alignLeft="@id/view_group_video"
-        android:layout_alignRight="@id/view_group_video"
-        android:layout_alignTop="@id/view_group_video"
-        android:animateLayoutChanges="true">
+        </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/bgImage"
+        <RelativeLayout
+            android:id="@+id/mediacontroller_anchor"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/player_bg" />
+            android:layout_alignBottom="@id/view_group_video"
+            android:layout_alignLeft="@id/view_group_video"
+            android:layout_alignRight="@id/view_group_video"
+            android:layout_alignTop="@id/view_group_video"
+            android:animateLayoutChanges="true">
 
-        <ImageButton
-            android:id="@+id/play_pause_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@color/transparent"
-            android:padding="16dp"
-            android:src="@drawable/big_play_button" />
+            <ImageView
+                android:id="@+id/bgImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/player_bg" />
 
-        <ImageButton
-            android:id="@+id/fullscreen_switch_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:background="@color/transparent"
-            android:padding="8dp"
-            android:src="@drawable/fullscreen_button" />
+            <ImageButton
+                android:id="@+id/play_pause_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:background="@color/transparent"
+                android:padding="16dp"
+                android:src="@drawable/big_play_button" />
 
-        <ImageButton
-            android:id="@+id/reveal_chat_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:background="@color/transparent"
-            android:padding="8dp"
-            android:src="@drawable/ic_chatrealm_reveal"
-            android:visibility="gone"/>
+            <ImageButton
+                android:id="@+id/fullscreen_switch_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:background="@color/transparent"
+                android:padding="8dp"
+                android:src="@drawable/fullscreen_button" />
+
+            <ImageButton
+                android:id="@+id/reveal_chat_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@color/transparent"
+                android:padding="8dp"
+                android:src="@drawable/ic_chatrealm_reveal"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+        <!-- Chat View -->
+        <RelativeLayout
+            android:id="@+id/chat_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/view_group_video"
+            android:layout_gravity="bottom"
+            android:orientation="vertical"></RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/art_fill_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/view_group_video"
+            android:layout_toLeftOf="@id/chat_fragment"
+            android:animateLayoutChanges="false"
+            android:background="@color/colorPrimary"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/art_fill"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="false"
+                android:padding="16dp"
+                android:scaleType="fitStart" />
+        </RelativeLayout>
 
     </RelativeLayout>
-
-    <!-- Chat View -->
-    <RelativeLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom"
-        android:layout_below="@id/view_group_video"
-        android:id="@+id/chat_fragment">
-    </RelativeLayout>
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/art_fill_container"
-    android:visibility="gone"
-    android:layout_below="@id/view_group_video"
-    android:layout_toLeftOf="@id/chat_fragment"
-    android:background="@color/colorPrimary"
-    android:animateLayoutChanges="false">
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentLeft="false"
-        android:id="@+id/art_fill"
-        android:padding="16dp"
-        android:scaleType="fitStart" />
-</RelativeLayout>
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
         android:background="#00000000"
-        app:elevation="0dp"
-        android:animateLayoutChanges="true">
+        app:elevation="0dp">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#00111111"
-            app:elevation="0dp"
-            android:fadingEdge="none" />
+            app:elevation="0dp" />
 
     </android.support.design.widget.AppBarLayout>
-
 </RelativeLayout>
