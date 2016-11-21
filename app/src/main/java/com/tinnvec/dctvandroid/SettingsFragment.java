@@ -9,9 +9,6 @@ import android.preference.PreferenceManager;
 
 import com.tinnvec.dctvandroid.channel.Quality;
 
-import static android.R.attr.key;
-import static android.R.attr.y;
-import static com.tinnvec.dctvandroid.R.string.chat;
 
 /**
  * Created by kev on 11/13/16.
@@ -21,7 +18,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
         Preference connectionPref = findPreference("chat_name");

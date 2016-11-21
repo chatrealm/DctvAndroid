@@ -12,26 +12,22 @@ import android.webkit.WebView;
 
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
-import com.google.android.gms.cast.framework.CastState;
-import com.google.android.gms.cast.framework.CastStateListener;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Properties;
+
+import static com.tinnvec.dctvandroid.R.string.chat;
 
 
 public class JustChatActivity extends AppCompatActivity {
 
     private MenuItem mediaRouteMenuItem;
     private CastContext mCastContext;
-    private Properties appConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        PropertyReader pReader = new PropertyReader(this);
-        appConfig = pReader.getMyProperties("app.properties");
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
 
         setContentView(R.layout.activity_just_chat);
 
@@ -43,20 +39,14 @@ public class JustChatActivity extends AppCompatActivity {
 
         mCastContext = CastContext.getSharedInstance(this); // initialises castcontext
 
-        WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
-        WebSettings settings = chatWebview.getSettings();
-        settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(true);
+        ChatFragment chatFragment = new ChatFragment();
 
-        String url = appConfig.getProperty("irc.web_url");
-        String nick = "";
-        try {
-            nick = URLEncoder.encode(sharedPreferences.getString("chat_name", ""), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        getFragmentManager()
+                .beginTransaction()
+                .add(R.id.chat_fragment, chatFragment)
+                .commit();
 
-        }
-        url = url + "?nick=" + nick;
-        chatWebview.loadUrl(url);
+
     }
 
     @Override

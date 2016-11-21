@@ -100,8 +100,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             throw new NullPointerException("No Channel passed to PlayStreamActivity");
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        PropertyReader pReader = new PropertyReader(this);
-        appConfig = pReader.getMyProperties("app.properties");
+        appConfig = ((DctvApplication)getApplication()).getAppConfig();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -175,19 +174,12 @@ public class PlayStreamActivity extends AppCompatActivity {
         mediaController.setAnchorView(findViewById(R.id.mediacontroller_anchor));
         vidView.setMediaController(mediaController);
 */
-        WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
-        WebSettings settings = chatWebview.getSettings();
-        settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(true);
-        String url = appConfig.getProperty("irc.web_url");
-        String nick = "";
-        try {
-            nick = URLEncoder.encode(sharedPreferences.getString("chat_name", ""), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        ChatFragment chatFragment = new ChatFragment();
 
-        }
-        url = url + "?nick=" + nick;
-        chatWebview.loadUrl(url);
+        getFragmentManager()
+                .beginTransaction()
+                .add(R.id.chat_fragment, chatFragment)
+                .commit();
 
         try {
             vidView.setVideoPath(streamUrl);
@@ -351,7 +343,7 @@ public class PlayStreamActivity extends AppCompatActivity {
 
             p.addRule(RelativeLayout.BELOW, R.id.view_group_video);
 
-            findViewById(R.id.chat_webview).setLayoutParams(p);
+            findViewById(R.id.chat_fragment).setLayoutParams(p);
 
             //               setCoverArtStatus(null);
             if (mPlaybackState == PLAYING

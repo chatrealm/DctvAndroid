@@ -33,7 +33,6 @@
 
     </FrameLayout>
 
-    <!-- Chat View -->
     <RelativeLayout
         android:id="@+id/buffer_circle"
         android:layout_width="match_parent"
@@ -86,13 +85,15 @@
 
     </RelativeLayout>
 
-    <WebView
-        android:id="@+id/chat_webview"
+    <!-- Chat View -->
+    <RelativeLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="bottom"
         android:layout_below="@id/view_group_video"
-        android:layout_gravity="bottom" />
-
+        android:id="@+id/chat_fragment">
+    </RelativeLayout>
 
     <!-- Chat Input -->
 
