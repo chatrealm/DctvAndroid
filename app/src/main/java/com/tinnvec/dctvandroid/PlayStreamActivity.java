@@ -1,10 +1,12 @@
 package com.tinnvec.dctvandroid;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -21,12 +23,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
@@ -82,6 +86,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private PlaybackState mPlaybackState;
     private MediaPlayer mediaPlayer;
     private ImageButton mPlayPause;
+    private ImageButton mFullscreenSwitch;
     private RelativeLayout mLoading;
     private View mControllers;
     private boolean mControllersVisible;
@@ -168,6 +173,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         mPlayPause = (ImageButton) findViewById(R.id.play_pause_button);
         mLoading = (RelativeLayout) findViewById(R.id.buffer_circle);
         mControllers = findViewById(R.id.mediacontroller_anchor);
+        mFullscreenSwitch = (ImageButton) findViewById(R.id.fullscreen_switch_button);
 
         setupControlsCallbacks();
 
@@ -217,8 +223,10 @@ public class PlayStreamActivity extends AppCompatActivity {
         if (mLocation == PlaybackLocation.LOCAL) {
             if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
                 hideSysUi();
+                updateFullscreenButton(false);
             } else if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
                 showSysUi();
+                updateFullscreenButton(true);
             }
         }
     }
@@ -550,6 +558,17 @@ public class PlayStreamActivity extends AppCompatActivity {
                 togglePlayback();
             }
         });
+
+        mFullscreenSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                } else if(getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE){
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                }
+            }
+        });
     }
 
     private void updatePlayButton(PlaybackState state) {
@@ -573,6 +592,14 @@ public class PlayStreamActivity extends AppCompatActivity {
                 break;
             default:
                 break;
+        }
+    }
+
+    private void updateFullscreenButton(boolean isPortrait){
+        if (isPortrait){
+            mFullscreenSwitch.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.fullscreen_button, null));
+        } else {
+            mFullscreenSwitch.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.fullscreen_exit_button, null));
         }
     }
 
@@ -690,8 +717,10 @@ public class PlayStreamActivity extends AppCompatActivity {
         // Checks the orientation of the screen
         if (newConfig.orientation == ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
             hideSysUi();
+            updateFullscreenButton(false);
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT && mLocation == PlaybackLocation.LOCAL) {
             showSysUi();
+            updateFullscreenButton(true);
         }
     }
 

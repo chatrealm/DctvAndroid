@@ -83,6 +83,15 @@
             android:padding="16dp"
             android:src="@drawable/big_play_button" />
 
+        <ImageButton
+            android:id="@+id/fullscreen_switch_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:background="@color/transparent"
+            android:padding="8dp"
+            android:src="@drawable/fullscreen_button" />
 
     </RelativeLayout>
 
