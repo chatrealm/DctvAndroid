@@ -22,7 +22,8 @@
         android:id="@+id/view_group_video"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/actionbarspacer">
+        android:layout_below="@id/actionbarspacer"
+        android:animateLayoutChanges="true">
 
         <!-- Video -->
         <io.vov.vitamio.widget.VideoView
@@ -93,6 +94,17 @@
             android:padding="8dp"
             android:src="@drawable/fullscreen_button" />
 
+        <ImageButton
+            android:id="@+id/reveal_chat_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:background="@color/transparent"
+            android:padding="8dp"
+            android:src="@drawable/ic_chatrealm_reveal"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 
     <WebView
@@ -102,7 +114,31 @@
         android:layout_below="@id/view_group_video"
         android:layout_gravity="bottom" />
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/view_group_video"
+        android:layout_toLeftOf="@id/chat_webview"
+        android:id="@+id/art_fill"
+        android:visibility="gone" />
 
-    <!-- Chat Input -->
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00000000"
+        app:elevation="0dp"
+        android:animateLayoutChanges="true">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#00111111"
+            app:elevation="0dp"
+            android:fadingEdge="none" />
+
+    </android.support.design.widget.AppBarLayout>
 
 </RelativeLayout>

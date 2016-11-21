@@ -1,7 +1,10 @@
 package com.tinnvec.dctvandroid;
 
+import android.animation.AnimatorSet;
+import android.animation.LayoutTransition;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +18,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
@@ -23,14 +27,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
@@ -49,7 +51,6 @@ import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
 import com.squareup.picasso.Picasso;
 import com.tinnvec.dctvandroid.channel.AbstractChannel;
-import com.tinnvec.dctvandroid.channel.DctvChannel;
 import com.tinnvec.dctvandroid.channel.Quality;
 import com.tinnvec.dctvandroid.channel.YoutubeChannel;
 
@@ -64,7 +65,6 @@ import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
 import io.vov.vitamio.widget.VideoView;
 
-import static android.R.drawable.ic_menu_sort_by_size;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.tinnvec.dctvandroid.PlayStreamActivity.PlaybackState.PLAYING;
@@ -87,6 +87,9 @@ public class PlayStreamActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private ImageButton mPlayPause;
     private ImageButton mFullscreenSwitch;
+    private ImageButton mChatrealmRevealer;
+    private LandscapeChatState mLandscapeChatState;
+    private WebView chatWebview;
     private RelativeLayout mLoading;
     private View mControllers;
     private boolean mControllersVisible;
@@ -174,6 +177,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         mLoading = (RelativeLayout) findViewById(R.id.buffer_circle);
         mControllers = findViewById(R.id.mediacontroller_anchor);
         mFullscreenSwitch = (ImageButton) findViewById(R.id.fullscreen_switch_button);
+        mChatrealmRevealer = (ImageButton) findViewById(R.id.reveal_chat_button);
 
         setupControlsCallbacks();
 
@@ -181,7 +185,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         mediaController.setAnchorView(findViewById(R.id.mediacontroller_anchor));
         vidView.setMediaController(mediaController);
 */
-        WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
+        chatWebview = (WebView) findViewById(R.id.chat_webview);
         WebSettings settings = chatWebview.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
@@ -222,10 +226,10 @@ public class PlayStreamActivity extends AppCompatActivity {
         }
         if (mLocation == PlaybackLocation.LOCAL) {
             if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
-                hideSysUi();
+                setLandscapeMode();
                 updateFullscreenButton(false);
             } else if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
-                showSysUi();
+                setPortraitMode();
                 updateFullscreenButton(true);
             }
         }
@@ -372,8 +376,12 @@ public class PlayStreamActivity extends AppCompatActivity {
 //                setCoverArtStatus(mSelectedMedia.getImage(0));
             }
         } else {
+            if (mLandscapeChatState == LandscapeChatState.SHOWING){
+                hideChat();
+            }
+
             hideVideoView();
-            showSysUi();
+            setPortraitMode();
             getSupportActionBar().show();
 
 
@@ -497,7 +505,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                 if (mLocation == PlaybackLocation.REMOTE) {
                     vidView.pause();
                     mp.stop();
-                    showSysUi();
+                    setPortraitMode();
                     updatePlayButton(mPlaybackState);
                     if (mCastSession != null && mCastSession.isConnected()) loadRemoteMedia(true);
                 }
@@ -566,6 +574,16 @@ public class PlayStreamActivity extends AppCompatActivity {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
                 } else if(getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE){
                         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                }
+            }
+        });
+        mChatrealmRevealer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mLandscapeChatState == LandscapeChatState.HIDDEN) {
+                    revealChat();
+                } else if (mLandscapeChatState == LandscapeChatState.SHOWING){
+                    hideChat();
                 }
             }
         });
@@ -704,9 +722,9 @@ public class PlayStreamActivity extends AppCompatActivity {
             updatePlaybackLocation(PlaybackLocation.LOCAL);
         }
         if (this.getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
-            hideSysUi();
+            setLandscapeMode();
         } else if (this.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT && mLocation == PlaybackLocation.LOCAL) {
-            showSysUi();
+            setPortraitMode();
         }
         super.onResume();
     }
@@ -716,28 +734,53 @@ public class PlayStreamActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         // Checks the orientation of the screen
         if (newConfig.orientation == ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
-            hideSysUi();
+            setLandscapeMode();
             updateFullscreenButton(false);
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT && mLocation == PlaybackLocation.LOCAL) {
-            showSysUi();
+            setPortraitMode();
             updateFullscreenButton(true);
+        }
+        if (newConfig.keyboardHidden == Configuration.KEYBOARDHIDDEN_YES && getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
+            hideSystemUI();
         }
     }
 
-    public void hideSysUi() {
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
+                delayedHide(300);
+            }
+        } else {
+                mHideHandler.removeMessages(0);
+            }
 
 
+    }
+
+    public void hideSystemUI() {
         View decorView = getWindow().getDecorView();
-// Hide both the navigation bar and the status bar.
-// SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-// a general rule, you should design your app to hide the status bar whenever you
-// hide the navigation bar.
         int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 //    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
+    }
+
+
+    public void setLandscapeMode() {
+        delayedHide(600);
+
+        View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                hideSystemUI(); // Needed to avoid exiting immersive_sticky when keyboard is displayed
+            }
+        });
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             findViewById(R.id.root_coordinator).setFitsSystemWindows(false);
         }
@@ -747,11 +790,36 @@ public class PlayStreamActivity extends AppCompatActivity {
 
         vidView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
+
+        chatWebview.setVisibility(View.INVISIBLE);
+
+        mLandscapeChatState = LandscapeChatState.HIDDEN;
+        mChatrealmRevealer.setVisibility(View.VISIBLE);
     }
 
-    public void showSysUi() {
+    public void setPortraitMode() {
+        if (mLandscapeChatState == LandscapeChatState.SHOWING){
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)chatWebview.getLayoutParams();
+            params.addRule(RelativeLayout.RIGHT_OF, 0);
+            params.addRule(RelativeLayout.BELOW, R.id.view_group_video);
+            chatWebview.setLayoutParams(params);
+
+            RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams)findViewById(R.id.toolbar_layout).getLayoutParams();
+            params2.addRule(RelativeLayout.ALIGN_RIGHT,0);
+            findViewById(R.id.toolbar_layout).setLayoutParams(params2);
+
+            ImageView artFillView = (ImageView) findViewById(R.id.art_fill);
+            artFillView.setVisibility(View.GONE);
+
+            mLandscapeChatState = LandscapeChatState.HIDDEN;
+            mChatrealmRevealer.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_chatrealm_reveal, null));
+        }
+        chatWebview.setVisibility(View.VISIBLE);
+
+        mChatrealmRevealer.setVisibility(View.GONE);
 
         View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener(null);
         int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
         decorView.setSystemUiVisibility(uiOptions);
 
@@ -764,7 +832,11 @@ public class PlayStreamActivity extends AppCompatActivity {
 
         // getting the videoview to be 16:9
         DisplayMetrics displaymetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
+        } else {
+            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        }
         float h = displaymetrics.heightPixels;
         float w = displaymetrics.widthPixels;
         float floatHeight = (float) (w * 0.5625);
@@ -773,7 +845,123 @@ public class PlayStreamActivity extends AppCompatActivity {
         vidView.setLayoutParams(new FrameLayout.LayoutParams(intWidth, intHeight));
     }
 
+    public void revealChat(){
+        chatWebview.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)chatWebview.getLayoutParams();
+        params.addRule(RelativeLayout.BELOW, 0);
+        params.addRule(RelativeLayout.RIGHT_OF, R.id.view_group_video);
+        chatWebview.setLayoutParams(params);
 
+        RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams)findViewById(R.id.toolbar_layout).getLayoutParams();
+        params2.addRule(RelativeLayout.ALIGN_RIGHT, R.id.view_group_video);
+        findViewById(R.id.toolbar_layout).setLayoutParams(params2);
+
+        FrameLayout container = (FrameLayout) findViewById(R.id.view_group_video);
+        container.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+
+
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
+        } else {
+            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        }
+        final int w = displaymetrics.widthPixels;
+        final int h = displaymetrics.heightPixels;
+        int videoWidth = (int) Math.round(0.6 * w);
+        int videoHeight = (int) Math.round(0.6 * h);
+
+        ValueAnimator anim = ValueAnimator.ofFloat((float) 1, (float) 0.55);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float valScale = (float) valueAnimator.getAnimatedValue();
+                ViewGroup.LayoutParams layoutParams = vidView.getLayoutParams();
+                layoutParams.width = Math.round(w * valScale);
+                layoutParams.height = Math.round(h * valScale);
+                vidView.setLayoutParams(layoutParams);
+            }
+        });
+        anim.setDuration(500);
+        anim.start();
+
+        ImageView artFillView = (ImageView) findViewById(R.id.art_fill);
+        String urlChannelart = channel.getImageAssetHDUrl();
+
+        if (urlChannelart != null) {
+            Picasso.with(this)
+                    .load(urlChannelart)
+                    .into(artFillView);
+        } else {
+            Drawable defaultArt = ResourcesCompat.getDrawable(getResources(), R.drawable.dctv_bg, null);
+            artFillView.setImageDrawable(defaultArt);
+        }
+        artFillView.setVisibility(View.VISIBLE);
+
+        mLandscapeChatState = LandscapeChatState.SHOWING;
+        mChatrealmRevealer.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_chatrealm_hide, null));
+//        vidView.setLayoutParams(new FrameLayout.LayoutParams(videoWidth, videoHeight)); //without animation
+    }
+
+    public void hideChat() {
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
+        } else {
+            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        }
+        final int w = displaymetrics.widthPixels;
+        final int h = displaymetrics.heightPixels;
+
+        ValueAnimator anim = ValueAnimator.ofFloat((float) 0.55, (float) 1);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float valScale = (float) valueAnimator.getAnimatedValue();
+                ViewGroup.LayoutParams layoutParams = vidView.getLayoutParams();
+                layoutParams.width = Math.round(w * valScale);
+                layoutParams.height = Math.round(h * valScale);
+                vidView.setLayoutParams(layoutParams);
+            }
+        });
+        anim.setDuration(500);
+        anim.start();
+
+        chatWebview.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ImageView artFillView = (ImageView) findViewById(R.id.art_fill);
+                artFillView.setVisibility(View.GONE);
+
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)chatWebview.getLayoutParams();
+                params.addRule(RelativeLayout.RIGHT_OF, 0);
+                params.addRule(RelativeLayout.BELOW, R.id.view_group_video);
+                chatWebview.setLayoutParams(params);
+                chatWebview.setVisibility(View.INVISIBLE);
+            }
+        }, 500);
+
+
+
+        RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams)findViewById(R.id.toolbar_layout).getLayoutParams();
+        params2.addRule(RelativeLayout.ALIGN_RIGHT, 0);
+        findViewById(R.id.toolbar_layout).setLayoutParams(params2);
+
+        mLandscapeChatState = LandscapeChatState.HIDDEN;
+        mChatrealmRevealer.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_chatrealm_reveal, null));
+    }
+
+    private final Handler mHideHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            hideSystemUI();
+        }
+    };
+    private void delayedHide(int delayMillis) {
+        mHideHandler.removeMessages(0);
+        mHideHandler.sendEmptyMessageDelayed(0, delayMillis);
+    }
     /**
      * indicates whether we are doing a local or a remote playback
      */
@@ -787,6 +975,10 @@ public class PlayStreamActivity extends AppCompatActivity {
      */
     public enum PlaybackState {
         PLAYING, PAUSED, BUFFERING, IDLE
+    }
+
+    public enum LandscapeChatState {
+        SHOWING, HIDDEN
     }
 
     private class HideControllersTask extends TimerTask {

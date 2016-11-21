@@ -13,23 +13,4 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent" />
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#00000000"
-        app:elevation="0dp"
-        android:animateLayoutChanges="true">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="#00111111"
-            app:elevation="0dp"
-            android:fadingEdge="none" />
-
-    </android.support.design.widget.AppBarLayout>
-
-
-
 </android.support.design.widget.CoordinatorLayout>
