@@ -5,6 +5,8 @@ import android.app.Application;
 import com.onesignal.OneSignal;
 import com.tinnvec.dctvandroid.notifications.DctvNotificationOpenedHandler;
 
+import java.util.Properties;
+
 import io.vov.vitamio.Vitamio;
 
 
@@ -13,6 +15,8 @@ import io.vov.vitamio.Vitamio;
  */
 
 public class DctvApplication extends Application {
+
+    private Properties appConfig;
 
     @Override
     public void onCreate() {
@@ -23,6 +27,14 @@ public class DctvApplication extends Application {
         ob.init();
 
         Vitamio.isInitialized(this);
+
+        // load appconfig
+        PropertyReader pReader = new PropertyReader(this);
+        appConfig = pReader.getMyProperties("app.properties");
+    }
+
+    public Properties getAppConfig() {
+        return appConfig;
     }
 
 }

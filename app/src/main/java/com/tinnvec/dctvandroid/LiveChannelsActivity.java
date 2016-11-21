@@ -44,8 +44,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
         setTheme(R.style.AppTheme_NoActionBar);
         super.onCreate(savedInstanceState);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        PropertyReader pReader = new PropertyReader(this);
-        appConfig = pReader.getMyProperties("app.properties");
+        appConfig = ((DctvApplication)getApplication()).getAppConfig();
         setContentView(R.layout.activity_live_channels);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

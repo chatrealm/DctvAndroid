@@ -51,6 +51,7 @@ import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
 import com.squareup.picasso.Picasso;
 import com.tinnvec.dctvandroid.channel.AbstractChannel;
+import com.tinnvec.dctvandroid.channel.DctvChannel;
 import com.tinnvec.dctvandroid.channel.Quality;
 import com.tinnvec.dctvandroid.channel.YoutubeChannel;
 
@@ -65,6 +66,7 @@ import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
 import io.vov.vitamio.widget.VideoView;
 
+import static android.R.drawable.ic_menu_sort_by_size;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.tinnvec.dctvandroid.PlayStreamActivity.PlaybackState.PLAYING;
@@ -185,19 +187,12 @@ public class PlayStreamActivity extends AppCompatActivity {
         mediaController.setAnchorView(findViewById(R.id.mediacontroller_anchor));
         vidView.setMediaController(mediaController);
 */
-        chatWebview = (WebView) findViewById(R.id.chat_webview);
-        WebSettings settings = chatWebview.getSettings();
-        settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(true);
-        String url = appConfig.getProperty("irc.web_url");
-        String nick = "";
-        try {
-            nick = URLEncoder.encode(sharedPreferences.getString("chat_name", ""), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        ChatFragment chatFragment = new ChatFragment();
 
-        }
-        url = url + "?nick=" + nick;
-        chatWebview.loadUrl(url);
+        getFragmentManager()
+                .beginTransaction()
+                .add(R.id.chat_fragment, chatFragment)
+                .commit();
 
         try {
             vidView.setVideoPath(streamUrl);
@@ -363,7 +358,7 @@ public class PlayStreamActivity extends AppCompatActivity {
 
             p.addRule(RelativeLayout.BELOW, R.id.view_group_video);
 
-            findViewById(R.id.chat_webview).setLayoutParams(p);
+            findViewById(R.id.chat_fragment).setLayoutParams(p);
 
             //               setCoverArtStatus(null);
             if (mPlaybackState == PLAYING

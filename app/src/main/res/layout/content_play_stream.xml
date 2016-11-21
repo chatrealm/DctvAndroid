@@ -107,18 +107,21 @@
 
     </RelativeLayout>
 
-    <WebView
-        android:id="@+id/chat_webview"
+    <!-- Chat View -->
+    <RelativeLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="bottom"
         android:layout_below="@id/view_group_video"
-        android:layout_gravity="bottom" />
+        android:id="@+id/chat_fragment">
+    </RelativeLayout>
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/view_group_video"
-        android:layout_toLeftOf="@id/chat_webview"
+        android:layout_toLeftOf="@id/chat_fragment"
         android:id="@+id/art_fill"
         android:visibility="gone" />
 
