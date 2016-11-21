@@ -11,6 +11,9 @@
             <item name="windowNoTitle">true</item>
 
         </style>
+    <style name="AppTheme.NoActionBar.Launcher" parent="Theme.AppCompat">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
 
     <style name="FullscreenTheme" parent="AppTheme">
         <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>

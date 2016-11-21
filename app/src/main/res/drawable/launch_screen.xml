@@ -1,0 +1,6 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:opacity="opaque">
+    <item android:drawable="@drawable/launch_gradient"/>
+    <item
+            android:drawable="@drawable/product_logo_288dp"
+            android:gravity="center"/>
+</layer-list>
