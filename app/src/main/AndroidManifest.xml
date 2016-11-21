@@ -18,6 +18,7 @@
         <meta-data
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
             android:value="com.tinnvec.dctvandroid.cast.CastOptionsProvider" />
+        <meta-data android:name="com.onesignal.NotificationAccentColor.DEFAULT" android:value="@color/colorAccentDark" />
 
         <activity
             android:name=".LiveChannelsActivity"
