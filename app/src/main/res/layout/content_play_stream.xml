@@ -9,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.tinnvec.dctvandroid.PlayStreamActivity"
         tools:showIn="@layout/activity_play_stream">
 
@@ -17,7 +16,7 @@
             android:id="@+id/actionbarspacer"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
+            android:background="@color/transparent"
             android:elevation="@dimen/actionbar_elevation"
             android:orientation="horizontal"
             android:visibility="visible" />
@@ -141,21 +140,26 @@
                 android:scaleType="fitStart" />
         </RelativeLayout>
 
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/view_group_video"
+            android:layout_alignRight="@id/view_group_video"
+            android:layout_alignTop="@id/view_group_video"
+            android:animateLayoutChanges="true"
+            android:background="#00000000"
+            app:elevation="0dp">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:elevation="0dp" />
+
+        </android.support.design.widget.AppBarLayout>
+
     </RelativeLayout>
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/toolbar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
-        android:background="#00000000"
-        app:elevation="0dp">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:elevation="0dp" />
-
-    </android.support.design.widget.AppBarLayout>
 </RelativeLayout>

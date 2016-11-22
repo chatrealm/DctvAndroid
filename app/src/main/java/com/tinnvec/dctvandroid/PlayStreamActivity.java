@@ -373,11 +373,10 @@ public class PlayStreamActivity extends AppCompatActivity {
 
             hideVideoView();
             setPortraitMode();
-            getSupportActionBar().show();
-
 
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#212121")));
             getSupportActionBar().setElevation(getResources().getDimensionPixelSize(R.dimen.actionbar_elevation));
+            getSupportActionBar().show();
 
             findViewById(R.id.actionbarspacer).setVisibility(View.VISIBLE);
             RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -397,12 +396,16 @@ public class PlayStreamActivity extends AppCompatActivity {
     private void hideVideoView() {
         if (findViewById(R.id.view_group_video).getVisibility() == View.VISIBLE) {
             findViewById(R.id.view_group_video).setVisibility(View.GONE);
+            mControllers.setVisibility(View.GONE);
+            mLoading.setVisibility(View.GONE);
         }
     }
 
     private void showVideoView() {
         if (findViewById(R.id.view_group_video).getVisibility() != View.VISIBLE) {
             findViewById(R.id.view_group_video).setVisibility(View.VISIBLE);
+            mControllers.setVisibility(View.VISIBLE);
+            mLoading.setVisibility(View.VISIBLE);
         }
 
     }
@@ -860,6 +863,11 @@ public class PlayStreamActivity extends AppCompatActivity {
 
     public void revealChat(){
         chatContainer.setVisibility(View.VISIBLE);
+
+        FrameLayout container = (FrameLayout) findViewById(R.id.view_group_video);
+        container.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) chatContainer.getLayoutParams();
         params.addRule(RelativeLayout.BELOW, 0);
         params.addRule(RelativeLayout.RIGHT_OF, R.id.view_group_video);
@@ -868,11 +876,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams)findViewById(R.id.toolbar_layout).getLayoutParams();
         params2.addRule(RelativeLayout.ALIGN_RIGHT, R.id.view_group_video);
         findViewById(R.id.toolbar_layout).setLayoutParams(params2);
-
-        FrameLayout container = (FrameLayout) findViewById(R.id.view_group_video);
-        container.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
-
 
         DisplayMetrics displaymetrics = new DisplayMetrics();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
