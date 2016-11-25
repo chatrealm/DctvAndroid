@@ -52,8 +52,8 @@
                 android:id="@+id/channelart"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="24dp"
-                android:scaleType="fitCenter" />
+                android:scaleType="fitCenter"
+                android:visibility="visible" />
 
             <ProgressBar
                 style="@style/Widget.AppCompat.ProgressBar"

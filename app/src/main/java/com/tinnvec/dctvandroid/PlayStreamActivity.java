@@ -102,6 +102,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private RelativeLayout chatContainer;
     private String streamService;
     private ChatFragment chatFragment;
+    private boolean artShown;
 
     @SuppressLint("NewApi")
     @Override
@@ -567,16 +568,19 @@ public class PlayStreamActivity extends AppCompatActivity {
                             mPlaybackState = PlaybackState.BUFFERING;
                             updatePlayButton(mPlaybackState);
                             updateControllersVisibility(true);
-                            ImageView channelart = (ImageView) findViewById(R.id.channelart);
-                            channelart.setVisibility(View.VISIBLE);
+                            if (!artShown) {
+                                ImageView channelart = (ImageView) findViewById(R.id.channelart);
+                                channelart.setVisibility(View.VISIBLE);
+                            }
                             break;
                         case android.media.MediaPlayer.MEDIA_INFO_BUFFERING_END:
                             mLocation = PlaybackLocation.LOCAL;
                             mp.start();
                             mPlaybackState = PLAYING;
                             updatePlayButton(mPlaybackState);
-                            channelart = (ImageView) findViewById(R.id.channelart);
+                            ImageView channelart = (ImageView) findViewById(R.id.channelart);
                             channelart.setVisibility(View.GONE);
+                            artShown = true;
                             startControllersTimer();
                             break;
                     }
