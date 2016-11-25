@@ -30,7 +30,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -47,7 +46,9 @@ import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
 import com.squareup.picasso.Picasso;
 import com.tinnvec.dctvandroid.channel.AbstractChannel;
+import com.tinnvec.dctvandroid.channel.DctvChannel;
 import com.tinnvec.dctvandroid.channel.Quality;
+import com.tinnvec.dctvandroid.channel.TwitchChannel;
 import com.tinnvec.dctvandroid.channel.YoutubeChannel;
 
 import java.util.Properties;
@@ -62,11 +63,16 @@ import io.vov.vitamio.widget.VideoView;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.tinnvec.dctvandroid.PlayStreamActivity.PlaybackState.PLAYING;
-import static com.tinnvec.dctvandroid.channel.Quality.HIGH;
 
 public class PlayStreamActivity extends AppCompatActivity {
     private static final String TAG = PlayStreamActivity.class.getName();
     private final Handler mHandler = new Handler();
+    private final Handler mHideHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            hideSystemUI();
+        }
+    };
     private ProgressDialog progressDialog;
     private VideoView vidView;
     private String streamUrl;
@@ -92,6 +98,8 @@ public class PlayStreamActivity extends AppCompatActivity {
     private Properties appConfig;
     private Quality currentQuality;
     private RelativeLayout chatContainer;
+    private String streamService;
+    private ChatFragment chatFragment;
 
     @SuppressLint("NewApi")
     @Override
@@ -181,7 +189,23 @@ public class PlayStreamActivity extends AppCompatActivity {
         mediaController.setAnchorView(findViewById(R.id.mediacontroller_anchor));
         vidView.setMediaController(mediaController);
 */
-        ChatFragment chatFragment = new ChatFragment();
+        chatFragment = new ChatFragment();
+
+        streamService = "dctv";
+        if (channel instanceof YoutubeChannel) {
+            streamService = "youtube";
+        }
+        if (channel instanceof TwitchChannel) {
+            streamService = "twitch";
+        }
+        if (channel instanceof DctvChannel) {
+            streamService = "dctv";
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putString("streamService", streamService);
+        bundle.putString("channelName", channel.getName());
+        chatFragment.setArguments(bundle);
 
         getFragmentManager()
                 .beginTransaction()
@@ -198,11 +222,9 @@ public class PlayStreamActivity extends AppCompatActivity {
             if (mCastSession != null && mCastSession.isConnected()) {
                 updatePlaybackLocation(PlaybackLocation.REMOTE);
                 RemoteMediaClient remoteMediaClient = mCastSession.getRemoteMediaClient();
-                if (remoteMediaClient.getMediaInfo() == null)
-                {
+                if (remoteMediaClient.getMediaInfo() == null) {
                     loadRemoteMedia(true);
-                }
-                else if (remoteMediaClient.getMediaInfo() != null){
+                } else if (remoteMediaClient.getMediaInfo() != null) {
                     if (!remoteMediaClient.getMediaInfo().getMetadata().getString(MediaMetadata.KEY_TITLE).equals(channel.getFriendlyAlias())) {
                         loadRemoteMedia(true);
                     }
@@ -301,6 +323,8 @@ public class PlayStreamActivity extends AppCompatActivity {
         };
     }
 
+    // building MediaInfo package to pass to chromecast and its logic on the phone
+
     // loads channel to cast device
     private void loadRemoteMedia(boolean autoPlay) {
         if (mCastSession == null) {
@@ -312,8 +336,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         }
         remoteMediaClient.load(buildMediaInfo(), autoPlay);
     }
-
-    // building MediaInfo package to pass to chromecast and its logic on the phone
 
     private MediaInfo buildMediaInfo() {
         MediaMetadata movieMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
@@ -367,7 +389,7 @@ public class PlayStreamActivity extends AppCompatActivity {
 //                setCoverArtStatus(mSelectedMedia.getImage(0));
             }
         } else {
-            if (mLandscapeChatState == LandscapeChatState.SHOWING){
+            if (mLandscapeChatState == LandscapeChatState.SHOWING) {
                 hideChat();
             }
 
@@ -410,7 +432,6 @@ public class PlayStreamActivity extends AppCompatActivity {
 
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -421,6 +442,18 @@ public class PlayStreamActivity extends AppCompatActivity {
         mediaRouteMenuItem = CastButtonFactory.setUpMediaRouteButton(getApplicationContext(), menu, R.id.media_route_menu_item);
 
         updateQualityButton(currentQuality);
+
+        if (chatFragment.shouldDisplayChatroomSwitcher()) {
+            menu.findItem(R.id.switch_chat).setVisible(true);
+            if (chatFragment.getDisplayedChatroomType().equals("alt")) {
+                menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
+            }
+            if (chatFragment.getDisplayedChatroomType().equals("main")) {
+                menu.findItem(R.id.switch_chat).setTitle("Switch to alt. chat room");
+            }
+        } else {
+            menu.findItem(R.id.switch_chat).setVisible(false);
+        }
 
         return true;
     }
@@ -453,6 +486,17 @@ public class PlayStreamActivity extends AppCompatActivity {
                 builder.show();
 
                 return true;
+            case R.id.switch_chat:
+                String chatroomType = chatFragment.getDisplayedChatroomType();
+                if (chatroomType == "alt") {
+                    chatFragment.setChatroom(true, streamService, channel.getName());
+                    menu.findItem(R.id.switch_chat).setTitle("Switch to alt. chat room");
+                }
+                if (chatroomType == "main") {
+                    chatFragment.setChatroom(false, streamService, channel.getName());
+                    menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
+                }
+
         }
 
 
@@ -569,8 +613,8 @@ public class PlayStreamActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-                } else if(getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE){
-                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                } else if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
                 }
             }
         });
@@ -579,7 +623,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (mLandscapeChatState == LandscapeChatState.HIDDEN) {
                     revealChat();
-                } else if (mLandscapeChatState == LandscapeChatState.SHOWING){
+                } else if (mLandscapeChatState == LandscapeChatState.SHOWING) {
                     hideChat();
                 }
             }
@@ -610,8 +654,8 @@ public class PlayStreamActivity extends AppCompatActivity {
         }
     }
 
-    private void updateFullscreenButton(boolean isPortrait){
-        if (isPortrait){
+    private void updateFullscreenButton(boolean isPortrait) {
+        if (isPortrait) {
             mFullscreenSwitch.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.fullscreen_button, null));
         } else {
             mFullscreenSwitch.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.fullscreen_exit_button, null));
@@ -769,8 +813,8 @@ public class PlayStreamActivity extends AppCompatActivity {
                 delayedHide(300);
             }
         } else {
-                mHideHandler.removeMessages(0);
-            }
+            mHideHandler.removeMessages(0);
+        }
 
 
     }
@@ -784,7 +828,6 @@ public class PlayStreamActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
     }
-
 
     public void setLandscapeMode() {
         delayedHide(600);
@@ -814,14 +857,14 @@ public class PlayStreamActivity extends AppCompatActivity {
     }
 
     public void setPortraitMode() {
-        if (mLandscapeChatState == LandscapeChatState.SHOWING){
+        if (mLandscapeChatState == LandscapeChatState.SHOWING) {
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) chatContainer.getLayoutParams();
             params.addRule(RelativeLayout.RIGHT_OF, 0);
             params.addRule(RelativeLayout.BELOW, R.id.view_group_video);
             chatContainer.setLayoutParams(params);
 
-            RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams)findViewById(R.id.toolbar_layout).getLayoutParams();
-            params2.addRule(RelativeLayout.ALIGN_RIGHT,0);
+            RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) findViewById(R.id.toolbar_layout).getLayoutParams();
+            params2.addRule(RelativeLayout.ALIGN_RIGHT, 0);
             findViewById(R.id.toolbar_layout).setLayoutParams(params2);
 
             RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
@@ -861,7 +904,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         vidView.setLayoutParams(new FrameLayout.LayoutParams(intWidth, intHeight));
     }
 
-    public void revealChat(){
+    public void revealChat() {
         chatContainer.setVisibility(View.VISIBLE);
 
         FrameLayout container = (FrameLayout) findViewById(R.id.view_group_video);
@@ -873,7 +916,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         params.addRule(RelativeLayout.RIGHT_OF, R.id.view_group_video);
         chatContainer.setLayoutParams(params);
 
-        RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams)findViewById(R.id.toolbar_layout).getLayoutParams();
+        RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) findViewById(R.id.toolbar_layout).getLayoutParams();
         params2.addRule(RelativeLayout.ALIGN_RIGHT, R.id.view_group_video);
         findViewById(R.id.toolbar_layout).setLayoutParams(params2);
 
@@ -960,8 +1003,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         }, 500);
 
 
-
-        RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams)findViewById(R.id.toolbar_layout).getLayoutParams();
+        RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) findViewById(R.id.toolbar_layout).getLayoutParams();
         params2.addRule(RelativeLayout.ALIGN_RIGHT, 0);
         findViewById(R.id.toolbar_layout).setLayoutParams(params2);
 
@@ -969,16 +1011,11 @@ public class PlayStreamActivity extends AppCompatActivity {
         mChatrealmRevealer.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_chatrealm_reveal, null));
     }
 
-    private final Handler mHideHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            hideSystemUI();
-        }
-    };
     private void delayedHide(int delayMillis) {
         mHideHandler.removeMessages(0);
         mHideHandler.sendEmptyMessageDelayed(0, delayMillis);
     }
+
     /**
      * indicates whether we are doing a local or a remote playback
      */
