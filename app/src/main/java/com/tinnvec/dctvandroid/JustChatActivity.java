@@ -41,6 +41,11 @@ public class JustChatActivity extends AppCompatActivity {
 
         ChatFragment chatFragment = new ChatFragment();
 
+        Bundle bundle = new Bundle();
+        bundle.putString("streamService", "none");
+        bundle.putString("channelName", "none");
+        chatFragment.setArguments(bundle);
+
         getFragmentManager()
                 .beginTransaction()
                 .add(R.id.chat_fragment, chatFragment)
