@@ -44,7 +44,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
         setTheme(R.style.AppTheme_NoActionBar);
         super.onCreate(savedInstanceState);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        appConfig = ((DctvApplication)getApplication()).getAppConfig();
+        appConfig = ((DctvApplication) getApplication()).getAppConfig();
         setContentView(R.layout.activity_live_channels);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -138,7 +138,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
                 public void run() {
                     mIntroductoryOverlay = new IntroductoryOverlay.Builder(
                             LiveChannelsActivity.this, mediaRouteMenuItem)
-                            .setTitleText("Introducing Cast")
+                            .setTitleText(getString(R.string.cast_introduction))
                             .setSingleTime()
                             .setOnOverlayDismissedListener(
                                     new IntroductoryOverlay.OnOverlayDismissedListener() {

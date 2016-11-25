@@ -1,14 +1,18 @@
 <resources>
-    <string name="app_name">diamondclub.tv</string>
+    <string name="app_name">Diamond Club TV</string>
     <string name="action_settings">Settings</string>
     <string name="action_quality">Stream Quality</string>
     <string name="channel_art_description">Channel art</string>
     <string name="title_activity_play_stream">PlayStreamActivity</string>
     <string name="main_bg_description">Diamondclub logo</string>
 
+    <string name="media_route_menu_title">Play on…</string>
+    <string name="cast_introduction">Play our streams on your big screen!</string>
 
-    <string name="media_route_menu_title">Play on...</string>
     <string name="chat">Open Chat</string>
+
+    <string name="alt_chat_msg">An alternative chatroom is displayed. You can go back to Chatrealm\'s #chat channel via the menu</string>
+
     <string name="video_error_media_load_timeout">Timeout loading video</string>
     <string name="video_error_server_unaccessible">Stream server not accessible</string>
     <string name="video_error_unknown_error">Unknown Error</string>
@@ -21,5 +25,6 @@
     <string name="pref_stream_quality">Stream Video Quality</string>
     <string name="pref_stream_quality_summary">Stream Video Quality</string>
     <string name="pref_stream_quality_default">high</string>
+
 
 </resources>

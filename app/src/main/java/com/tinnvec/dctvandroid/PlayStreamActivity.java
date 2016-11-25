@@ -17,11 +17,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -447,6 +449,9 @@ public class PlayStreamActivity extends AppCompatActivity {
             menu.findItem(R.id.switch_chat).setVisible(true);
             if (chatFragment.getDisplayedChatroomType().equals("alt")) {
                 menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
+                String msg = getString(R.string.alt_chat_msg);
+                Snackbar.make(findViewById(R.id.root_coordinator), msg , Snackbar.LENGTH_LONG)
+                        .show();
             }
             if (chatFragment.getDisplayedChatroomType().equals("main")) {
                 menu.findItem(R.id.switch_chat).setTitle("Switch to alt. chat room");
@@ -488,11 +493,10 @@ public class PlayStreamActivity extends AppCompatActivity {
                 return true;
             case R.id.switch_chat:
                 String chatroomType = chatFragment.getDisplayedChatroomType();
-                if (chatroomType == "alt") {
+                if (chatroomType.equals("alt")) {
                     chatFragment.setChatroom(true, streamService, channel.getName());
                     menu.findItem(R.id.switch_chat).setTitle("Switch to alt. chat room");
-                }
-                if (chatroomType == "main") {
+                }else if (chatroomType.equals("main")) {
                     chatFragment.setChatroom(false, streamService, channel.getName());
                     menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
                 }
@@ -521,11 +525,9 @@ public class PlayStreamActivity extends AppCompatActivity {
                 } else {
                     msg = getString(R.string.video_error_unknown_error);
                 }
-                Context context = getApplicationContext();
-                int duration = Toast.LENGTH_LONG;
                 String text = "Error: " + msg;
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
+                Snackbar.make(findViewById(R.id.root_coordinator), text, Snackbar.LENGTH_LONG)
+                        .show();
                 vidView.stopPlayback();
                 mPlaybackState = PlaybackState.IDLE;
                 updatePlayButton(mPlaybackState);
