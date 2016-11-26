@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -473,6 +474,8 @@ public class PlayStreamActivity extends AppCompatActivity {
 
         switch (id) {
             case R.id.action_settings:
+                Intent intent = new Intent(getBaseContext(), SettingsActivity.class);
+                startActivity(intent);
                 return true;
             case R.id.action_quality:
                 String qualities[] = Quality.allAsStrings(channel.getAllowedQualities());
@@ -495,13 +498,12 @@ public class PlayStreamActivity extends AppCompatActivity {
             case R.id.switch_chat:
                 String chatroomType = chatFragment.getDisplayedChatroomType();
                 if (chatroomType.equals("alt")) {
-                    chatFragment.setChatroom(true, streamService, channel.getName());
-                    menu.findItem(R.id.switch_chat).setTitle("Switch to alt. chat room");
+                    chatFragment.setChatroom("dctv", "dummy");
+                    menu.findItem(R.id.switch_chat).setTitle("Switch to alternative chat room");
                 }else if (chatroomType.equals("main")) {
-                    chatFragment.setChatroom(false, streamService, channel.getName());
+                    chatFragment.setChatroom(streamService, channel.getName());
                     menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
                 }
-
         }
 
 

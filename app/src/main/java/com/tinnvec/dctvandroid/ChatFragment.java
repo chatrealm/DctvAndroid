@@ -57,12 +57,12 @@ public class ChatFragment extends Fragment {
         String streamService = this.getArguments().getString("streamService");
         String channelName = this.getArguments().getString("channelName");
 
-        setChatroom(false, streamService, channelName);
+        setChatroom(streamService, channelName);
 
         return chatLayout;
     }
 
-    public void setChatroom(boolean overrideToMain, String streamService, String channelName) {
+    public void setChatroom(String streamService, String channelName) {
         String url = appConfig.getProperty("irc.web_url");
         String chatRoom = "#chat";
         String nick = "";
@@ -70,13 +70,6 @@ public class ChatFragment extends Fragment {
         try {
             nick = URLEncoder.encode(sharedPreferences.getString("chat_name", ""), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-        }
-        if (overrideToMain) {
-            url = url + "?nick=" + nick + chatRoom;
-            chatWebview.loadUrl(url);
-            chatWebview.reload();
-            chatRoomType = "main";
-            return;
         }
         if (streamService.equals("dctv") || streamService.equals("youtube")) {
             chatRoomType = "main";
@@ -101,6 +94,7 @@ public class ChatFragment extends Fragment {
             }
             url = url + "?nick=" + nick + chatRoom;
             chatWebview.loadUrl(url);
+            chatWebview.reload();
             return;
         } else if (streamService.equals("twitch")) {
             if (channelName.equals("coverville")){
