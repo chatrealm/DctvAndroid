@@ -1,22 +1,14 @@
 package com.tinnvec.dctvandroid;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
-import static com.tinnvec.dctvandroid.R.string.chat;
 
 
 public class JustChatActivity extends AppCompatActivity {
@@ -65,4 +57,18 @@ public class JustChatActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.navigate_back:
+                WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
+                chatWebview.goBack();
+        }
+        return true;
+    }
 }

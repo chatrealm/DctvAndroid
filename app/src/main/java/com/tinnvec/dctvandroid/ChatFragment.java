@@ -1,13 +1,15 @@
 package com.tinnvec.dctvandroid;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -45,12 +47,19 @@ public class ChatFragment extends Fragment {
         WebSettings settings = chatWebview.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
 
-// Needed to allow users to log in to twitch chat
+// Needed to allow users to log in to twitch chat while opening other links externally
+        chatWebview.setWebChromeClient(new WebChromeClient());
         chatWebview.setWebViewClient(new WebViewClient() {
-            @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return false;
+                if (url.contains("api.twitch.tv")) {
+                    return false;
+                } else {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(browserIntent);
+                    return true;
+                }
             }
         });
 

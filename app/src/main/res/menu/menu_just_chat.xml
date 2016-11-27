@@ -12,4 +12,10 @@
         android:title="@string/action_settings"
         app:showAsAction="never"/>
 
+    <item
+        android:id="@+id/navigate_back"
+        android:checkable="false"
+        android:title="Chat: Navigate Back"
+        app:showAsAction="withText" />
+
 </menu>
