@@ -76,10 +76,10 @@
             android:layout_marginBottom="16dp" />
 
         <Button
-            android:text="Open this project on Github"
+            android:text="Our Github Project"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/button4"
+            android:id="@+id/button_github"
             android:background="?android:attr/selectableItemBackground"
             android:onClick="onGithubClick" />
 
@@ -87,7 +87,7 @@
             android:text="Open Source Licences"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/button2"
+            android:id="@+id/button_licences"
             android:background="?android:attr/selectableItemBackground"
             android:onClick="onLicencesClick" />
     </LinearLayout>
