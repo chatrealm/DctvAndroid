@@ -124,6 +124,10 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
             Intent intent = new Intent(getBaseContext(), JustChatActivity.class);
             startActivity(intent);
         }
+        if (id == R.id.about) {
+            Intent intent = new Intent(getBaseContext(), AboutActivity.class);
+            startActivity(intent);
+        }
 
         return super.onOptionsItemSelected(item);
     }

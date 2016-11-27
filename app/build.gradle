@@ -12,7 +12,7 @@ android {
         versionCode project.VERSION_CODE.toInteger()
         versionName project.VERSION_NAME
 
-        manifestPlaceholders = [onesignal_app_id: "8fca7cd5-ca1d-4d45-a44d-c2afa00d8724",
+        manifestPlaceholders = [onesignal_app_id               : "8fca7cd5-ca1d-4d45-a44d-c2afa00d8724",
                                 // Project number pulled from dashboard, local value is ignored.
                                 onesignal_google_project_number: "REMOTE"]
         ndk {
@@ -46,6 +46,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-cast-framework:10.0.0'
     compile 'com.googlecode.android-query:android-query:0.25.9'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'de.psdev.licensesdialog:licensesdialog:1.8.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

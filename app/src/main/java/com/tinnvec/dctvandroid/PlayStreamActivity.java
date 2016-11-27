@@ -467,9 +467,9 @@ public class PlayStreamActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         String chatroomType = chatFragment.getDisplayedChatroomType();
         if (chatroomType.equals("alt")) {
-            menu.findItem(R.id.switch_chat).setTitle("Switch to alternative chat room");
-        } else if (chatroomType.equals("main")) {
             menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
+        } else if (chatroomType.equals("main")) {
+            menu.findItem(R.id.switch_chat).setTitle("Switch to channel chat room");
         }
 
         WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
