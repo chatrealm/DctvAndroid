@@ -24,7 +24,12 @@
 
     <item
         android:id="@+id/navigate_back"
-        android:checkable="false"
         android:title="Chat: Navigate Back"
+        app:showAsAction="withText" />
+
+    <item
+        android:id="@+id/test"
+        android:title="TEST"
+        android:visible="false"
         app:showAsAction="withText" />
 </menu>

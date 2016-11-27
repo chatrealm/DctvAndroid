@@ -464,6 +464,25 @@ public class PlayStreamActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        String chatroomType = chatFragment.getDisplayedChatroomType();
+        if (chatroomType.equals("alt")) {
+            menu.findItem(R.id.switch_chat).setTitle("Switch to alternative chat room");
+        } else if (chatroomType.equals("main")) {
+            menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
+        }
+
+        WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
+        if (chatWebview.canGoBack()) {
+            menu.findItem(R.id.navigate_back).setVisible(true);
+        } else {
+            menu.findItem(R.id.navigate_back).setVisible(false);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
