@@ -102,8 +102,8 @@ public class ChatFragment extends Fragment {
                 shouldDisplayChatroomSwitcher = true;
             }
             url = url + "?nick=" + nick + chatRoom;
+            chatWebview.clearHistory();
             chatWebview.loadUrl(url);
-            chatWebview.reload();
             return;
         } else if (streamService.equals("twitch")) {
             if (channelName.equals("coverville")){
@@ -114,16 +114,16 @@ public class ChatFragment extends Fragment {
                 url = "https://www.twitch.tv/";
                 chatRoom = channelName;
                 url = url + chatRoom + "/chat?popout=";
+                chatWebview.clearHistory();
                 chatWebview.loadUrl(url);
-                chatWebview.reload();
                 chatRoomType = "alt";
                 shouldDisplayChatroomSwitcher = true;
                 return;
             }
         }
         url = url + "?nick=" + nick + chatRoom;
+        chatWebview.clearHistory();
         chatWebview.loadUrl(url);
-        chatWebview.reload();
     }
 
     public String getDisplayedChatroomType() {
