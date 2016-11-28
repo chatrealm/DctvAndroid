@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:animateLayoutChanges="true"
-        tools:context="com.tinnvec.dctvandroid.PlayStreamActivity"
-        tools:showIn="@layout/activity_play_stream">
+        android:animateLayoutChanges="true">
 
         <LinearLayout
             android:id="@+id/actionbarspacer"
@@ -37,7 +34,6 @@
 
         </FrameLayout>
 
-        <!-- Chat View -->
         <RelativeLayout
             android:id="@+id/buffer_circle"
             android:layout_width="match_parent"
@@ -61,7 +57,6 @@
                 android:layout_height="96dp"
                 android:layout_centerInParent="true"
                 android:theme="@style/AppTheme" />
-
         </RelativeLayout>
 
         <RelativeLayout
@@ -113,33 +108,6 @@
 
         </RelativeLayout>
 
-        <!-- Chat View -->
-        <RelativeLayout
-            android:id="@+id/chat_fragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/view_group_video"
-            android:layout_gravity="bottom"
-            android:orientation="vertical"></RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/art_fill_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/view_group_video"
-            android:layout_toLeftOf="@id/chat_fragment"
-            android:animateLayoutChanges="false"
-            android:background="@color/colorPrimary"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/art_fill"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentLeft="false"
-                android:padding="16dp"
-                android:scaleType="fitStart" />
-        </RelativeLayout>
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/toolbar_layout"

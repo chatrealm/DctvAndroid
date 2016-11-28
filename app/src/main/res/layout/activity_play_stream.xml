@@ -1,16 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/root_coordinator"
-    tools:context="com.tinnvec.dctvandroid.PlayStreamActivity"
     android:animateLayoutChanges="true">
 
-    <include layout="@layout/content_play_stream"
+    <RelativeLayout
+        android:id="@+id/video_fragment"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_width="match_parent" />
+        android:animateLayoutChanges="true">
+    </RelativeLayout>
+
+
+    <!-- Chat View -->
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:layout_below="@id/video_fragment"
+        android:id="@+id/chat_fragment">
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/art_fill_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/video_fragment"
+        android:layout_toLeftOf="@id/chat_fragment"
+        android:animateLayoutChanges="false"
+        android:background="@color/colorPrimary"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/art_fill"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="false"
+            android:padding="16dp"
+            android:scaleType="fitStart" />
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>
