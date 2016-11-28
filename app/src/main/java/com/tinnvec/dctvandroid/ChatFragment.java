@@ -53,7 +53,7 @@ public class ChatFragment extends Fragment {
         chatWebview.setWebChromeClient(new WebChromeClient());
         chatWebview.setWebViewClient(new WebViewClient() {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.contains("api.twitch.tv")) {
+                if (url.contains("twitch.tv")) {
                     return false;
                 } else {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
