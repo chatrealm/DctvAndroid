@@ -57,9 +57,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
-import io.vov.vitamio.MediaPlayer;
-import io.vov.vitamio.Vitamio;
-import io.vov.vitamio.widget.VideoView;
 
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
@@ -75,7 +72,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         }
     };
     private ProgressDialog progressDialog;
-    private VideoView vidView;
+
     private String streamUrl;
     //converted to global for interaction with cast methods
     private AbstractChannel channel;
@@ -86,28 +83,23 @@ public class PlayStreamActivity extends AppCompatActivity {
     private CastSession mCastSession;
     private SessionManagerListener<CastSession> mSessionManagerListener;
     private PlaybackLocation mLocation;
-    private PlaybackState mPlaybackState;
-    private MediaPlayer mediaPlayer;
-    private ImageButton mPlayPause;
-    private ImageButton mFullscreenSwitch;
-    private ImageButton mChatrealmRevealer;
+
+
     private LandscapeChatState mLandscapeChatState;
-    private RelativeLayout mLoading;
-    private View mControllers;
-    private boolean mControllersVisible;
-    private Timer mControllersTimer;
+
+
     private Properties appConfig;
     private Quality currentQuality;
     private RelativeLayout chatContainer;
     private String streamService;
     private ChatFragment chatFragment;
-    private boolean artShown;
+    private VideoFragment mVideoFragment;
+
 
     @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Vitamio.isInitialized(getApplicationContext());
 
         channel = getIntent().getExtras().getParcelable(LiveChannelsActivity.CHANNEL_DATA);
         if (channel == null)
@@ -135,20 +127,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
         mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
 
-        String title = channel.getFriendlyAlias();
-        title = title != null ? title : "Unknown";
-
-        ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
-        String urlChannelart = channel.getImageAssetHDUrl();
-
-        if (urlChannelart != null) {
-            Picasso.with(this)
-                    .load(urlChannelart)
-                    .into(channelArtView);
-        } else {
-            Drawable defaultArt = ResourcesCompat.getDrawable(getResources(), R.drawable.dctv_bg, null);
-            channelArtView.setImageDrawable(defaultArt);
-        }
 
 
    /*         Bitmap resizedBitmap = channel.getImageBitmap(this);
@@ -158,6 +136,8 @@ public class PlayStreamActivity extends AppCompatActivity {
 
 
  */
+        String title = channel.getFriendlyAlias();
+        title = title != null ? title : "Unknown";
 
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
@@ -175,17 +155,10 @@ public class PlayStreamActivity extends AppCompatActivity {
         progressDialog.setIndeterminate(false);
         progressDialog.setCancelable(false);
 */
-        vidView = (VideoView) findViewById(R.id.video_view);
+
 //        vidView.setOnInfoListener(this);
         //       vidView.setOnPreparedListener(this);
 //        vidView.setOnErrorListener(this);
-        mPlayPause = (ImageButton) findViewById(R.id.play_pause_button);
-        mLoading = (RelativeLayout) findViewById(R.id.buffer_circle);
-        mControllers = findViewById(R.id.mediacontroller_anchor);
-        mFullscreenSwitch = (ImageButton) findViewById(R.id.fullscreen_switch_button);
-        mChatrealmRevealer = (ImageButton) findViewById(R.id.reveal_chat_button);
-
-        setupControlsCallbacks();
 
 /*        MediaController mediaController = new MediaController(vidView.getContext());
         mediaController.setAnchorView(findViewById(R.id.mediacontroller_anchor));
@@ -204,14 +177,24 @@ public class PlayStreamActivity extends AppCompatActivity {
             streamService = "dctv";
         }
 
-        Bundle bundle = new Bundle();
-        bundle.putString("streamService", streamService);
-        bundle.putString("channelName", channel.getName());
-        chatFragment.setArguments(bundle);
+        Bundle chatBundle = new Bundle();
+        chatBundle.putString("streamService", streamService);
+        chatBundle.putString("channelName", channel.getName());
+
+        chatFragment.setArguments(chatBundle);
+
+        VitamioStreamFragment videoFragment = new VitamioStreamFragment();
+        mVideoFragment = videoFragment;
+
+        Bundle videoBundle = new Bundle();
+        videoBundle.putParcelable("channel", channel);
+
+        videoFragment.setArguments(videoBundle);
 
         getFragmentManager()
                 .beginTransaction()
                 .add(R.id.chat_fragment, chatFragment)
+                .add(R.id.video_fragment, videoFragment)
                 .commit();
 
         chatContainer = (RelativeLayout) findViewById(R.id.chat_fragment);
@@ -418,18 +401,18 @@ public class PlayStreamActivity extends AppCompatActivity {
     }
 
     private void hideVideoView() {
-        if (findViewById(R.id.view_group_video).getVisibility() == View.VISIBLE) {
-            findViewById(R.id.view_group_video).setVisibility(View.GONE);
-            mControllers.setVisibility(View.GONE);
-            mLoading.setVisibility(View.GONE);
+        if (findViewById(R.id.video_fragment).getVisibility() == View.VISIBLE) {
+            findViewById(R.id.video_fragment).setVisibility(View.GONE);
+//            mControllers.setVisibility(View.GONE);
+//            mLoading.setVisibility(View.GONE);
         }
     }
 
     private void showVideoView() {
-        if (findViewById(R.id.view_group_video).getVisibility() != View.VISIBLE) {
-            findViewById(R.id.view_group_video).setVisibility(View.VISIBLE);
-            mControllers.setVisibility(View.VISIBLE);
-            mLoading.setVisibility(View.VISIBLE);
+        if (findViewById(R.id.video_fragment).getVisibility() != View.VISIBLE) {
+            findViewById(R.id.video_fragment).setVisibility(View.VISIBLE);
+//            mControllers.setVisibility(View.VISIBLE);
+//            mLoading.setVisibility(View.VISIBLE);
         }
 
     }
@@ -530,165 +513,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void setupControlsCallbacks() {
-        vidView.setOnErrorListener(new io.vov.vitamio.MediaPlayer.OnErrorListener() {
-
-            @SuppressLint("NewApi")
-            @Override
-            public boolean onError(io.vov.vitamio.MediaPlayer mp, int what, int extra) {
-                Log.e(TAG, "OnErrorListener.onError(): VideoView encountered an " +
-                        "error, what: " + what + ", extra: " + extra);
-                String msg = "";
-                if (extra == android.media.MediaPlayer.MEDIA_ERROR_TIMED_OUT) {
-                    msg = getString(R.string.video_error_media_load_timeout);
-                } else if (what == android.media.MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
-                    msg = getString(R.string.video_error_server_unaccessible);
-                } else if (channel instanceof YoutubeChannel) {
-                    msg = getString(R.string.video_error_youtube);
-                } else {
-                    msg = getString(R.string.video_error_unknown_error);
-                }
-                String text = "Error: " + msg;
-                Snackbar.make(findViewById(R.id.root_coordinator), text, Snackbar.LENGTH_LONG)
-                        .show();
-                vidView.stopPlayback();
-                mPlaybackState = PlaybackState.IDLE;
-                updatePlayButton(mPlaybackState);
-                return true;
-            }
-        });
-
-        vidView.setOnPreparedListener(new io.vov.vitamio.MediaPlayer.OnPreparedListener() {
-
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                if (mLocation == PlaybackLocation.LOCAL) {
-                    vidView.requestFocus();
-                    mp.start();
-                    mPlaybackState = PLAYING;
-                    updatePlayButton(mPlaybackState);
-                }
-                if (mLocation == PlaybackLocation.REMOTE) {
-                    vidView.pause();
-                    mp.stop();
-                    setPortraitMode();
-                    updatePlayButton(mPlaybackState);
-                    if (mCastSession != null && mCastSession.isConnected()) loadRemoteMedia(true);
-                }
-            }
-        });
-
-        vidView.setOnInfoListener(new io.vov.vitamio.MediaPlayer.OnInfoListener() {
-            @Override
-            public boolean onInfo(MediaPlayer mp, int what, int extra) {
-                if (mLocation == PlaybackLocation.LOCAL) {
-                    switch (what) {
-                        case android.media.MediaPlayer.MEDIA_INFO_BUFFERING_START:
-                            if (mp.isPlaying()) {
-                                mp.pause();
-                            }
-                            mPlaybackState = PlaybackState.BUFFERING;
-                            updatePlayButton(mPlaybackState);
-                            updateControllersVisibility(true);
-                            if (!artShown) {
-                                ImageView channelart = (ImageView) findViewById(R.id.channelart);
-                                channelart.setVisibility(View.VISIBLE);
-                            }
-                            break;
-                        case android.media.MediaPlayer.MEDIA_INFO_BUFFERING_END:
-                            mLocation = PlaybackLocation.LOCAL;
-                            mp.start();
-                            mPlaybackState = PLAYING;
-                            updatePlayButton(mPlaybackState);
-                            ImageView channelart = (ImageView) findViewById(R.id.channelart);
-                            channelart.setVisibility(View.GONE);
-                            artShown = true;
-                            startControllersTimer();
-                            break;
-                    }
-                }
-
-                return true;
-                //           return false;
-            }
-        });
-
-        vidView.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (!mControllersVisible) {
-                    updateControllersVisibility(true);
-                }
-                if (mPlaybackState == PLAYING) {
-                    startControllersTimer();
-                }
-                return false;
-            }
-        });
-
-
-        mPlayPause.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                togglePlayback();
-            }
-        });
-
-        mFullscreenSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-                } else if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-                }
-            }
-        });
-        mChatrealmRevealer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mLandscapeChatState == LandscapeChatState.HIDDEN) {
-                    revealChat();
-                } else if (mLandscapeChatState == LandscapeChatState.SHOWING) {
-                    hideChat();
-                }
-            }
-        });
-    }
-
-    private void updatePlayButton(PlaybackState state) {
-        switch (state) {
-            case PLAYING:
-                mLoading.setVisibility(View.INVISIBLE);
-                mPlayPause.setVisibility(View.VISIBLE);
-                mPlayPause.setImageDrawable(
-                        ResourcesCompat.getDrawable(getResources(), R.drawable.big_pause_button, null));
-                break;
-            case PAUSED:
-            case IDLE:
-                mLoading.setVisibility(View.INVISIBLE);
-                mPlayPause.setVisibility(View.VISIBLE);
-                mPlayPause.setImageDrawable(
-                        ResourcesCompat.getDrawable(getResources(), R.drawable.big_play_button, null));
-                break;
-            case BUFFERING:
-                mPlayPause.setVisibility(View.INVISIBLE);
-                mLoading.setVisibility(View.VISIBLE);
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void updateFullscreenButton(boolean isPortrait) {
-        if (isPortrait) {
-            mFullscreenSwitch.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.fullscreen_button, null));
-        } else {
-            mFullscreenSwitch.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.fullscreen_exit_button, null));
-        }
-    }
 
     private void videoQualityChanged() {
         this.streamUrl = channel.getStreamUrl(appConfig, currentQuality);
@@ -719,39 +543,6 @@ public class PlayStreamActivity extends AppCompatActivity {
 
     }
 
-    private void togglePlayback() {
-        stopControllersTimer();
-        switch (mPlaybackState) {
-            case PAUSED:
-                switch (mLocation) {
-                    case LOCAL:
-                        vidView.start();
-                        mPlaybackState = PLAYING;
-                        startControllersTimer();
-                        break;
-                    case REMOTE:
-                        break;
-                    default:
-                        break;
-                }
-                break;
-
-            case PLAYING:
-                mPlaybackState = PlaybackState.PAUSED;
-                vidView.pause();
-                break;
-
-            case IDLE:
-                vidView.setVideoPath(streamUrl);
-                vidView.start();
-                mPlaybackState = PLAYING;
-                break;
-
-            default:
-                break;
-        }
-        updatePlayButton(mPlaybackState);
-    }
 
     private void stopControllersTimer() {
         if (null != mControllersTimer) {
