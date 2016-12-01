@@ -1,4 +1,4 @@
-package com.tinnvec.dctvandroid;
+package com.tinnvec.dctvandroid.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,18 +10,19 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.tinnvec.dctvandroid.channel.AbstractChannel;
+import com.tinnvec.dctvandroid.R;
+import com.tinnvec.dctvandroid.channel.RadioChannel;
 import com.tinnvec.dctvandroid.tasks.ImageDownloaderTask;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.ChannelViewHolder> {
-    private final List<AbstractChannel> channelList;
+public class RadioListAdapter extends RecyclerView.Adapter<RadioListAdapter.ChannelViewHolder> {
+    private final List<RadioChannel> channelList;
     private int lastPosition = -1;
-    private ChannelListCallback callback;
+    private RadioListCallback callback;
 
-    public ChannelListAdapter(ChannelListCallback callback) {
+    public RadioListAdapter(RadioListCallback callback) {
         this.channelList = new ArrayList<>();
         this.callback = callback;
     }
@@ -33,12 +34,12 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     }
 
     // Add a list of items
-    public void addAll(List<AbstractChannel> list) {
+    public void addAll(List<RadioChannel> list) {
         channelList.addAll(list);
         notifyDataSetChanged();
     }
 
-    public List<AbstractChannel> getChannelList() {
+    public List<RadioChannel> getChannelList() {
         return this.channelList;
     }
 
@@ -50,13 +51,13 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
                 .from(parent.getContext())
                 .inflate(R.layout.live_list_item, parent, false);
 
-        return new ChannelListAdapter.ChannelViewHolder(v);
+        return new RadioListAdapter.ChannelViewHolder(v);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ChannelViewHolder holder, int position) {
-        final AbstractChannel chan = channelList.get(position);
+        final RadioChannel chan = channelList.get(position);
         if (chan.getImageAssetUrl() != null)
             new ImageDownloaderTask(holder.channelArt).execute(chan.getImageAssetUrl());
 
@@ -93,7 +94,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public class ChannelViewHolder extends RecyclerView.ViewHolder implements  View.OnClickListener{
+    public class ChannelViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         LinearLayout mLinearLayout;
         TextView channelName, channelDescription;
         ImageView channelArt;
@@ -110,7 +111,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
 
         @Override
         public void onClick(View view) {
-            AbstractChannel channel = channelList.get(getAdapterPosition());
+            RadioChannel channel = channelList.get(getAdapterPosition());
             callback.onChannelClicked(channel);
         }
     }

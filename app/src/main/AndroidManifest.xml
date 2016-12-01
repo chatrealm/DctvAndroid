@@ -70,8 +70,17 @@
         <activity
             android:name=".AboutActivity"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName=".LiveChannelsActivity"
-            android:label="About">
+            android:label="About"
+            android:parentActivityName=".LiveChannelsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />
+        </activity>
+        <activity
+            android:name=".RadioChannelsActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="About"
+            android:parentActivityName=".LiveChannelsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />
@@ -91,6 +100,7 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
     </application>
 
 </manifest>

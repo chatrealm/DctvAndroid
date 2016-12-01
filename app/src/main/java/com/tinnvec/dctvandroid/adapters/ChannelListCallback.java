@@ -1,4 +1,4 @@
-package com.tinnvec.dctvandroid;
+package com.tinnvec.dctvandroid.adapters;
 
 
 import com.tinnvec.dctvandroid.channel.AbstractChannel;

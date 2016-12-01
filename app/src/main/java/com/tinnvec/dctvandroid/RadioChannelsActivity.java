@@ -19,20 +19,24 @@ import com.google.android.gms.cast.framework.CastStateListener;
 import com.google.android.gms.cast.framework.IntroductoryOverlay;
 import com.tinnvec.dctvandroid.adapters.ChannelListAdapter;
 import com.tinnvec.dctvandroid.adapters.ChannelListCallback;
+import com.tinnvec.dctvandroid.adapters.RadioListAdapter;
+import com.tinnvec.dctvandroid.adapters.RadioListCallback;
 import com.tinnvec.dctvandroid.channel.AbstractChannel;
+import com.tinnvec.dctvandroid.channel.RadioChannel;
 import com.tinnvec.dctvandroid.tasks.LoadLiveChannelsTask;
+import com.tinnvec.dctvandroid.tasks.LoadRadioChannelsTask;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class LiveChannelsActivity extends AppCompatActivity implements ChannelListCallback {
+public class RadioChannelsActivity extends AppCompatActivity implements RadioListCallback {
 
     public static final String CHANNEL_DATA = "com.tinnvec.dctv_android.CHANNEL_MESSAGE";
-    private static final String TAG = LiveChannelsActivity.class.getName();
+    private static final String TAG = RadioChannelsActivity.class.getName();
     private Properties appConfig;
     private RecyclerView mRecyclerView;
-    private ChannelListAdapter mAdapter;
+    private RadioListAdapter mAdapter;
     private SwipeRefreshLayout swipeContainer;
 
     // added for cast SDK v3
@@ -65,7 +69,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
         mRecyclerView = (RecyclerView) findViewById(R.id.live_list);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getBaseContext(), null));
         mRecyclerView.setHasFixedSize(true);
-        mAdapter = new ChannelListAdapter(this);
+        mAdapter = new RadioListAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
@@ -73,10 +77,10 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
             @Override
             public void onRefresh() {
 
-                new LoadLiveChannelsTask(mRecyclerView, appConfig) {
+                new LoadRadioChannelsTask(mRecyclerView, appConfig) {
 
                     @Override
-                    protected void onPostExecute(List<AbstractChannel> result) {
+                    protected void onPostExecute(List<RadioChannel> result) {
                         super.onPostExecute(result);
                         swipeContainer.setRefreshing(false);
                     }
@@ -87,14 +91,14 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        ArrayList<AbstractChannel> savedChannels = null;
+        ArrayList<RadioChannel> savedChannels = null;
         if (savedInstanceState != null) {
             savedChannels = savedInstanceState.getParcelableArrayList("CHANNEL_LIST");
         }
         if (savedChannels != null) {
             mAdapter.addAll(savedChannels);
         } else {
-            new LoadLiveChannelsTask(mRecyclerView, appConfig).execute();
+            new LoadRadioChannelsTask(mRecyclerView, appConfig).execute();
         }
     }
 
@@ -130,10 +134,6 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
             Intent intent = new Intent(getBaseContext(), AboutActivity.class);
             startActivity(intent);
         }
-        if (id == R.id.radio) {
-            Intent intent = new Intent(getBaseContext(), RadioChannelsActivity.class);
-            startActivity(intent);
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -147,7 +147,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
                 @Override
                 public void run() {
                     mIntroductoryOverlay = new IntroductoryOverlay.Builder(
-                            LiveChannelsActivity.this, mediaRouteMenuItem)
+                            RadioChannelsActivity.this, mediaRouteMenuItem)
                             .setTitleText(getString(R.string.cast_introduction))
                             .setSingleTime()
                             .setOnOverlayDismissedListener(
@@ -165,7 +165,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
     }
 
     @Override
-    public void onChannelClicked(AbstractChannel channel) {
+    public void onChannelClicked(RadioChannel channel) {
         Intent intent = new Intent(this, PlayStreamActivity.class);
         Bundle bundle = new Bundle();
         bundle.putParcelable(CHANNEL_DATA, channel);
@@ -189,6 +189,6 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(
-                "CHANNEL_LIST", (ArrayList<AbstractChannel>) mAdapter.getChannelList());
+                "CHANNEL_LIST", (ArrayList<RadioChannel>) mAdapter.getChannelList());
     }
 }

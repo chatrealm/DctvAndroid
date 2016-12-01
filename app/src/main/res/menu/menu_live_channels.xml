@@ -23,4 +23,9 @@
         android:title="About"
         app:showAsAction="never"/>
 
+    <item
+        android:title="TEST Radio"
+        android:id="@+id/radio"
+        app:showAsAction="never"/>
+
 </menu>
