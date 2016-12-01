@@ -79,7 +79,7 @@
         <activity
             android:name=".RadioChannelsActivity"
             android:configChanges="orientation|screenSize"
-            android:label="About"
+            android:label="Radio"
             android:parentActivityName=".LiveChannelsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

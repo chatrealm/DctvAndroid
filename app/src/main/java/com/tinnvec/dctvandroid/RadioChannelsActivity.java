@@ -1,6 +1,7 @@
 package com.tinnvec.dctvandroid;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -166,10 +167,13 @@ public class RadioChannelsActivity extends AppCompatActivity implements RadioLis
 
     @Override
     public void onChannelClicked(RadioChannel channel) {
-        Intent intent = new Intent(this, PlayStreamActivity.class);
+/*        Intent intent = new Intent(this, PlayStreamActivity.class);
         Bundle bundle = new Bundle();
         bundle.putParcelable(CHANNEL_DATA, channel);
         intent.putExtras(bundle);
+*/      Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.parse(channel.getStreamUrl()), "audio/*");
         startActivity(intent);
     }
 
