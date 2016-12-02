@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#212121</color>
     <color name="colorPrimaryDark">#111111</color>
-    <color name="colorAccent">#2860bf</color>
+    <color name="colorAccent">#448aff</color>
     <color name="colorAccentDark">#183871</color>
     <color name="lineDivider">#FFFFFFFF</color>
     <color name="liveListItemBg">#AA000000</color>
