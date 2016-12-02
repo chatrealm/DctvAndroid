@@ -53,8 +53,7 @@
         <activity
             android:name=".JustChatActivity"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName=".LiveChannelsActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName=".LiveChannelsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />

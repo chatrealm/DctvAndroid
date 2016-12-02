@@ -71,6 +71,10 @@ public class JustChatActivity extends AppCompatActivity {
             case R.id.navigate_back:
                 WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
                 chatWebview.goBack();
+                return true;
+            case android.R.id.home:
+                onBackPressed();
+                return true;
         }
         return true;
     }
