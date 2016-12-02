@@ -27,4 +27,7 @@
     <string name="pref_stream_quality_summary">Stream Video Quality</string>
     <string name="pref_stream_quality_default">high</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

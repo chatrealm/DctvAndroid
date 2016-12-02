@@ -42,5 +42,12 @@
         android:visibility="gone"
         class="com.google.android.gms.cast.framework.media.widget.MiniControllerFragment" />
 
+    <fragment
+        android:id="@+id/mini_radio_player"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        class="com.tinnvec.dctvandroid.MiniRadioPlayerFragment"/>
+
 </android.support.design.widget.CoordinatorLayout>
 

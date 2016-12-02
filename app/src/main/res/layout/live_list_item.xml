@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/liveListItemBg"
-    android:minHeight="75dp"
+    android:minHeight="64dp"
     android:orientation="horizontal">
 
     <LinearLayout
@@ -12,21 +12,24 @@
         android:layout_height="match_parent"
         android:background="?android:attr/selectableItemBackground"
         android:orientation="horizontal"
-        android:paddingBottom="@dimen/list_item_vertical_padding"
+        android:paddingBottom="0dp"
         android:paddingEnd="@dimen/activity_horizontal_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingLeft="0dp"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/list_item_vertical_padding">
+        android:paddingStart="0dp"
+        android:paddingTop="0dp">
 
         <ImageView
             android:id="@+id/live_item_art"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:contentDescription="@string/channel_art_description"
-            android:layout_gravity="center_vertical" />
+            android:layout_gravity="center_vertical"
+            android:cropToPadding="false"
+            android:adjustViewBounds="true"
+            android:maxWidth="128dp" />
 
         <LinearLayout
             android:layout_width="match_parent"

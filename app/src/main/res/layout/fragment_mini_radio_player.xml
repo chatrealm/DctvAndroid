@@ -1,0 +1,62 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:context="com.tinnvec.dctvandroid.MiniRadioPlayerFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:elevation="5dp"
+        android:background="@color/colorPrimaryDark">
+
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            app:srcCompat="@color/colorAccentDark"
+            android:id="@+id/radio_channel_art"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="true"
+            android:scaleType="fitCenter" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/radio_channel_art"
+            android:layout_marginLeft="16dp"
+            android:layout_toLeftOf="@+id/radio_play_stop"
+            android:layout_marginRight="16dp">
+
+            <TextView
+                android:text="Title"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:id="@+id/text_radio_channel_title"
+                android:layout_weight="1"
+                android:gravity="bottom"
+                android:textStyle="normal|bold"
+                android:textSize="18sp" />
+
+            <TextView
+                android:text="Description"
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:id="@+id/text_radio_channel_description"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <ImageButton
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:src="@drawable/big_play_button"
+            android:id="@id/radio_play_stop"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:background="?selectableItemBackgroundBorderless"/>
+    </RelativeLayout>
+
+</FrameLayout>
