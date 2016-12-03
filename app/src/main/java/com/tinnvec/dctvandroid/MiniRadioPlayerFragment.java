@@ -1,12 +1,21 @@
 package com.tinnvec.dctvandroid;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ResourcesCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+
+import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,6 +40,12 @@ public class MiniRadioPlayerFragment extends Fragment {
     public MiniRadioPlayerFragment() {
         // Required empty public constructor
     }
+
+    private ImageButton buttonPlayPause;
+
+    private ImageButton buttonStopPlay;
+
+    private MediaPlayer player;
 
     /**
      * Use this factory method to create a new instance of
@@ -59,11 +74,100 @@ public class MiniRadioPlayerFragment extends Fragment {
         }
     }
 
+    private void initializeUIElements() {
+
+        buttonPlayPause = (ImageButton) getView().findViewById(R.id.audio_play_pause);
+        buttonPlayPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (player.isPlaying()){
+                    player.pause();
+                    buttonPlayPause.setImageDrawable(
+                            ResourcesCompat.getDrawable(getResources(), R.drawable.big_play_button, null));;
+            } else {
+                    startPlaying();
+                }
+        }});
+
+        buttonStopPlay = (ImageButton) getView().findViewById(R.id.audio_stop);
+        buttonStopPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopPlaying();
+            }
+        });
+
+    }
+
+    private void startPlaying() {
+        buttonStopPlay.setEnabled(true);
+        buttonPlayPause.setImageDrawable(
+                ResourcesCompat.getDrawable(getResources(), R.drawable.big_pause_button, null));;
+
+        player.prepareAsync();
+
+        player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+            public void onPrepared(MediaPlayer mp) {
+                player.start();
+            }
+        });
+
+    }
+
+    private void stopPlaying() {
+        if (player.isPlaying()) {
+            player.stop();
+            player.release();
+            initializeMediaPlayer();
+        }
+
+        buttonPlayPause.setImageDrawable(
+                ResourcesCompat.getDrawable(getResources(), R.drawable.big_play_button, null));;
+        buttonStopPlay.setEnabled(false);
+    }
+
+    private void initializeMediaPlayer() {
+        player = new MediaPlayer();
+        try {
+            player.setDataSource("http://fm.diamondclub.tv:8000/live1");
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        player.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+
+            public void onBufferingUpdate(MediaPlayer mp, int percent) {
+                Log.i("Buffering", "" + percent);
+            }
+        });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (player.isPlaying()) {
+            player.stop();
+        }
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_mini_radio_player, container, false);
+        return inflater.inflate(R.layout.fragment_mini_audio_player, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initializeUIElements();
+        initializeMediaPlayer();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -72,8 +176,8 @@ public class MiniRadioPlayerFragment extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
-
-/*    @Override
+/*
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
@@ -89,7 +193,6 @@ public class MiniRadioPlayerFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-*/
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

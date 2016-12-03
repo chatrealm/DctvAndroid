@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:elevation="5dp"
-        android:background="@color/colorPrimaryDark">
+        android:background="@color/colorPrimaryDark"
+        android:paddingRight="@dimen/activity_horizontal_margin">
 
         <ImageView
             android:layout_width="72dp"
@@ -27,7 +28,7 @@
             android:layout_height="match_parent"
             android:layout_toRightOf="@id/radio_channel_art"
             android:layout_marginLeft="16dp"
-            android:layout_toLeftOf="@+id/radio_play_stop"
+            android:layout_toLeftOf="@+id/controllers"
             android:layout_marginRight="16dp">
 
             <TextView
@@ -48,15 +49,34 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
-        <ImageButton
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:src="@drawable/big_play_button"
-            android:id="@id/radio_play_stop"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/controllers"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:background="?selectableItemBackgroundBorderless"/>
+            android:layout_alignParentBottom="true">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/big_play_button"
+                android:id="@+id/audio_play_pause"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/big_stop_button"
+                android:id="@+id/audio_stop"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_weight="1"
+                android:layout_marginLeft="8dp"/>
+
+        </LinearLayout>
+
     </RelativeLayout>
 
 </FrameLayout>
