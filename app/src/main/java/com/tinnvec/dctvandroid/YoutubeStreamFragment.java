@@ -162,4 +162,14 @@ public class YoutubeStreamFragment extends YouTubePlayerFragment implements YouT
     public void setPlaybackState(PlayStreamActivity.PlaybackState state_) {
 
     }
+
+    @Override
+    public void setLandscapeMode() {
+
+    }
+
+    @Override
+    public void setPortraitMode() {
+
+    }
 }

@@ -2,11 +2,11 @@ package com.tinnvec.dctvandroid;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -27,13 +27,11 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -60,18 +58,29 @@ import java.util.concurrent.ExecutionException;
 
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
+import static com.tinnvec.dctvandroid.PlayStreamActivity.PlaybackState.IDLE;
 import static com.tinnvec.dctvandroid.PlayStreamActivity.PlaybackState.PLAYING;
 
 public class PlayStreamActivity extends AppCompatActivity {
     private static final String TAG = PlayStreamActivity.class.getName();
-    private final Handler mHandler = new Handler();
+
     private final Handler mHideHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             hideSystemUI();
         }
     };
-    private ProgressDialog progressDialog;
+
+    private final Handler mLocationHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            PlaybackLocation location = PlaybackLocation.valueOf(msg.getData().getString("location"));
+            updatePlaybackLocation(location);
+        }
+    };
+
+
+   // private ProgressDialog progressDialog;
 
     private String streamUrl;
     //converted to global for interaction with cast methods
@@ -94,6 +103,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private String streamService;
     private ChatFragment chatFragment;
     private VideoFragment mVideoFragment;
+    private ChatVisibilityChangeListener mChatVisiblityChangeListener;
 
 
     @SuppressLint("NewApi")
@@ -115,7 +125,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 
         setContentView(R.layout.activity_play_stream);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         currentQuality = Quality.valueOf(sharedPreferences.getString("stream_quality", "high").toUpperCase());
         this.streamUrl = channel.getStreamUrl(appConfig, currentQuality);
@@ -128,42 +137,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
 
 
-
-   /*         Bitmap resizedBitmap = channel.getImageBitmap(this);
-            Drawable smallerArt = new BitmapDrawable(getResources(), resizedBitmap);
-            toolbar.setLogo(smallerArt);
-            toolbar.setLogoDescription(R.string.channel_art_description);
-
-
- */
-        String title = channel.getFriendlyAlias();
-        title = title != null ? title : "Unknown";
-
-        setSupportActionBar(toolbar);
-        ActionBar actionbar = getSupportActionBar();
-        if (actionbar != null) {
-            actionbar.setDisplayHomeAsUpEnabled(true);
-            actionbar.setTitle(title);
-        }
-
-        actionbar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#00000000")));
-        actionbar.setElevation(0);
-
-/*        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle(title);
-        progressDialog.setMessage("Loading...");
-        progressDialog.setIndeterminate(false);
-        progressDialog.setCancelable(false);
-*/
-
-//        vidView.setOnInfoListener(this);
-        //       vidView.setOnPreparedListener(this);
-//        vidView.setOnErrorListener(this);
-
-/*        MediaController mediaController = new MediaController(vidView.getContext());
-        mediaController.setAnchorView(findViewById(R.id.mediacontroller_anchor));
-        vidView.setMediaController(mediaController);
-*/
         chatFragment = new ChatFragment();
 
         streamService = "dctv";
@@ -197,13 +170,24 @@ public class PlayStreamActivity extends AppCompatActivity {
                 .add(R.id.video_fragment, videoFragment)
                 .commit();
 
+        // fragment holds the button, but we control the views
+        // that need to be mutated
+        videoFragment.setChatRevelerClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mLandscapeChatState == PlayStreamActivity.LandscapeChatState.HIDDEN) {
+                    revealChat();
+                } else if (mLandscapeChatState == PlayStreamActivity.LandscapeChatState.SHOWING) {
+                    hideChat();
+                }
+            }
+        });
+
+        mChatVisiblityChangeListener = videoFragment;
+
         chatContainer = (RelativeLayout) findViewById(R.id.chat_fragment);
 
         try {
-            vidView.setVideoPath(streamUrl);
-            Log.d(TAG, "Setting url of the VideoView to: " + streamUrl);
-            mPlaybackState = PLAYING;
-            updatePlayButton(mPlaybackState);
             if (mCastSession != null && mCastSession.isConnected()) {
                 updatePlaybackLocation(PlaybackLocation.REMOTE);
                 RemoteMediaClient remoteMediaClient = mCastSession.getRemoteMediaClient();
@@ -215,20 +199,20 @@ public class PlayStreamActivity extends AppCompatActivity {
                     }
                 }
             } else {
-                updatePlaybackLocation(PlaybackLocation.LOCAL);
+                delayUpdatePlaybackLocation(PlaybackLocation.LOCAL, 600l);
+
             }
 
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
             throw e;
         }
+
         if (mLocation == PlaybackLocation.LOCAL) {
             if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
                 setLandscapeMode();
-                updateFullscreenButton(false);
             } else if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
                 setPortraitMode();
-                updateFullscreenButton(true);
             }
         }
     }
@@ -281,28 +265,25 @@ public class PlayStreamActivity extends AppCompatActivity {
             private void onApplicationConnected(CastSession castSession) {
                 mCastSession = castSession;
 
-                if (mPlaybackState == PLAYING) {
+
+                updatePlaybackLocation(PlaybackLocation.REMOTE);
+                PlaybackState playbackState = mVideoFragment.getPlaybackState();
+                if (playbackState == PLAYING) {
                     loadRemoteMedia(true);
-                    vidView.stopPlayback();
+                    mVideoFragment.setPlaybackState(PlaybackState.IDLE);
                     updatePlaybackLocation(PlaybackLocation.REMOTE);
-                    mPlaybackState = PlaybackState.IDLE;
-//                        mediaPlayer.stop();
-//                        finish();
                     return;
                 } else {
-                    mPlaybackState = PlaybackState.IDLE;
                     updatePlaybackLocation(PlaybackLocation.REMOTE);
                 }
-
-                updatePlayButton(mPlaybackState);
                 invalidateOptionsMenu();
             }
 
             private void onApplicationDisconnected() {
                 updatePlaybackLocation(PlaybackLocation.LOCAL);
-                mPlaybackState = PlaybackState.IDLE;
+
                 mLocation = PlaybackLocation.LOCAL;
-                updatePlayButton(mPlaybackState);
+                mVideoFragment.setPlaybackState(PlaybackState.IDLE);
                 invalidateOptionsMenu();
             }
         };
@@ -363,21 +344,13 @@ public class PlayStreamActivity extends AppCompatActivity {
 
             chatContainer.setLayoutParams(p);
 
-            //               setCoverArtStatus(null);
-            if (mPlaybackState == PLAYING
-                    || mPlaybackState == PlaybackState.BUFFERING) {
+            mVideoFragment.setPlaybackState(PLAYING);
 
-                startControllersTimer();
-            } else {
-
-                stopControllersTimer();
-//                setCoverArtStatus(mSelectedMedia.getImage(0));
-            }
         } else {
             if (mLandscapeChatState == LandscapeChatState.SHOWING) {
                 hideChat();
             }
-
+            mVideoFragment.setPlaybackState(IDLE);
             hideVideoView();
             setPortraitMode();
 
@@ -394,7 +367,6 @@ public class PlayStreamActivity extends AppCompatActivity {
             findViewById(R.id.chat_fragment).setLayoutParams(p);
 
 
-            stopControllersTimer();
 //            setCoverArtStatus(mSelectedMedia.getImage(0));
             updateControllersVisibility(false);
         }
@@ -433,7 +405,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             if (chatFragment.getDisplayedChatroomType().equals("alt")) {
                 menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
                 String msg = getString(R.string.alt_chat_msg);
-                Snackbar.make(findViewById(R.id.root_coordinator), msg , Snackbar.LENGTH_LONG)
+                Snackbar.make(findViewById(R.id.root_coordinator), msg, Snackbar.LENGTH_LONG)
                         .show();
             }
             if (chatFragment.getDisplayedChatroomType().equals("main")) {
@@ -500,7 +472,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                 if (chatroomType.equals("alt")) {
                     chatFragment.setChatroom("dctv", "dummy");
                     menu.findItem(R.id.switch_chat).setTitle("Switch to alternative chat room");
-                }else if (chatroomType.equals("main")) {
+                } else if (chatroomType.equals("main")) {
                     chatFragment.setChatroom(streamService, channel.getName());
                     menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
                 }
@@ -517,11 +489,11 @@ public class PlayStreamActivity extends AppCompatActivity {
     private void videoQualityChanged() {
         this.streamUrl = channel.getStreamUrl(appConfig, currentQuality);
         updateQualityButton(currentQuality);
-        if (mLocation == PlaybackLocation.LOCAL) {
-            vidView.setVideoPath(this.streamUrl);
-        } else if (mCastSession != null && mCastSession.isConnected()) {
-            // reload chromecast
-            loadRemoteMedia(true);
+        if (mLocation.equals(PlaybackLocation.REMOTE)) {
+            if (mCastSession != null && mCastSession.isConnected()) {
+                // reload chromecast
+                loadRemoteMedia(true);
+            }
         }
     }
 
@@ -544,31 +516,12 @@ public class PlayStreamActivity extends AppCompatActivity {
     }
 
 
-    private void stopControllersTimer() {
-        if (null != mControllersTimer) {
-            mControllersTimer.cancel();
-        }
-    }
-
-    private void startControllersTimer() {
-        if (null != mControllersTimer) {
-            mControllersTimer.cancel();
-        }
-        if (mLocation == PlaybackLocation.REMOTE) {
-            return;
-        }
-        mControllersTimer = new Timer();
-        mControllersTimer.schedule(new HideControllersTask(), 3000);
-    }
-
     // should be called from the main thread
     private void updateControllersVisibility(boolean show) {
         if (show) {
             getSupportActionBar().show();
-            mControllers.setVisibility(View.VISIBLE);
         } else if (mLocation == PlaybackLocation.LOCAL) {
             getSupportActionBar().hide();
-            mControllers.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -576,16 +529,6 @@ public class PlayStreamActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "onPause() was called");
-        if (mLocation == PlaybackLocation.LOCAL) {
-            if (mControllersTimer != null) {
-                mControllersTimer.cancel();
-            }
-            // since we are playing locally, we need to stop the playback of
-            // video (if user is not watching, pause it!)
-            vidView.pause();
-            mPlaybackState = PlaybackState.PAUSED;
-//           updatePlayButton(PlaybackState.PAUSED);
-        }
         mCastContext.getSessionManager().removeSessionManagerListener(
                 mSessionManagerListener, CastSession.class);
     }
@@ -614,10 +557,10 @@ public class PlayStreamActivity extends AppCompatActivity {
         // Checks the orientation of the screen
         if (newConfig.orientation == ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
             setLandscapeMode();
-            updateFullscreenButton(false);
+
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT && mLocation == PlaybackLocation.LOCAL) {
             setPortraitMode();
-            updateFullscreenButton(true);
+
         }
         if (newConfig.keyboardHidden == Configuration.KEYBOARDHIDDEN_YES && getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
             hideSystemUI();
@@ -650,6 +593,7 @@ public class PlayStreamActivity extends AppCompatActivity {
 
     public void setLandscapeMode() {
         delayedHide(600);
+        mVideoFragment.setLandscapeMode();
 
         View decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
@@ -663,38 +607,29 @@ public class PlayStreamActivity extends AppCompatActivity {
             findViewById(R.id.root_coordinator).setFitsSystemWindows(false);
         }
 
-        findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-
-        vidView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
 
         chatContainer.setVisibility(View.INVISIBLE);
 
         mLandscapeChatState = LandscapeChatState.HIDDEN;
-        mChatrealmRevealer.setVisibility(View.VISIBLE);
+
     }
 
     public void setPortraitMode() {
+        mVideoFragment.setPortraitMode();
+
+        RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
+        artFillView.setVisibility(View.GONE);
+
         if (mLandscapeChatState == LandscapeChatState.SHOWING) {
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) chatContainer.getLayoutParams();
             params.addRule(RelativeLayout.RIGHT_OF, 0);
             params.addRule(RelativeLayout.BELOW, R.id.view_group_video);
             chatContainer.setLayoutParams(params);
 
-            RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) findViewById(R.id.toolbar_layout).getLayoutParams();
-            params2.addRule(RelativeLayout.ALIGN_RIGHT, 0);
-            findViewById(R.id.toolbar_layout).setLayoutParams(params2);
-
-            RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
-            artFillView.setVisibility(View.GONE);
-
             mLandscapeChatState = LandscapeChatState.HIDDEN;
-            mChatrealmRevealer.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_chatrealm_reveal, null));
         }
         chatContainer.setVisibility(View.VISIBLE);
 
-        mChatrealmRevealer.setVisibility(View.GONE);
 
         View decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener(null);
@@ -705,22 +640,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             findViewById(R.id.root_coordinator).setFitsSystemWindows(true);
         }
 
-        findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        // getting the videoview to be 16:9
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
-        } else {
-            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        }
-        float h = displaymetrics.heightPixels;
-        float w = displaymetrics.widthPixels;
-        float floatHeight = (float) (w * 0.5625);
-        int intHeight = Math.round(floatHeight);
-        int intWidth = (int) w;
-        vidView.setLayoutParams(new FrameLayout.LayoutParams(intWidth, intHeight));
     }
 
     public void revealChat() {
@@ -747,18 +667,18 @@ public class PlayStreamActivity extends AppCompatActivity {
         }
         final int w = displaymetrics.widthPixels;
         final int h = displaymetrics.heightPixels;
-        int videoWidth = (int) Math.round(0.6 * w);
-        int videoHeight = (int) Math.round(0.6 * h);
+
+        final View videoView = ((Fragment)mVideoFragment).getView();
 
         ValueAnimator anim = ValueAnimator.ofFloat((float) 1, (float) 0.55);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 float valScale = (float) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = vidView.getLayoutParams();
+                ViewGroup.LayoutParams layoutParams = videoView.getLayoutParams();
                 layoutParams.width = Math.round(w * valScale);
                 layoutParams.height = Math.round(h * valScale);
-                vidView.setLayoutParams(layoutParams);
+                videoView.setLayoutParams(layoutParams);
             }
         });
         anim.setDuration(500);
@@ -779,8 +699,8 @@ public class PlayStreamActivity extends AppCompatActivity {
         artFillView.setVisibility(View.VISIBLE);
 
         mLandscapeChatState = LandscapeChatState.SHOWING;
-        mChatrealmRevealer.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_chatrealm_hide, null));
-//        vidView.setLayoutParams(new FrameLayout.LayoutParams(videoWidth, videoHeight)); //without animation
+        mChatVisiblityChangeListener.onChatVisibiltiyChanged(mLandscapeChatState);
+
     }
 
     public void hideChat() {
@@ -793,15 +713,17 @@ public class PlayStreamActivity extends AppCompatActivity {
         final int w = displaymetrics.widthPixels;
         final int h = displaymetrics.heightPixels;
 
+        final View videoView = ((Fragment)mVideoFragment).getView();
+
         ValueAnimator anim = ValueAnimator.ofFloat((float) 0.55, (float) 1);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 float valScale = (float) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = vidView.getLayoutParams();
+                ViewGroup.LayoutParams layoutParams = videoView.getLayoutParams();
                 layoutParams.width = Math.round(w * valScale);
                 layoutParams.height = Math.round(h * valScale);
-                vidView.setLayoutParams(layoutParams);
+                videoView.setLayoutParams(layoutParams);
             }
         });
         anim.setDuration(500);
@@ -827,12 +749,20 @@ public class PlayStreamActivity extends AppCompatActivity {
         findViewById(R.id.toolbar_layout).setLayoutParams(params2);
 
         mLandscapeChatState = LandscapeChatState.HIDDEN;
-        mChatrealmRevealer.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_chatrealm_reveal, null));
+        mChatVisiblityChangeListener.onChatVisibiltiyChanged(mLandscapeChatState);
+
     }
 
-    private void delayedHide(int delayMillis) {
+    private void delayedHide(long delayMillis) {
         mHideHandler.removeMessages(0);
         mHideHandler.sendEmptyMessageDelayed(0, delayMillis);
+    }
+
+    private void delayUpdatePlaybackLocation(PlaybackLocation location, long delayMillis ) {
+        mLocationHandler.removeMessages(0);
+        Message msg = new Message();
+        msg.getData().putString("location", location.toString());
+        mLocationHandler.sendMessageDelayed(msg, delayMillis);
     }
 
     /**
@@ -854,18 +784,5 @@ public class PlayStreamActivity extends AppCompatActivity {
         SHOWING, HIDDEN
     }
 
-    private class HideControllersTask extends TimerTask {
 
-        @Override
-        public void run() {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateControllersVisibility(false);
-                    mControllersVisible = false;
-                }
-            });
-
-        }
-    }
 }

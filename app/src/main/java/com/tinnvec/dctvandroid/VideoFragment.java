@@ -14,6 +14,10 @@ public interface VideoFragment {
 
     public void showSysUi();
 
+    public void setLandscapeMode();
+
+    public void setPortraitMode();
+
     public PlayStreamActivity.PlaybackState getPlaybackState();
 
     public void setPlaybackState(PlayStreamActivity.PlaybackState state_);
