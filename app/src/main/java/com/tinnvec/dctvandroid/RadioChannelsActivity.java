@@ -1,7 +1,6 @@
 package com.tinnvec.dctvandroid;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -18,18 +17,16 @@ import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastState;
 import com.google.android.gms.cast.framework.CastStateListener;
 import com.google.android.gms.cast.framework.IntroductoryOverlay;
-import com.tinnvec.dctvandroid.adapters.ChannelListAdapter;
-import com.tinnvec.dctvandroid.adapters.ChannelListCallback;
 import com.tinnvec.dctvandroid.adapters.RadioListAdapter;
 import com.tinnvec.dctvandroid.adapters.RadioListCallback;
-import com.tinnvec.dctvandroid.channel.AbstractChannel;
 import com.tinnvec.dctvandroid.channel.RadioChannel;
-import com.tinnvec.dctvandroid.tasks.LoadLiveChannelsTask;
 import com.tinnvec.dctvandroid.tasks.LoadRadioChannelsTask;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import static android.support.v7.media.MediaControlIntent.ACTION_PLAY;
 
 public class RadioChannelsActivity extends AppCompatActivity implements RadioListCallback {
 
@@ -167,14 +164,12 @@ public class RadioChannelsActivity extends AppCompatActivity implements RadioLis
 
     @Override
     public void onChannelClicked(RadioChannel channel) {
-/*        Intent intent = new Intent(this, PlayStreamActivity.class);
+        Intent intent = new Intent(this, RadioPlayerService.class);
         Bundle bundle = new Bundle();
         bundle.putParcelable(CHANNEL_DATA, channel);
         intent.putExtras(bundle);
-*/      Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse(channel.getStreamUrl()), "audio/*");
-        startActivity(intent);
+        intent.setAction(ACTION_PLAY);
+        startService(intent);
     }
 
     @Override

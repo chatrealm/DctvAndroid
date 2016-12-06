@@ -5,15 +5,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:fitsSystemWindows="true"
-    tools:context="com.tinnvec.dctvandroid.LiveChannelsActivity"
-    android:animateLayoutChanges="true">
+    tools:context="com.tinnvec.dctvandroid.LiveChannelsActivity">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
         android:contentDescription="@string/main_bg_description"
+        android:scaleType="centerCrop"
         android:src="@drawable/dctv_bg"
         />
 
@@ -36,18 +36,17 @@
 
     <fragment
         android:id="@+id/castMiniController"
+        class="com.google.android.gms.cast.framework.media.widget.MiniControllerFragment"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
-        android:visibility="gone"
-        class="com.google.android.gms.cast.framework.media.widget.MiniControllerFragment" />
+        android:visibility="gone" />
 
-    <fragment
-        android:id="@+id/mini_radio_player"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/radio_controller_anchor"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        class="com.tinnvec.dctvandroid.MiniRadioPlayerFragment"/>
+        android:layout_gravity="end|bottom" />
 
 </android.support.design.widget.CoordinatorLayout>
 
