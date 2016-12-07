@@ -17,6 +17,12 @@
   -->
 <notices>
     <notice>
+        <name>MaterialDrawer</name>
+        <url>https://github.com/mikepenz/MaterialDrawer</url>
+        <copyright>Copyright 2016 Mike Penz</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
         <name>LicensesDialog</name>
         <url>http://psdev.de/LicensesDialog</url>
         <copyright>Copyright 2013-2016 Philip Schiffer</copyright>

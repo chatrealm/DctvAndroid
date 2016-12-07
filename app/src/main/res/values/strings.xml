@@ -29,5 +29,12 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="live_video">Live Video</string>
+    <string name="live_audio">Live Audio</string>
+    <string name="chat_activity">Chatrealm</string>
+    <string name="about">About</string>
+    <string name="refresh">Refresh</string>
+    <string name="title_activity_radio">DCFM</string>
+
 
 </resources>

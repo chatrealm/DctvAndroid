@@ -54,6 +54,7 @@
         <activity
             android:name=".JustChatActivity"
             android:configChanges="orientation|screenSize"
+            android:label="@string/chat_activity"
             android:parentActivityName=".LiveChannelsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -62,7 +63,7 @@
         <activity
             android:name=".SettingsActivity"
             android:configChanges="orientation|screenSize"
-            android:label="Settings"
+            android:label="@string/action_settings"
             android:parentActivityName=".LiveChannelsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -71,7 +72,7 @@
         <activity
             android:name=".AboutActivity"
             android:configChanges="orientation|screenSize"
-            android:label="About"
+            android:label="@string/about"
             android:parentActivityName=".LiveChannelsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -80,7 +81,7 @@
         <activity
             android:name=".RadioChannelsActivity"
             android:configChanges="orientation|screenSize"
-            android:label="Radio"
+            android:label="@string/title_activity_radio"
             android:parentActivityName=".LiveChannelsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

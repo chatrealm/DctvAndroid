@@ -8,11 +8,6 @@
         app:showAsAction="always"/>
 
     <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        app:showAsAction="never"/>
-
-    <item
         android:id="@+id/navigate_back"
         android:checkable="false"
         android:title="Chat: Navigate Back"

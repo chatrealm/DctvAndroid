@@ -11,12 +11,20 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastState;
 import com.google.android.gms.cast.framework.CastStateListener;
 import com.google.android.gms.cast.framework.IntroductoryOverlay;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.tinnvec.dctvandroid.adapters.RadioListAdapter;
 import com.tinnvec.dctvandroid.adapters.RadioListCallback;
 import com.tinnvec.dctvandroid.channel.RadioChannel;
@@ -36,6 +44,7 @@ public class RadioChannelsActivity extends AppCompatActivity implements RadioLis
     private RecyclerView mRecyclerView;
     private RadioListAdapter mAdapter;
     private SwipeRefreshLayout swipeContainer;
+    private SwipeRefreshLayout.OnRefreshListener swipeRefreshListener;
 
     // added for cast SDK v3
     private CastContext mCastContext;
@@ -52,6 +61,61 @@ public class RadioChannelsActivity extends AppCompatActivity implements RadioLis
         setContentView(R.layout.activity_live_channels);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        AccountHeader headerResult = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withTranslucentStatusBar(true)
+                .withHeaderBackground(R.drawable.product_logo_header)
+                .build();
+
+
+//create the drawer and remember the `Drawer` result object
+        Drawer result = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withHasStableIds(true)
+                .withAccountHeader(headerResult)
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withIdentifier(1).withName(R.string.live_video).withIcon(R.drawable.ic_live_video),
+                        new PrimaryDrawerItem().withIdentifier(2).withName(R.string.live_audio).withIcon(R.drawable.ic_live_radio),
+                        new DividerDrawerItem(),
+                        new PrimaryDrawerItem().withIdentifier(3).withName(R.string.chat_activity).withIcon(R.drawable.ic_chatrealm_bubble_white_24px),
+                        new DividerDrawerItem(),
+                        new PrimaryDrawerItem().withIdentifier(4).withName(R.string.action_settings).withIcon(R.drawable.settings_white),
+                        new PrimaryDrawerItem().withIdentifier(5).withName(R.string.about).withIcon(R.drawable.ic_about)
+
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        if (drawerItem != null) {
+                            Intent intent = null;
+                            if (drawerItem.getIdentifier() == 1) {
+                                intent = new Intent(RadioChannelsActivity.this, LiveChannelsActivity.class);
+                            } else if (drawerItem.getIdentifier() == 2) {
+                                intent = new Intent(RadioChannelsActivity.this, RadioChannelsActivity.class);
+                            } else if (drawerItem.getIdentifier() == 3) {
+                                intent = new Intent(RadioChannelsActivity.this, JustChatActivity.class);
+                            } else if (drawerItem.getIdentifier() == 4) {
+                                intent = new Intent(RadioChannelsActivity.this, SettingsActivity.class);
+                            } else if (drawerItem.getIdentifier() == 5) {
+                                intent = new Intent(RadioChannelsActivity.this, AboutActivity.class);
+                            }
+                            if (intent != null) {
+                                RadioChannelsActivity.this.startActivity(intent);
+                            }
+                        }
+
+                        return false;
+                    }
+                })
+                .withSavedInstance(savedInstanceState)
+                .withShowDrawerOnFirstLaunch(true)
+                .build();
+        if (savedInstanceState == null) {
+            // set the selection to the item with the identifier 1
+            result.setSelection(2, false);
+        }
 
         mCastStateListener = new CastStateListener() {
             @Override
@@ -71,10 +135,9 @@ public class RadioChannelsActivity extends AppCompatActivity implements RadioLis
         mRecyclerView.setAdapter(mAdapter);
 
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        swipeRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-
                 new LoadRadioChannelsTask(mRecyclerView, appConfig) {
 
                     @Override
@@ -84,7 +147,9 @@ public class RadioChannelsActivity extends AppCompatActivity implements RadioLis
                     }
                 }.execute();
             }
-        });
+        };
+        swipeContainer.setColorSchemeColors(getResources().getColor(R.color.colorAccentDark));
+        swipeContainer.setOnRefreshListener(swipeRefreshListener);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -118,19 +183,15 @@ public class RadioChannelsActivity extends AppCompatActivity implements RadioLis
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(getBaseContext(), SettingsActivity.class);
-            startActivity(intent);
-            return true;
-        }
-        if (id == R.id.action_chat) {
-            Intent intent = new Intent(getBaseContext(), JustChatActivity.class);
-            startActivity(intent);
-        }
-        if (id == R.id.about) {
-            Intent intent = new Intent(getBaseContext(), AboutActivity.class);
-            startActivity(intent);
+        if (id == R.id.refresh) {
+            swipeContainer.post(new Runnable() {
+                @Override
+                public void run() {
+                    swipeContainer.setRefreshing(true);
+                    // directly call onRefresh() method
+                    swipeRefreshListener.onRefresh();
+                }
+            });
         }
 
         return super.onOptionsItemSelected(item);
