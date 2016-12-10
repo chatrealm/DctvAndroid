@@ -67,6 +67,7 @@ public class SettingsActivity extends AppCompatActivity {
                             }
                             if (intent != null) {
                                 SettingsActivity.this.startActivity(intent);
+                                SettingsActivity.this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                             }
                         }
 

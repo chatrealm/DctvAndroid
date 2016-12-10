@@ -68,6 +68,7 @@ public class AboutActivity extends AppCompatActivity {
                             }
                             if (intent != null) {
                                 AboutActivity.this.startActivity(intent);
+                                AboutActivity.this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                             }
                         }
 

@@ -103,6 +103,7 @@ public class RadioChannelsActivity extends AppCompatActivity implements RadioLis
                             }
                             if (intent != null) {
                                 RadioChannelsActivity.this.startActivity(intent);
+                                RadioChannelsActivity.this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                             }
                         }
 

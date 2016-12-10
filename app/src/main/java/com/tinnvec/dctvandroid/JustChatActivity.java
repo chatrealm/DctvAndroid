@@ -76,6 +76,7 @@ public class JustChatActivity extends AppCompatActivity {
                             }
                             if (intent != null) {
                                 JustChatActivity.this.startActivity(intent);
+                                JustChatActivity.this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                             }
                         }
 

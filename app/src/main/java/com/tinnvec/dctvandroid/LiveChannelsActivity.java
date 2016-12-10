@@ -110,6 +110,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
                             }
                             if (intent != null) {
                                 LiveChannelsActivity.this.startActivity(intent);
+                                LiveChannelsActivity.this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                             }
                         }
 
