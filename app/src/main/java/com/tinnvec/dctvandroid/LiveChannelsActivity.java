@@ -4,14 +4,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
@@ -59,6 +63,13 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
         setContentView(R.layout.activity_live_channels);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Fade fade;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            fade = new Fade();
+            getWindow().setExitTransition(fade);
+        }
+
 
         mCastStateListener = new CastStateListener() {
             @Override
@@ -221,12 +232,14 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
     }
 
     @Override
-    public void onChannelClicked(AbstractChannel channel) {
+    public void onChannelClicked(AbstractChannel channel, int position, ImageView channelArt) {
         Intent intent = new Intent(this, PlayStreamActivity.class);
         Bundle bundle = new Bundle();
         bundle.putParcelable(CHANNEL_DATA, channel);
+        ActivityOptionsCompat options = ActivityOptionsCompat.
+                makeSceneTransitionAnimation(this, channelArt, "target");
         intent.putExtras(bundle);
-        startActivity(intent);
+        ActivityCompat.startActivity(this, intent, options.toBundle());
     }
 
     @Override

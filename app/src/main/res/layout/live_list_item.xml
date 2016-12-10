@@ -21,13 +21,14 @@
             android:id="@+id/live_item_art"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:adjustViewBounds="true"
             android:contentDescription="@string/channel_art_description"
-            android:layout_gravity="center_vertical"
             android:cropToPadding="false"
             android:maxWidth="96dp"
-            android:adjustViewBounds="true" />
+            android:transitionName="channelart" />
 
         <LinearLayout
             android:layout_width="match_parent"

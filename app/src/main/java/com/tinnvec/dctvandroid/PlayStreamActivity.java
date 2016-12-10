@@ -23,6 +23,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -30,11 +31,13 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.cast.MediaInfo;
@@ -45,7 +48,9 @@ import com.google.android.gms.cast.framework.CastSession;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 import com.tinnvec.dctvandroid.channel.AbstractChannel;
 import com.tinnvec.dctvandroid.channel.DctvChannel;
 import com.tinnvec.dctvandroid.channel.Quality;
@@ -92,7 +97,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private ImageButton mFullscreenSwitch;
     private ImageButton mChatrealmRevealer;
     private LandscapeChatState mLandscapeChatState;
-    private RelativeLayout mLoading;
+    private ProgressBar mLoading;
     private View mControllers;
     private boolean mControllersVisible;
     private Timer mControllersTimer;
@@ -108,10 +113,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Vitamio.isInitialized(getApplicationContext());
-
-        channel = getIntent().getExtras().getParcelable(LiveChannelsActivity.CHANNEL_DATA);
-        if (channel == null)
-            throw new NullPointerException("No Channel passed to PlayStreamActivity");
+        postponeEnterTransition();
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         PropertyReader pReader = new PropertyReader(this);
@@ -124,6 +126,41 @@ public class PlayStreamActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_play_stream);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        channel = getIntent().getExtras().getParcelable(LiveChannelsActivity.CHANNEL_DATA);
+        if (channel == null)
+            throw new NullPointerException("No Channel passed to PlayStreamActivity");
+
+        streamService = "dctv";
+        if (channel instanceof YoutubeChannel) {
+            streamService = "youtube";
+        }
+        if (channel instanceof TwitchChannel) {
+            streamService = "twitch";
+        }
+        if (channel instanceof DctvChannel) {
+            streamService = "dctv";
+        }
+
+        chatFragment = new ChatFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("streamService", streamService);
+        bundle.putString("channelName", channel.getName());
+        chatFragment.setArguments(bundle);
+
+        Fade fade;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            fade = new Fade();
+            getWindow().setEnterTransition(fade);
+        }
+
+        getFragmentManager()
+                .beginTransaction()
+                .add(R.id.chat_fragment, chatFragment)
+                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+                .commit();
+
+        chatContainer = (RelativeLayout) findViewById(R.id.chat_fragment);
 
         currentQuality = Quality.valueOf(sharedPreferences.getString("stream_quality", "high").toUpperCase());
         this.streamUrl = channel.getStreamUrl(appConfig, currentQuality);
@@ -138,16 +175,35 @@ public class PlayStreamActivity extends AppCompatActivity {
         String title = channel.getFriendlyAlias();
         title = title != null ? title : "Unknown";
 
-        ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
+        final ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
         String urlChannelart = channel.getImageAssetHDUrl();
 
+        Callback callback = new Callback() {
+            @Override
+            public void onSuccess() {
+                channelArtView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        channelArtView.getViewTreeObserver().removeOnPreDrawListener(this);
+                        PlayStreamActivity.this.startPostponedEnterTransition();
+                        return true;
+                    }
+                });
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        };
+
         if (urlChannelart != null) {
-            Picasso.with(this)
-                    .load(urlChannelart)
-                    .into(channelArtView);
+            RequestCreator requestCreator = Picasso.with(this).load(urlChannelart);
+            requestCreator.into(channelArtView, callback);
         } else {
             Drawable defaultArt = ResourcesCompat.getDrawable(getResources(), R.drawable.dctv_bg, null);
             channelArtView.setImageDrawable(defaultArt);
+            startPostponedEnterTransition();
         }
 
 
@@ -180,7 +236,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         //       vidView.setOnPreparedListener(this);
 //        vidView.setOnErrorListener(this);
         mPlayPause = (ImageButton) findViewById(R.id.play_pause_button);
-        mLoading = (RelativeLayout) findViewById(R.id.buffer_circle);
+        mLoading = (ProgressBar) findViewById(R.id.buffer_circle);
         mControllers = findViewById(R.id.mediacontroller_anchor);
         mFullscreenSwitch = (ImageButton) findViewById(R.id.fullscreen_switch_button);
         mChatrealmRevealer = (ImageButton) findViewById(R.id.reveal_chat_button);
@@ -191,30 +247,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         mediaController.setAnchorView(findViewById(R.id.mediacontroller_anchor));
         vidView.setMediaController(mediaController);
 */
-        chatFragment = new ChatFragment();
-
-        streamService = "dctv";
-        if (channel instanceof YoutubeChannel) {
-            streamService = "youtube";
-        }
-        if (channel instanceof TwitchChannel) {
-            streamService = "twitch";
-        }
-        if (channel instanceof DctvChannel) {
-            streamService = "dctv";
-        }
-
-        Bundle bundle = new Bundle();
-        bundle.putString("streamService", streamService);
-        bundle.putString("channelName", channel.getName());
-        chatFragment.setArguments(bundle);
-
-        getFragmentManager()
-                .beginTransaction()
-                .add(R.id.chat_fragment, chatFragment)
-                .commit();
-
-        chatContainer = (RelativeLayout) findViewById(R.id.chat_fragment);
 
         try {
             vidView.setVideoPath(streamUrl);
@@ -524,6 +556,9 @@ public class PlayStreamActivity extends AppCompatActivity {
             case R.id.navigate_back:
                 WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
                 chatWebview.goBack();
+            case android.R.id.home:
+                supportFinishAfterTransition();
+                return true;
         }
 
 

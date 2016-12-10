@@ -1,5 +1,6 @@
 package com.tinnvec.dctvandroid.adapters;
 
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,8 +59,13 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     @Override
     public void onBindViewHolder(ChannelViewHolder holder, int position) {
         final AbstractChannel chan = channelList.get(position);
-        if (chan.getImageAssetUrl() != null)
+        if (chan.getImageAssetUrl() != null) {
             new ImageDownloaderTask(holder.channelArt).execute(chan.getImageAssetUrl());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                holder.channelArt.setTransitionName("channelart" + position);
+            }
+        }
+
 
         holder.channelName.setText(chan.getFriendlyAlias());
         holder.channelName.setSelected(true);
@@ -112,7 +118,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
         @Override
         public void onClick(View view) {
             AbstractChannel channel = channelList.get(getAdapterPosition());
-            callback.onChannelClicked(channel);
+            callback.onChannelClicked(channel, getAdapterPosition(), channelArt);
         }
     }
 }

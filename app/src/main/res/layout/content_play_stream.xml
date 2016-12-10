@@ -39,7 +39,6 @@
 
         <!-- Chat View -->
         <RelativeLayout
-            android:id="@+id/buffer_circle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignBottom="@id/view_group_video"
@@ -53,9 +52,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="fitCenter"
+                android:transitionName="target"
                 android:visibility="visible" />
 
             <ProgressBar
+                android:id="@+id/buffer_circle"
                 style="@style/Widget.AppCompat.ProgressBar"
                 android:layout_width="96dp"
                 android:layout_height="96dp"
