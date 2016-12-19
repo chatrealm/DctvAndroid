@@ -19,12 +19,17 @@
 
     <item
         android:id="@+id/switch_chat"
-        android:title="Switch Chat"
+        android:title="@string/switch_chat"
+        app:showAsAction="withText" />
+
+    <item
+        android:id="@+id/switch_to_custom_twitch_chat"
+        android:title="@string/switch_to_custom_twitch_chat"
         app:showAsAction="withText" />
 
     <item
         android:id="@+id/navigate_back"
-        android:title="Chat: Navigate Back"
+        android:title="@string/chat_navigate_back"
         app:showAsAction="withText" />
 
 </menu>

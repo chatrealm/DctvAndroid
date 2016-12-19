@@ -27,7 +27,6 @@
     <string name="pref_stream_quality_summary">Stream Video Quality</string>
     <string name="pref_stream_quality_default">high</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="live_video">Live Video</string>
     <string name="live_audio">Live Audio</string>
@@ -35,6 +34,11 @@
     <string name="about">About</string>
     <string name="refresh">Refresh</string>
     <string name="title_activity_radio">DCFM</string>
+    <string name="switch_chat">Switch Chat</string>
+    <string name="chat_navigate_back">Chat: Navigate Back</string>
+    <string name="switch_to_custom_twitch_chat">Go to a Twitch chatroom</string>
+    <string name="custom_twitch_chat_dialog_msg">If this show simulcasts to Twitch and uses Twitch as the main chatroom, you can enter the username the show uses to view their chat</string>
+    <string name="custom_twitch_chat_dialog_title">Enter Twitch username</string>
 
 
 </resources>

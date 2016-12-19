@@ -1,14 +1,18 @@
 package com.tinnvec.dctvandroid;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.EditText;
 
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
@@ -25,6 +29,7 @@ public class JustChatActivity extends AppCompatActivity {
 
     private MenuItem mediaRouteMenuItem;
     private CastContext mCastContext;
+    private ChatFragment chatFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +99,7 @@ public class JustChatActivity extends AppCompatActivity {
 
         mCastContext = CastContext.getSharedInstance(this); // initialises castcontext
 
-        ChatFragment chatFragment = new ChatFragment();
+        chatFragment = new ChatFragment();
 
         Bundle bundle = new Bundle();
         bundle.putString("streamService", "none");
@@ -128,6 +133,25 @@ public class JustChatActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         switch (id) {
+            case R.id.switch_to_custom_twitch_chat:
+                final EditText twitchUser = new EditText(this);
+                twitchUser.setHint("username");
+                twitchUser.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.custom_twitch_chat_dialog_title)
+                        .setMessage(R.string.custom_twitch_chat_dialog_msg)
+                        .setView(twitchUser)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                chatFragment.setChatroom("twitch", twitchUser.getText().toString());
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                            }
+                        })
+                        .show();
+                break;
             case R.id.navigate_back:
                 WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
                 chatWebview.goBack();
