@@ -77,6 +77,7 @@ public class AboutActivity extends AppCompatActivity {
                 })
                 .withSavedInstance(savedInstanceState)
                 .withShowDrawerOnFirstLaunch(true)
+                .withCloseOnClick(false)
                 .build();
         if (savedInstanceState == null) {
             // set the selection to the item with the identifier 1

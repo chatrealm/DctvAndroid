@@ -4,14 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.transition.Fade;
+import android.transition.Explode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,10 +62,10 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Fade fade;
+        Explode explode;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            fade = new Fade();
-            getWindow().setExitTransition(fade);
+            explode = new Explode();
+            getWindow().setExitTransition(explode);
         }
 
 
@@ -130,6 +128,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
                 })
                 .withSavedInstance(savedInstanceState)
                 .withShowDrawerOnFirstLaunch(true)
+                .withCloseOnClick(false)
                 .build();
         if (savedInstanceState == null) {
             // set the selection to the item with the identifier 1
@@ -236,10 +235,8 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
         Intent intent = new Intent(this, PlayStreamActivity.class);
         Bundle bundle = new Bundle();
         bundle.putParcelable(CHANNEL_DATA, channel);
-        ActivityOptionsCompat options = ActivityOptionsCompat.
-                makeSceneTransitionAnimation(this, channelArt, "target");
         intent.putExtras(bundle);
-        ActivityCompat.startActivity(this, intent, options.toBundle());
+        LiveChannelsActivity.this.startActivity(intent);
     }
 
     @Override

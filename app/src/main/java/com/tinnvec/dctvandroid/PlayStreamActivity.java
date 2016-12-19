@@ -23,9 +23,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Fade;
+import android.transition.Slide;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -142,26 +143,6 @@ public class PlayStreamActivity extends AppCompatActivity {
             streamService = "dctv";
         }
 
-        chatFragment = new ChatFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("streamService", streamService);
-        bundle.putString("channelName", channel.getName());
-        chatFragment.setArguments(bundle);
-
-        Fade fade;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            fade = new Fade();
-            getWindow().setEnterTransition(fade);
-        }
-
-        getFragmentManager()
-                .beginTransaction()
-                .add(R.id.chat_fragment, chatFragment)
-                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-                .commit();
-
-        chatContainer = (RelativeLayout) findViewById(R.id.chat_fragment);
-
         currentQuality = Quality.valueOf(sharedPreferences.getString("stream_quality", "high").toUpperCase());
         this.streamUrl = channel.getStreamUrl(appConfig, currentQuality);
 
@@ -177,6 +158,36 @@ public class PlayStreamActivity extends AppCompatActivity {
 
         final ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
         String urlChannelart = channel.getImageAssetHDUrl();
+        vidView = (VideoView) findViewById(R.id.video_view);
+//        vidView.setOnInfoListener(this);
+        //       vidView.setOnPreparedListener(this);
+//        vidView.setOnErrorListener(this);
+        mPlayPause = (ImageButton) findViewById(R.id.play_pause_button);
+        mLoading = (ProgressBar) findViewById(R.id.buffer_circle);
+        mControllers = findViewById(R.id.mediacontroller_anchor);
+        mFullscreenSwitch = (ImageButton) findViewById(R.id.fullscreen_switch_button);
+        mChatrealmRevealer = (ImageButton) findViewById(R.id.reveal_chat_button);
+
+        chatFragment = new ChatFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("streamService", streamService);
+        bundle.putString("channelName", channel.getName());
+        chatFragment.setArguments(bundle);
+
+        chatContainer = (RelativeLayout) findViewById(R.id.chat_fragment);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            Slide slide = new Slide();
+            slide.setSlideEdge(Gravity.BOTTOM);
+            getWindow().setEnterTransition(slide);
+            getWindow().setExitTransition(new Slide());
+        }
+
+        getFragmentManager()
+                .beginTransaction()
+                .add(chatContainer.getId(), chatFragment)
+                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+                .commit();
 
         Callback callback = new Callback() {
             @Override
@@ -231,16 +242,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         progressDialog.setIndeterminate(false);
         progressDialog.setCancelable(false);
 */
-        vidView = (VideoView) findViewById(R.id.video_view);
-//        vidView.setOnInfoListener(this);
-        //       vidView.setOnPreparedListener(this);
-//        vidView.setOnErrorListener(this);
-        mPlayPause = (ImageButton) findViewById(R.id.play_pause_button);
-        mLoading = (ProgressBar) findViewById(R.id.buffer_circle);
-        mControllers = findViewById(R.id.mediacontroller_anchor);
-        mFullscreenSwitch = (ImageButton) findViewById(R.id.fullscreen_switch_button);
-        mChatrealmRevealer = (ImageButton) findViewById(R.id.reveal_chat_button);
-
         setupControlsCallbacks();
 
 /*        MediaController mediaController = new MediaController(vidView.getContext());

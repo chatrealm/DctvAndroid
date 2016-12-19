@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:transitionOrdering="sequential"
+    tools:targetSdkVersion="21">
+    <targets>
+        <target android:excludeId="@id/view_group_video" />
+        <target android:excludeId="@id/mediacontroller_anchor" />
+        <target android:excludeId="@id/buffer_circle" />
+    </targets>
+    <slide />
+</transitionSet>
