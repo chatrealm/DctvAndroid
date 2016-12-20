@@ -255,10 +255,26 @@ public class PlayStreamActivity extends AppCompatActivity {
             String resolvedStreamUrl = "";
             try {
                 resolvedStreamUrl = channel.getResolvedStreamUrl(streamUrl);
-            } catch (InterruptedException | ExecutionException ex) {
+            } catch (InterruptedException | ExecutionException | NullPointerException ex) {
                 Log.e(TAG, "Exception when trying to get full Stream URL", ex);
             }
-            vidView.setVideoPath(resolvedStreamUrl);
+            try {
+                vidView.setVideoPath(resolvedStreamUrl);
+            } catch (NullPointerException ex) {
+                Log.e(TAG, "Resolved Stream URL returns null", ex);
+                String msg = "";
+                if (channel instanceof YoutubeChannel) {
+                    msg = getString(R.string.video_error_youtube);
+                } else {
+                    msg = getString(R.string.video_error_fail);
+                }
+                String text = "Error: " + msg;
+                Snackbar.make(findViewById(R.id.root_coordinator), text, Snackbar.LENGTH_LONG)
+                        .show();
+                vidView.stopPlayback();
+                mPlaybackState = PlaybackState.IDLE;
+                updatePlayButton(mPlaybackState);
+            }
             Log.d(TAG, "Setting url of the VideoView to: " + resolvedStreamUrl);
             mPlaybackState = BUFFERING;
             updatePlayButton(mPlaybackState);
