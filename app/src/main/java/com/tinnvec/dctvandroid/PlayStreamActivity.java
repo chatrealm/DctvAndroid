@@ -33,7 +33,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.EditText;
@@ -55,7 +54,6 @@ import com.google.android.gms.cast.framework.CastSession;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.tinnvec.dctvandroid.channel.AbstractChannel;
@@ -116,8 +114,6 @@ public class PlayStreamActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        postponeEnterTransition();
-
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         PropertyReader pReader = new PropertyReader(this);
         appConfig = pReader.getMyProperties("app.properties");
@@ -191,42 +187,13 @@ public class PlayStreamActivity extends AppCompatActivity {
                 .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                 .commit();
 
-        Callback callback = new Callback() {
-            @Override
-            public void onSuccess() {
-                channelArtView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                    @Override
-                    public boolean onPreDraw() {
-                        channelArtView.getViewTreeObserver().removeOnPreDrawListener(this);
-                        PlayStreamActivity.this.startPostponedEnterTransition();
-                        return true;
-                    }
-                });
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        };
-
         if (urlChannelart != null) {
             RequestCreator requestCreator = Picasso.with(this).load(urlChannelart);
-            requestCreator.into(channelArtView, callback);
+            requestCreator.into(channelArtView);
         } else {
             Drawable defaultArt = ResourcesCompat.getDrawable(getResources(), R.drawable.dctv_bg, null);
             channelArtView.setImageDrawable(defaultArt);
-            startPostponedEnterTransition();
         }
-
-
-   /*         Bitmap resizedBitmap = channel.getImageBitmap(this);
-            Drawable smallerArt = new BitmapDrawable(getResources(), resizedBitmap);
-            toolbar.setLogo(smallerArt);
-            toolbar.setLogoDescription(R.string.channel_art_description);
-
-
- */
 
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
@@ -238,18 +205,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         actionbar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#00000000")));
         actionbar.setElevation(0);
 
-/*        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle(title);
-        progressDialog.setMessage("Loading...");
-        progressDialog.setIndeterminate(false);
-        progressDialog.setCancelable(false);
-*/
         setupControlsCallbacks();
-
-/*        MediaController mediaController = new MediaController(vidView.getContext());
-        mediaController.setAnchorView(findViewById(R.id.mediacontroller_anchor));
-        vidView.setMediaController(mediaController);
-*/
 
         try {
             String resolvedStreamUrl = "";
