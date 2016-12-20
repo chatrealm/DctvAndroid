@@ -42,7 +42,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import com.devbrackets.android.exomedia.core.exoplayer.EMExoPlayer;
 import com.devbrackets.android.exomedia.listener.OnErrorListener;
 import com.devbrackets.android.exomedia.listener.OnPreparedListener;
 import com.devbrackets.android.exomedia.ui.widget.EMVideoView;
@@ -94,7 +93,6 @@ public class PlayStreamActivity extends AppCompatActivity {
     private SessionManagerListener<CastSession> mSessionManagerListener;
     private PlaybackLocation mLocation;
     private PlaybackState mPlaybackState;
-    private EMExoPlayer mediaPlayer;
     private ImageButton mPlayPause;
     private ImageButton mFullscreenSwitch;
     private ImageButton mChatrealmRevealer;
@@ -603,8 +601,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                     channelart.setVisibility(View.GONE);
                 }
                 if (mLocation == PlaybackLocation.REMOTE) {
-                    vidView.pause();
-                    mediaPlayer.stop();
+                    vidView.stopPlayback();
                     setPortraitMode();
                     updatePlayButton(mPlaybackState);
                     if (mCastSession != null && mCastSession.isConnected()) loadRemoteMedia(true);
