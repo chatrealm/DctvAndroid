@@ -7,34 +7,54 @@
     android:minHeight="72dp"
     android:orientation="horizontal">
 
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:background="?android:attr/selectableItemBackground"
         android:orientation="horizontal"
-        android:paddingBottom="@dimen/list_item_vertical_padding"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/list_item_vertical_padding">
+        android:paddingRight="@dimen/activity_horizontal_margin">
 
-        <ImageView
-            android:id="@+id/live_item_art"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+        <LinearLayout
+            android:layout_width="96dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/channel_art_description"
-            android:cropToPadding="false"
-            android:maxWidth="96dp"
-            android:transitionName="channelart" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/channel_label"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:layout_weight="1"
+                android:background="@color/colorAccentDark"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:text="Channel"
+                android:textAllCaps="true"
+                android:textSize="12sp"
+                android:textStyle="normal|bold" />
+
+            <ImageView
+                android:id="@+id/live_item_art"
+                android:layout_width="96dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/channel_art_description"
+                android:cropToPadding="false"
+                android:maxWidth="96dp"
+                android:transitionName="channelart" />
+        </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/list_item_vertical_padding"
+            android:paddingTop="@dimen/list_item_vertical_padding">
 
             <TextView
                 android:id="@+id/live_item_name"

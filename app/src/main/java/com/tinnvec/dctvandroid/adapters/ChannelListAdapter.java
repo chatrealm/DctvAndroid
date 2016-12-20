@@ -18,6 +18,8 @@ import com.tinnvec.dctvandroid.tasks.ImageDownloaderTask;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.view.View.GONE;
+
 public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.ChannelViewHolder> {
     private final List<AbstractChannel> channelList;
     private int lastPosition = -1;
@@ -66,13 +68,19 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
             }
         }
 
+        if (chan.getChannelID() != 0) {
+            holder.channelLabel.setText("Channel " + chan.getChannelID());
+        } else {
+            holder.channelLabel.setVisibility(GONE);
+        }
+
 
         holder.channelName.setText(chan.getFriendlyAlias());
         holder.channelName.setSelected(true);
 
 
         if (chan.getDescription().isEmpty()) {
-            holder.channelDescription.setVisibility(View.GONE);
+            holder.channelDescription.setVisibility(GONE);
         } else {
             holder.channelDescription.setVisibility(View.VISIBLE);
             holder.channelDescription.setText(chan.getDescription());
@@ -102,7 +110,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     // you provide access to all the views for a data item in a view holder
     public class ChannelViewHolder extends RecyclerView.ViewHolder implements  View.OnClickListener{
         LinearLayout mLinearLayout;
-        TextView channelName, channelDescription;
+        TextView channelName, channelDescription, channelLabel;
         ImageView channelArt;
 
         public ChannelViewHolder(LinearLayout v) {
@@ -110,6 +118,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
             mLinearLayout = v;
             channelName = (TextView) v.findViewById(R.id.live_item_name);
             channelDescription = (TextView) v.findViewById(R.id.live_item_description);
+            channelLabel = (TextView) v.findViewById(R.id.channel_label);
             channelArt = (ImageView) v.findViewById(R.id.live_item_art);
 
             v.setOnClickListener(this);
