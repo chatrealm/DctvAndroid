@@ -30,10 +30,10 @@
             android:animateLayoutChanges="true">
 
             <!-- Video -->
-            <io.vov.vitamio.widget.VideoView
+            <com.devbrackets.android.exomedia.ui.widget.EMVideoView
                 android:id="@+id/video_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="top" />
 
         </FrameLayout>

@@ -7,7 +7,6 @@ import com.tinnvec.dctvandroid.notifications.DctvNotificationOpenedHandler;
 
 import java.util.Properties;
 
-import io.vov.vitamio.Vitamio;
 
 
 /**
@@ -25,8 +24,6 @@ public class DctvApplication extends Application {
         OneSignal.Builder ob = OneSignal.startInit(this);
         ob.setNotificationOpenedHandler(new DctvNotificationOpenedHandler());
         ob.init();
-
-        Vitamio.isInitialized(this);
 
         // load appconfig
         PropertyReader pReader = new PropertyReader(this);

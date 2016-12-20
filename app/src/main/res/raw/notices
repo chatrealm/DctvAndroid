@@ -17,6 +17,18 @@
   -->
 <notices>
     <notice>
+        <name>ExoPlayer</name>
+        <url>https://github.com/google/ExoPlayer</url>
+        <copyright>Copyright 2016 Google</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>ExoMedia</name>
+        <url>https://devbrackets.com/dev/libs/exomedia.html</url>
+        <copyright>Copyright 2016 Brian Wernick</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
         <name>MaterialDrawer</name>
         <url>https://github.com/mikepenz/MaterialDrawer</url>
         <copyright>Copyright 2016 Mike Penz</copyright>

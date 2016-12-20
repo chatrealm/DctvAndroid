@@ -43,6 +43,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.devbrackets.android.exomedia.core.exoplayer.EMExoPlayer;
+import com.devbrackets.android.exomedia.listener.OnErrorListener;
+import com.devbrackets.android.exomedia.listener.OnPreparedListener;
+import com.devbrackets.android.exomedia.ui.widget.EMVideoView;
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.gms.cast.framework.CastButtonFactory;
@@ -65,12 +69,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
-import io.vov.vitamio.MediaPlayer;
-import io.vov.vitamio.Vitamio;
-import io.vov.vitamio.widget.VideoView;
-
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
+import static com.tinnvec.dctvandroid.PlayStreamActivity.PlaybackState.BUFFERING;
 import static com.tinnvec.dctvandroid.PlayStreamActivity.PlaybackState.PLAYING;
 
 public class PlayStreamActivity extends AppCompatActivity {
@@ -83,7 +84,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         }
     };
     private ProgressDialog progressDialog;
-    private VideoView vidView;
+    private EMVideoView vidView;
     private String streamUrl;
     //converted to global for interaction with cast methods
     private AbstractChannel channel;
@@ -95,7 +96,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private SessionManagerListener<CastSession> mSessionManagerListener;
     private PlaybackLocation mLocation;
     private PlaybackState mPlaybackState;
-    private MediaPlayer mediaPlayer;
+    private EMExoPlayer mediaPlayer;
     private ImageButton mPlayPause;
     private ImageButton mFullscreenSwitch;
     private ImageButton mChatrealmRevealer;
@@ -115,7 +116,6 @@ public class PlayStreamActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Vitamio.isInitialized(getApplicationContext());
         postponeEnterTransition();
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -160,7 +160,7 @@ public class PlayStreamActivity extends AppCompatActivity {
 
         final ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
         String urlChannelart = channel.getImageAssetHDUrl();
-        vidView = (VideoView) findViewById(R.id.video_view);
+        vidView = (EMVideoView) findViewById(R.id.video_view);
 //        vidView.setOnInfoListener(this);
         //       vidView.setOnPreparedListener(this);
 //        vidView.setOnErrorListener(this);
@@ -252,9 +252,15 @@ public class PlayStreamActivity extends AppCompatActivity {
 */
 
         try {
-            vidView.setVideoPath(streamUrl);
-            Log.d(TAG, "Setting url of the VideoView to: " + streamUrl);
-            mPlaybackState = PLAYING;
+            String resolvedStreamUrl = "";
+            try {
+                resolvedStreamUrl = channel.getResolvedStreamUrl(streamUrl);
+            } catch (InterruptedException | ExecutionException ex) {
+                Log.e(TAG, "Exception when trying to get full Stream URL", ex);
+            }
+            vidView.setVideoPath(resolvedStreamUrl);
+            Log.d(TAG, "Setting url of the VideoView to: " + resolvedStreamUrl);
+            mPlaybackState = BUFFERING;
             updatePlayButton(mPlaybackState);
             if (mCastSession != null && mCastSession.isConnected()) {
                 updatePlaybackLocation(PlaybackLocation.REMOTE);
@@ -485,7 +491,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             if (chatFragment.getDisplayedChatroomType().equals("alt")) {
                 menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
                 String msg = getString(R.string.alt_chat_msg);
-                Snackbar.make(findViewById(R.id.root_coordinator), msg , Snackbar.LENGTH_LONG)
+                Snackbar.make(findViewById(R.id.root_coordinator), msg, Snackbar.LENGTH_LONG)
                         .show();
             }
             if (chatFragment.getDisplayedChatroomType().equals("main")) {
@@ -552,7 +558,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                 if (chatroomType.equals("alt")) {
                     chatFragment.setChatroom("dctv", "dummy");
                     menu.findItem(R.id.switch_chat).setTitle("Switch to alternative chat room");
-                }else if (chatroomType.equals("main")) {
+                } else if (chatroomType.equals("main")) {
                     chatFragment.setChatroom(streamService, channel.getName());
                     menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
                 }
@@ -589,19 +595,14 @@ public class PlayStreamActivity extends AppCompatActivity {
     }
 
     private void setupControlsCallbacks() {
-        vidView.setOnErrorListener(new io.vov.vitamio.MediaPlayer.OnErrorListener() {
+        vidView.setOnErrorListener(new OnErrorListener() {
 
-            @SuppressLint("NewApi")
             @Override
-            public boolean onError(io.vov.vitamio.MediaPlayer mp, int what, int extra) {
-                Log.e(TAG, "OnErrorListener.onError(): VideoView encountered an " +
-                        "error, what: " + what + ", extra: " + extra);
+            public boolean onError() {
+                Log.e(TAG, "OnErrorListener.onError(): EMVideoView encountered an " +
+                        "error");
                 String msg = "";
-                if (extra == android.media.MediaPlayer.MEDIA_ERROR_TIMED_OUT) {
-                    msg = getString(R.string.video_error_media_load_timeout);
-                } else if (what == android.media.MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
-                    msg = getString(R.string.video_error_server_unaccessible);
-                } else if (channel instanceof YoutubeChannel) {
+                if (channel instanceof YoutubeChannel) {
                     msg = getString(R.string.video_error_youtube);
                 } else {
                     msg = getString(R.string.video_error_unknown_error);
@@ -616,19 +617,22 @@ public class PlayStreamActivity extends AppCompatActivity {
             }
         });
 
-        vidView.setOnPreparedListener(new io.vov.vitamio.MediaPlayer.OnPreparedListener() {
+        vidView.setOnPreparedListener(new OnPreparedListener() {
 
             @Override
-            public void onPrepared(MediaPlayer mp) {
+            public void onPrepared() {
                 if (mLocation == PlaybackLocation.LOCAL) {
                     vidView.requestFocus();
-                    mp.start();
+                    vidView.start();
                     mPlaybackState = PLAYING;
                     updatePlayButton(mPlaybackState);
+                    mLoading.setVisibility(View.GONE);
+                    ImageView channelart = (ImageView) findViewById(R.id.channelart);
+                    channelart.setVisibility(View.GONE);
                 }
                 if (mLocation == PlaybackLocation.REMOTE) {
                     vidView.pause();
-                    mp.stop();
+                    mediaPlayer.stop();
                     setPortraitMode();
                     updatePlayButton(mPlaybackState);
                     if (mCastSession != null && mCastSession.isConnected()) loadRemoteMedia(true);
@@ -636,7 +640,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             }
         });
 
-        vidView.setOnInfoListener(new io.vov.vitamio.MediaPlayer.OnInfoListener() {
+     /*   vidView.setOnBufferUpdateListener(new InfoListener() {
             @Override
             public boolean onInfo(MediaPlayer mp, int what, int extra) {
                 if (mLocation == PlaybackLocation.LOCAL) {
@@ -670,7 +674,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                 //           return false;
             }
         });
-
+*/
         vidView.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -752,7 +756,15 @@ public class PlayStreamActivity extends AppCompatActivity {
         this.streamUrl = channel.getStreamUrl(appConfig, currentQuality);
         updateQualityButton(currentQuality);
         if (mLocation == PlaybackLocation.LOCAL) {
-            vidView.setVideoPath(this.streamUrl);
+            String resolvedStreamUrl = "";
+            try {
+                resolvedStreamUrl = channel.getResolvedStreamUrl(this.streamUrl);
+            } catch (InterruptedException | ExecutionException ex) {
+                Log.e(TAG, "Exception when trying to get full Stream URL", ex);
+            }
+            vidView.setVideoPath(resolvedStreamUrl);
+            mPlaybackState = BUFFERING;
+            updatePlayButton(mPlaybackState);
         } else if (mCastSession != null && mCastSession.isConnected()) {
             // reload chromecast
             loadRemoteMedia(true);
@@ -908,7 +920,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     public void hideSystemUI() {
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                //    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
@@ -930,11 +942,20 @@ public class PlayStreamActivity extends AppCompatActivity {
             findViewById(R.id.root_coordinator).setFitsSystemWindows(false);
         }
 
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
+        } else {
+            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        }
+
+        int w = displaymetrics.widthPixels;
+        int h = displaymetrics.heightPixels;
+
         findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
 
-        vidView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
+        vidView.setLayoutParams(new FrameLayout.LayoutParams(w, h));
 
         chatContainer.setVisibility(View.INVISIBLE);
 
