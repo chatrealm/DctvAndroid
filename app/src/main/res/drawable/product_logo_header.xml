@@ -1,8 +1,9 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/launch_gradient" />
+    <item android:drawable="@drawable/header_bg" />
     <item
+        android:bottom="8dp"
         android:drawable="@drawable/product_logo_288dp"
-        android:left="16dp"
-        android:right="16dp"
-        android:top="16dp" />
+        android:left="24dp"
+        android:right="24dp"
+        android:top="24dp" />
 </layer-list>

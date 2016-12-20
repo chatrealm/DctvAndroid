@@ -562,6 +562,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             case R.id.switch_to_custom_twitch_chat:
                 final EditText twitchUser = new EditText(this);
                 twitchUser.setHint(channel.getName());
+                twitchUser.setText(channel.getName());
                 twitchUser.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.custom_twitch_chat_dialog_title)
