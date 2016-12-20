@@ -40,6 +40,7 @@
     <string name="custom_twitch_chat_dialog_msg">If this show simulcasts to Twitch and uses Twitch as the main chatroom, you can enter the username the show uses to view their chat</string>
     <string name="custom_twitch_chat_dialog_title">Enter Twitch username</string>
     <string name="video_error_fail">Stream failed to load; perhaps the show stopped broadcasting</string>
+    <string name="loading_radio">%s is loading in your notifications</string>
 
 
 </resources>
