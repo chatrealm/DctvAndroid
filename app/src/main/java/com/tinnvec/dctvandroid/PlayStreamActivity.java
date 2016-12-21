@@ -219,12 +219,40 @@ public class PlayStreamActivity extends AppCompatActivity {
                 String msg = "";
                 if (channel instanceof YoutubeChannel) {
                     msg = getString(R.string.video_error_youtube);
+                    String errortext = "Error: " + msg;
+                    Snackbar.make(findViewById(R.id.root_coordinator), errortext, Snackbar.LENGTH_LONG)
+                            .show();
                 } else {
                     msg = getString(R.string.video_error_fail);
+                    new AlertDialog.Builder(this)
+                            .setTitle("Error")
+                            .setMessage(msg)
+                            .setPositiveButton("Change Quality", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    String qualities[] = Quality.allAsStrings(channel.getAllowedQualities());
+
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(PlayStreamActivity.this);
+                                    builder.setTitle("Pick a stream quality");
+                                    builder.setItems(qualities, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Quality newQuality = channel.getAllowedQualities()[which];
+                                            if (newQuality != currentQuality) {
+                                                currentQuality = newQuality;
+                                                videoQualityChanged();
+                                            }
+                                        }
+                                    });
+                                    builder.show();
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    startActivity(new Intent(PlayStreamActivity.this, LiveChannelsActivity.class));
+                                }
+                            })
+                            .show();
                 }
-                String text = "Error: " + msg;
-                Snackbar.make(findViewById(R.id.root_coordinator), text, Snackbar.LENGTH_LONG)
-                        .show();
                 vidView.stopPlayback();
                 mPlaybackState = PlaybackState.IDLE;
                 updatePlayButton(mPlaybackState);
@@ -347,7 +375,49 @@ public class PlayStreamActivity extends AppCompatActivity {
         if (remoteMediaClient == null) {
             return;
         }
-        remoteMediaClient.load(buildMediaInfo(), autoPlay);
+        try {
+            remoteMediaClient.load(buildMediaInfo(), autoPlay);
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "Exception when trying to load stream to chromecast", e);
+            Log.e(TAG, "Resolved Stream URL returns null", e);
+            String msg = "";
+            if (channel instanceof YoutubeChannel) {
+                msg = getString(R.string.video_error_youtube);
+                String errortext = "Error: " + msg;
+                Snackbar.make(findViewById(R.id.root_coordinator), errortext, Snackbar.LENGTH_LONG)
+                        .show();
+            } else {
+                msg = getString(R.string.video_error_fail);
+                new AlertDialog.Builder(this)
+                        .setTitle("Error")
+                        .setMessage(msg)
+                        .setPositiveButton("Change Quality", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                String qualities[] = Quality.allAsStrings(channel.getAllowedQualities());
+
+                                AlertDialog.Builder builder = new AlertDialog.Builder(PlayStreamActivity.this);
+                                builder.setTitle("Pick a stream quality");
+                                builder.setItems(qualities, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Quality newQuality = channel.getAllowedQualities()[which];
+                                        if (newQuality != currentQuality) {
+                                            currentQuality = newQuality;
+                                            videoQualityChanged();
+                                        }
+                                    }
+                                });
+                                builder.show();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                startActivity(new Intent(PlayStreamActivity.this, LiveChannelsActivity.class));
+                            }
+                        })
+                        .show();
+            }
+        }
     }
 
     private MediaInfo buildMediaInfo() {
@@ -363,7 +433,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         String resolvedStreamUrl = "";
         try {
             resolvedStreamUrl = channel.getResolvedStreamUrl(streamUrl);
-        } catch (InterruptedException | ExecutionException ex) {
+        } catch (InterruptedException | ExecutionException | NullPointerException ex) {
             Log.e(TAG, "Exception when trying to get full Stream URL", ex);
         }
 
@@ -391,15 +461,11 @@ public class PlayStreamActivity extends AppCompatActivity {
 
             chatContainer.setLayoutParams(p);
 
-            //               setCoverArtStatus(null);
             if (mPlaybackState == PLAYING
                     || mPlaybackState == PlaybackState.BUFFERING) {
-
                 startControllersTimer();
             } else {
-
                 stopControllersTimer();
-//                setCoverArtStatus(mSelectedMedia.getImage(0));
             }
         } else {
             if (mLandscapeChatState == LandscapeChatState.SHOWING) {
@@ -608,6 +674,8 @@ public class PlayStreamActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // support for these kind of play state listeners are not yet supported in ExoMedia. keeping this for reference wehen the do
 
      /*   vidView.setOnBufferUpdateListener(new InfoListener() {
             @Override
