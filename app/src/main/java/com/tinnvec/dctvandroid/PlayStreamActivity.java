@@ -205,6 +205,20 @@ public class PlayStreamActivity extends AppCompatActivity {
 
         setupControlsCallbacks();
 
+        setVideoUrl(streamUrl);
+
+        if (mLocation == PlaybackLocation.LOCAL) {
+            if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
+                setLandscapeMode();
+                updateFullscreenButton(false);
+            } else if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
+                setPortraitMode();
+                updateFullscreenButton(true);
+            }
+        }
+    }
+
+    private void setVideoUrl(String streamUrl) {
         try {
             String resolvedStreamUrl = "";
             try {
@@ -277,15 +291,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
             throw e;
-        }
-        if (mLocation == PlaybackLocation.LOCAL) {
-            if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
-                setLandscapeMode();
-                updateFullscreenButton(false);
-            } else if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
-                setPortraitMode();
-                updateFullscreenButton(true);
-            }
         }
     }
 
@@ -792,20 +797,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private void videoQualityChanged() {
         this.streamUrl = channel.getStreamUrl(appConfig, currentQuality);
         updateQualityButton(currentQuality);
-        if (mLocation == PlaybackLocation.LOCAL) {
-            String resolvedStreamUrl = "";
-            try {
-                resolvedStreamUrl = channel.getResolvedStreamUrl(this.streamUrl);
-            } catch (InterruptedException | ExecutionException ex) {
-                Log.e(TAG, "Exception when trying to get full Stream URL", ex);
-            }
-            vidView.setVideoPath(resolvedStreamUrl);
-            mPlaybackState = BUFFERING;
-            updatePlayButton(mPlaybackState);
-        } else if (mCastSession != null && mCastSession.isConnected()) {
-            // reload chromecast
-            loadRemoteMedia(true);
-        }
+        setVideoUrl(streamUrl);
     }
 
     private void updateQualityButton(Quality currentQuality) {
