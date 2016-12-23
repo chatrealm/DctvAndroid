@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -34,6 +35,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -172,11 +174,16 @@ public class PlayStreamActivity extends AppCompatActivity {
 
         chatContainer = (RelativeLayout) findViewById(R.id.chat_fragment);
 
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             Slide slide = new Slide();
             slide.setSlideEdge(Gravity.BOTTOM);
-            getWindow().setEnterTransition(slide);
-            getWindow().setExitTransition(new Slide());
+            window.setEnterTransition(slide);
+            window.setExitTransition(new Slide());
         }
 
         getFragmentManager()
@@ -920,9 +927,16 @@ public class PlayStreamActivity extends AppCompatActivity {
             }
             // since we are playing locally, we need to stop the playback of
             // video (if user is not watching, pause it!)
-            vidView.pause();
-            mPlaybackState = PlaybackState.PAUSED;
-//           updatePlayButton(PlaybackState.PAUSED);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if (!isInMultiWindowMode()) {
+                    vidView.pause();
+                    mPlaybackState = PlaybackState.PAUSED;
+                    //           updatePlayButton(PlaybackState.PAUSED);
+                }
+            } else {
+                vidView.pause();
+                mPlaybackState = PlaybackState.PAUSED;
+            }
         }
         mCastContext.getSessionManager().removeSessionManagerListener(
                 mSessionManagerListener, CastSession.class);
@@ -944,6 +958,22 @@ public class PlayStreamActivity extends AppCompatActivity {
             setPortraitMode();
         }
         super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onPause() was called");
+        if (mLocation == PlaybackLocation.LOCAL) {
+            if (mControllersTimer != null) {
+                mControllersTimer.cancel();
+            }
+            vidView.release();
+            mPlaybackState = PlaybackState.IDLE;
+            updatePlayButton(mPlaybackState);
+        }
+        mCastContext.getSessionManager().removeSessionManagerListener(
+                mSessionManagerListener, CastSession.class);
     }
 
     @Override
@@ -997,29 +1027,36 @@ public class PlayStreamActivity extends AppCompatActivity {
             }
         });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            findViewById(R.id.root_coordinator).setFitsSystemWindows(false);
-        }
-
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInMultiWindowMode()) {
+            findViewById(R.id.root_coordinator).setFitsSystemWindows(true);
+            findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+            vidView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
         } else {
-            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                findViewById(R.id.root_coordinator).setFitsSystemWindows(false);
+            }
+
+            DisplayMetrics displaymetrics = new DisplayMetrics();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
+            } else {
+                getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+            }
+
+            int w = displaymetrics.widthPixels;
+            int h = displaymetrics.heightPixels;
+
+            findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+
+            vidView.setLayoutParams(new FrameLayout.LayoutParams(w, h));
+            mChatrealmRevealer.setVisibility(View.VISIBLE);
         }
-
-        int w = displaymetrics.widthPixels;
-        int h = displaymetrics.heightPixels;
-
-        findViewById(R.id.view_group_video).setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-
-        vidView.setLayoutParams(new FrameLayout.LayoutParams(w, h));
-
         chatContainer.setVisibility(View.INVISIBLE);
-
         mLandscapeChatState = LandscapeChatState.HIDDEN;
-        mChatrealmRevealer.setVisibility(View.VISIBLE);
     }
 
     public void setPortraitMode() {
