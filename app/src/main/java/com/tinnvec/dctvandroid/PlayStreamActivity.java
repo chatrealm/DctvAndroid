@@ -599,9 +599,11 @@ public class PlayStreamActivity extends AppCompatActivity {
                     chatFragment.setChatroom(streamService, channel.getName());
                     menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
                 }
+                return true;
             case R.id.navigate_back:
                 WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
                 chatWebview.goBack();
+                return true;
             case R.id.switch_to_custom_twitch_chat:
                 final EditText twitchUser = new EditText(this);
                 twitchUser.setHint(channel.getName());
@@ -621,7 +623,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                             }
                         })
                         .show();
-                break;
+                return true;
             case android.R.id.home:
                 supportFinishAfterTransition();
                 return true;
@@ -795,6 +797,10 @@ public class PlayStreamActivity extends AppCompatActivity {
                         ResourcesCompat.getDrawable(getResources(), R.drawable.big_pause_button, null));
                 break;
             case PAUSED:
+                mPlayPause.setVisibility(View.VISIBLE);
+                mPlayPause.setImageDrawable(
+                        ResourcesCompat.getDrawable(getResources(), R.drawable.big_play_button, null));
+                break;
             case IDLE:
                 mLoading.setVisibility(View.INVISIBLE);
                 mPlayPause.setVisibility(View.INVISIBLE);
