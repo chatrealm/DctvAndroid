@@ -41,6 +41,9 @@
     <string name="custom_twitch_chat_dialog_title">Enter Twitch username</string>
     <string name="video_error_fail">Stream failed to load. Perhaps the show stopped broadcasting or the selected quality isn\'t available. Try another quality.</string>
     <string name="loading_radio">%s is loading in your notifications</string>
+    <string name="pref_stream_quality_mobile">Video Quality on Mobile</string>
+    <string name="pref_stream_quality_mobile_summary">Video quality on mobile connections and metered WiFi hotspots</string>
+    <string name="pref_stream_quality_mobile_default">low</string>
 
 
 </resources>

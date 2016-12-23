@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <CheckBoxPreference
+        android:defaultValue="true"
         android:key="pref_notify"
-        android:title="@string/pref_notify"
         android:summary="@string/pref_notify_summary"
-        android:defaultValue="true" />
-    <EditTextPreference android:title="@string/pref_chat_name"
+        android:title="@string/pref_notify" />
+    <EditTextPreference
         android:key="chat_name"
-        android:summary="@string/pref_chat_name_summary" />
+        android:summary="@string/pref_chat_name_summary"
+        android:title="@string/pref_chat_name" />
     <ListPreference
-        android:key="stream_quality"
-        android:title="@string/pref_stream_quality"
-        android:summary="@string/pref_stream_quality_summary"
+        android:defaultValue="@string/pref_stream_quality_default"
         android:dialogTitle="@string/pref_stream_quality"
-        android:defaultValue="@string/pref_stream_quality_default" />
+        android:key="stream_quality"
+        android:summary="@string/pref_stream_quality_summary"
+        android:title="@string/pref_stream_quality" />
+    <ListPreference
+        android:defaultValue="@string/pref_stream_quality_mobile_default"
+        android:dialogTitle="@string/pref_stream_quality_mobile"
+        android:key="stream_quality_mobile"
+        android:summary="@string/pref_stream_quality_mobile_summary"
+        android:title="@string/pref_stream_quality_mobile" />
 </PreferenceScreen>

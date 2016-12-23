@@ -33,9 +33,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         qualityPreference.setEntries(Quality.allAsStrings());
         qualityPreference.setEntryValues(Quality.allAsStrings());
 
+        ListPreference qualityMobilePreference = (ListPreference) findPreference("stream_quality_mobile");
+        qualityMobilePreference.setEntries(Quality.allAsStrings());
+        qualityMobilePreference.setEntryValues(Quality.allAsStrings());
+
         String streamQuality = sharedPreferences.getString("stream_quality", "");
         if (!streamQuality.isEmpty()) {
             qualityPreference.setSummary(streamQuality);
+        }
+        String streamQualityMobile = sharedPreferences.getString("stream_quality_mobile", "");
+        if (!streamQuality.isEmpty()) {
+            qualityMobilePreference.setSummary(streamQualityMobile);
         }
     }
 
@@ -48,6 +56,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         } else if (key.equals("stream_quality")) {
             Preference qualityPref = findPreference("stream_quality");
             qualityPref.setSummary(sharedPreferences.getString(key, ""));
+        } else if (key.equals("stream_quality_mobile")) {
+            Preference qualityMobPref = findPreference("stream_quality_mobile");
+            qualityMobPref.setSummary(sharedPreferences.getString(key, ""));
         }
     }
 

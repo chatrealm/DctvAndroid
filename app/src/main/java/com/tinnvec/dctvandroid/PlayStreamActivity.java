@@ -3,6 +3,7 @@ package com.tinnvec.dctvandroid;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +12,8 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -141,7 +144,17 @@ public class PlayStreamActivity extends AppCompatActivity {
             streamService = "dctv";
         }
 
-        currentQuality = Quality.valueOf(sharedPreferences.getString("stream_quality", "high").toUpperCase());
+        ConnectivityManager cm =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isMobile = activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE;
+
+        if (isMobile) {
+            currentQuality = Quality.valueOf(sharedPreferences.getString("stream_quality_mobile", "low").toUpperCase());
+        } else {
+            currentQuality = Quality.valueOf(sharedPreferences.getString("stream_quality", "high").toUpperCase());
+        }
         this.streamUrl = channel.getStreamUrl(appConfig, currentQuality);
 
         // for cast SDK v3
@@ -1033,6 +1046,10 @@ public class PlayStreamActivity extends AppCompatActivity {
                     ViewGroup.LayoutParams.MATCH_PARENT));
             vidView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
         } else {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
