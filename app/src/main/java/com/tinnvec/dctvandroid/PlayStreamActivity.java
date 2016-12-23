@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -20,12 +21,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.transition.Slide;
@@ -57,9 +60,10 @@ import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.images.WebImage;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
+import com.squareup.picasso.Target;
 import com.tinnvec.dctvandroid.channel.AbstractChannel;
 import com.tinnvec.dctvandroid.channel.DctvChannel;
 import com.tinnvec.dctvandroid.channel.Quality;
@@ -112,6 +116,13 @@ public class PlayStreamActivity extends AppCompatActivity {
     private String streamService;
     private ChatFragment chatFragment;
     private boolean artShown;
+    private int actionBarColorIfShown;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+    private Target mTarget;
 
     @SuppressLint("NewApi")
     @Override
@@ -168,6 +179,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         title = title != null ? title : "Unknown";
 
         final ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
+        final ImageView artFillImg = (ImageView) findViewById(R.id.art_fill);
         String urlChannelart = channel.getImageAssetHDUrl();
         vidView = (EMVideoView) findViewById(R.id.video_view);
 //        vidView.setOnInfoListener(this);
@@ -192,7 +204,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Slide slide = new Slide();
             slide.setSlideEdge(Gravity.BOTTOM);
             window.setEnterTransition(slide);
@@ -206,12 +218,14 @@ public class PlayStreamActivity extends AppCompatActivity {
                 .commit();
 
         if (urlChannelart != null) {
-            RequestCreator requestCreator = Picasso.with(this).load(urlChannelart);
-            requestCreator.into(channelArtView);
+            loadArt(this, urlChannelart);
         } else {
             Drawable defaultArt = ResourcesCompat.getDrawable(getResources(), R.drawable.dctv_bg, null);
             channelArtView.setImageDrawable(defaultArt);
+            artFillImg.setImageDrawable(defaultArt);
         }
+
+        actionBarColorIfShown = getColor(R.color.primary);
 
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
@@ -238,8 +252,67 @@ public class PlayStreamActivity extends AppCompatActivity {
         }
     }
 
+    void loadArt(Context context, String url) {
+        final ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
+        final ImageView artFillImg = (ImageView) findViewById(R.id.art_fill);
+
+        mTarget = new Target() {
+            @Override
+            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                //Do something
+                channelArtView.setImageBitmap(bitmap);
+                artFillImg.setImageBitmap(bitmap);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+                    Palette.PaletteAsyncListener paletteListener = new Palette.PaletteAsyncListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                        public void onGenerated(Palette palette) {
+                            int standard = getResources().getColor(R.color.primary_dark);
+                            int vibrant = palette.getVibrantColor(standard);
+                            int vibrantLight = palette.getLightVibrantColor(standard);
+                            int vibrantDark = palette.getDarkVibrantColor(standard);
+                            int muted = palette.getMutedColor(standard);
+                            int mutedLight = palette.getLightMutedColor(standard);
+                            int mutedDark = palette.getDarkMutedColor(standard);
+
+                            Window window = PlayStreamActivity.this.getWindow();
+                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+                            window.setStatusBarColor(mutedDark);
+                            window.setNavigationBarColor(mutedDark);
+                            window.setBackgroundDrawable(new ColorDrawable(vibrantDark));
+                            channelArtView.setBackground(new ColorDrawable(vibrantDark));
+                            actionBarColorIfShown = muted;
+                        }
+
+
+                    };
+
+                    if (bitmap != null && !bitmap.isRecycled()) {
+                        Palette.from(bitmap).generate(paletteListener);
+                    }
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
+        Picasso.with(context)
+                .load(url)
+                .into(mTarget);
+    }
+
     private void setVideoUrl(String streamUrl) {
-            String resolvedStreamUrl = "";
+        String resolvedStreamUrl = "";
         try {
             resolvedStreamUrl = channel.getResolvedStreamUrl(streamUrl);
         } catch (ExecutionException | InterruptedException e) {
@@ -248,66 +321,66 @@ public class PlayStreamActivity extends AppCompatActivity {
         }
 
         if (resolvedStreamUrl == null) {
-                String msg = "";
-                if (channel instanceof YoutubeChannel) {
-                    msg = getString(R.string.video_error_youtube);
-                    String errortext = "Error: " + msg;
-                    Snackbar.make(findViewById(R.id.root_coordinator), errortext, Snackbar.LENGTH_LONG)
-                            .show();
-                } else {
-                    msg = getString(R.string.video_error_fail);
-                    new AlertDialog.Builder(this)
-                            .setTitle("Error")
-                            .setMessage(msg)
-                            .setPositiveButton("Change Quality", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    String qualities[] = Quality.allAsStrings(channel.getAllowedQualities());
-
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(PlayStreamActivity.this);
-                                    builder.setTitle("Pick a stream quality");
-                                    builder.setItems(qualities, new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            Quality newQuality = channel.getAllowedQualities()[which];
-                                            if (newQuality != currentQuality) {
-                                                currentQuality = newQuality;
-                                                videoQualityChanged();
-                                            }
-                                        }
-                                    });
-                                    builder.show();
-                                }
-                            })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    startActivity(new Intent(PlayStreamActivity.this, LiveChannelsActivity.class));
-                                }
-                            })
-                            .show();
-                }
-                vidView.stopPlayback();
-                mPlaybackState = PlaybackState.IDLE;
-                updatePlayButton(mPlaybackState);
-            return;
-            }
-        vidView.setVideoPath(resolvedStreamUrl);
-            Log.d(TAG, "Setting url of the VideoView to: " + resolvedStreamUrl);
-            mPlaybackState = BUFFERING;
-            updatePlayButton(mPlaybackState);
-            if (mCastSession != null && mCastSession.isConnected()) {
-                updatePlaybackLocation(PlaybackLocation.REMOTE);
-                RemoteMediaClient remoteMediaClient = mCastSession.getRemoteMediaClient();
-                if (remoteMediaClient.getMediaInfo() == null) {
-                    loadRemoteMedia(true);
-                } else if (remoteMediaClient.getMediaInfo() != null) {
-                    if (!remoteMediaClient.getMediaInfo().getMetadata().getString(MediaMetadata.KEY_TITLE).equals(channel.getFriendlyAlias())) {
-                        loadRemoteMedia(true);
-                    }
-                }
+            String msg = "";
+            if (channel instanceof YoutubeChannel) {
+                msg = getString(R.string.video_error_youtube);
+                String errortext = "Error: " + msg;
+                Snackbar.make(findViewById(R.id.root_coordinator), errortext, Snackbar.LENGTH_LONG)
+                        .show();
             } else {
-                updatePlaybackLocation(PlaybackLocation.LOCAL);
+                msg = getString(R.string.video_error_fail);
+                new AlertDialog.Builder(this)
+                        .setTitle("Error")
+                        .setMessage(msg)
+                        .setPositiveButton("Change Quality", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                String qualities[] = Quality.allAsStrings(channel.getAllowedQualities());
+
+                                AlertDialog.Builder builder = new AlertDialog.Builder(PlayStreamActivity.this);
+                                builder.setTitle("Pick a stream quality");
+                                builder.setItems(qualities, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Quality newQuality = channel.getAllowedQualities()[which];
+                                        if (newQuality != currentQuality) {
+                                            currentQuality = newQuality;
+                                            videoQualityChanged();
+                                        }
+                                    }
+                                });
+                                builder.show();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                startActivity(new Intent(PlayStreamActivity.this, LiveChannelsActivity.class));
+                            }
+                        })
+                        .show();
             }
+            vidView.stopPlayback();
+            mPlaybackState = PlaybackState.IDLE;
+            updatePlayButton(mPlaybackState);
+            return;
         }
+        vidView.setVideoPath(resolvedStreamUrl);
+        Log.d(TAG, "Setting url of the VideoView to: " + resolvedStreamUrl);
+        mPlaybackState = BUFFERING;
+        updatePlayButton(mPlaybackState);
+        if (mCastSession != null && mCastSession.isConnected()) {
+            updatePlaybackLocation(PlaybackLocation.REMOTE);
+            RemoteMediaClient remoteMediaClient = mCastSession.getRemoteMediaClient();
+            if (remoteMediaClient.getMediaInfo() == null) {
+                loadRemoteMedia(true);
+            } else if (remoteMediaClient.getMediaInfo() != null) {
+                if (!remoteMediaClient.getMediaInfo().getMetadata().getString(MediaMetadata.KEY_TITLE).equals(channel.getFriendlyAlias())) {
+                    loadRemoteMedia(true);
+                }
+            }
+        } else {
+            updatePlaybackLocation(PlaybackLocation.LOCAL);
+        }
+    }
 
 
     //sets up a listener for cast events
@@ -496,7 +569,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             hideVideoView();
             setPortraitMode();
 
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#212121")));
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(actionBarColorIfShown));
             getSupportActionBar().setElevation(getResources().getDimensionPixelSize(R.dimen.actionbar_elevation));
             getSupportActionBar().show();
 
@@ -1166,17 +1239,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         anim.start();
 
         RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
-        ImageView artFillImg = (ImageView) findViewById(R.id.art_fill);
-        String urlChannelart = channel.getImageAssetHDUrl();
-
-        if (urlChannelart != null) {
-            Picasso.with(this)
-                    .load(urlChannelart)
-                    .into(artFillImg);
-        } else {
-            Drawable defaultArt = ResourcesCompat.getDrawable(getResources(), R.drawable.dctv_bg, null);
-            artFillImg.setImageDrawable(defaultArt);
-        }
         artFillView.setVisibility(View.VISIBLE);
 
         mLandscapeChatState = LandscapeChatState.SHOWING;
@@ -1234,6 +1296,11 @@ public class PlayStreamActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeMessages(0);
         mHideHandler.sendEmptyMessageDelayed(0, delayMillis);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 
     /**

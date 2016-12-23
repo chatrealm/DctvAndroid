@@ -41,6 +41,7 @@ dependencies {
         transitive = true
     }
     compile 'com.devbrackets.android:exomedia:3.1.0'
+    compile 'com.android.support:palette-v7:23.1.1'
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support:support-annotations:25.0.1'
     androidTestCompile 'com.android.support.test:runner:0.5'

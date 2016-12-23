@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/black">
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -143,7 +142,6 @@
             android:layout_below="@id/view_group_video"
             android:layout_toLeftOf="@id/chat_fragment"
             android:animateLayoutChanges="false"
-            android:background="@color/colorPrimary"
             android:visibility="gone">
 
             <ImageView
