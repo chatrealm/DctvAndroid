@@ -203,6 +203,8 @@ public class PlayStreamActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
+        window.setNavigationBarColor(ContextCompat.getColor(this, android.R.color.black));
+        window.setBackgroundDrawable(new ColorDrawable(getColor(android.R.color.black)));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Slide slide = new Slide();
@@ -225,7 +227,9 @@ public class PlayStreamActivity extends AppCompatActivity {
             artFillImg.setImageDrawable(defaultArt);
         }
 
-        actionBarColorIfShown = getColor(R.color.primary);
+        if (actionBarColorIfShown == 0) {
+            actionBarColorIfShown = getColor(R.color.primary);
+        }
 
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
@@ -269,22 +273,11 @@ public class PlayStreamActivity extends AppCompatActivity {
                         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                         public void onGenerated(Palette palette) {
                             int standard = getResources().getColor(R.color.primary_dark);
-                            int vibrant = palette.getVibrantColor(standard);
-                            int vibrantLight = palette.getLightVibrantColor(standard);
                             int vibrantDark = palette.getDarkVibrantColor(standard);
-                            int muted = palette.getMutedColor(standard);
-                            int mutedLight = palette.getLightMutedColor(standard);
-                            int mutedDark = palette.getDarkMutedColor(standard);
 
-                            Window window = PlayStreamActivity.this.getWindow();
-                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
-                            window.setStatusBarColor(mutedDark);
-                            window.setNavigationBarColor(mutedDark);
-                            window.setBackgroundDrawable(new ColorDrawable(vibrantDark));
                             channelArtView.setBackground(new ColorDrawable(vibrantDark));
-                            actionBarColorIfShown = muted;
+                            artFillImg.setBackground(new ColorDrawable(vibrantDark));
+                            actionBarColorIfShown = vibrantDark;
                         }
 
 
@@ -1119,10 +1112,6 @@ public class PlayStreamActivity extends AppCompatActivity {
                     ViewGroup.LayoutParams.MATCH_PARENT));
             vidView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
         } else {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
