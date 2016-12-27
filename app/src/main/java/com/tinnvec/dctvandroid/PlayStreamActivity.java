@@ -1016,6 +1016,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                 vidView.pause();
                 mPlaybackState = PlaybackState.PAUSED;
             }
+            updatePlayButton(mPlaybackState);
         }
         mCastContext.getSessionManager().removeSessionManagerListener(
                 mSessionManagerListener, CastSession.class);
