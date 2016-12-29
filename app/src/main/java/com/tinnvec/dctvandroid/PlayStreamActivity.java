@@ -199,14 +199,13 @@ public class PlayStreamActivity extends AppCompatActivity {
 
         chatContainer = (RelativeLayout) findViewById(R.id.chat_fragment);
 
-        Window window = getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
-        window.setNavigationBarColor(ContextCompat.getColor(this, android.R.color.black));
-        window.setBackgroundDrawable(new ColorDrawable(getColor(android.R.color.black)));
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
+            window.setNavigationBarColor(ContextCompat.getColor(this, android.R.color.black));
+            window.setBackgroundDrawable(new ColorDrawable(getColor(android.R.color.black)));
             Slide slide = new Slide();
             slide.setSlideEdge(Gravity.BOTTOM);
             window.setEnterTransition(slide);
@@ -228,7 +227,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         }
 
         if (actionBarColorIfShown == 0) {
-            actionBarColorIfShown = getColor(R.color.primary);
+            actionBarColorIfShown = ContextCompat.getColor(this, R.color.primary);
         }
 
         setSupportActionBar(toolbar);
@@ -272,7 +271,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                     Palette.PaletteAsyncListener paletteListener = new Palette.PaletteAsyncListener() {
                         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                         public void onGenerated(Palette palette) {
-                            int standard = getResources().getColor(R.color.primary_dark);
+                            int standard = ContextCompat.getColor(PlayStreamActivity.this, R.color.primary_dark);
                             int vibrantDark = palette.getDarkVibrantColor(standard);
 
                             channelArtView.setBackground(new ColorDrawable(vibrantDark));
