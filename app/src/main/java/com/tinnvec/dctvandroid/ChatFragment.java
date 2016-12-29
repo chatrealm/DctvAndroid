@@ -138,4 +138,12 @@ public class ChatFragment extends Fragment {
     public void onPause() {
         super.onPause();
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (chatWebview != null) {
+            chatWebview.destroy();
+        }
+    }
 }

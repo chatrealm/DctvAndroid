@@ -1,8 +1,6 @@
 package com.tinnvec.dctvandroid;
 
 import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -89,7 +87,6 @@ public class PlayStreamActivity extends AppCompatActivity {
             hideSystemUI();
         }
     };
-    private ProgressDialog progressDialog;
     private EMVideoView vidView;
     private String streamUrl;
     //converted to global for interaction with cast methods
@@ -115,16 +112,10 @@ public class PlayStreamActivity extends AppCompatActivity {
     private RelativeLayout chatContainer;
     private String streamService;
     private ChatFragment chatFragment;
-    private boolean artShown;
     private int actionBarColorIfShown;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
     private GoogleApiClient client;
     private Target mTarget;
 
-    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -182,9 +173,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         final ImageView artFillImg = (ImageView) findViewById(R.id.art_fill);
         String urlChannelart = channel.getImageAssetHDUrl();
         vidView = (EMVideoView) findViewById(R.id.video_view);
-//        vidView.setOnInfoListener(this);
-        //       vidView.setOnPreparedListener(this);
-//        vidView.setOnErrorListener(this);
         mPlayPause = (ImageButton) findViewById(R.id.play_pause_button);
         mLoading = (ProgressBar) findViewById(R.id.buffer_circle);
         mControllers = findViewById(R.id.mediacontroller_anchor);
@@ -205,7 +193,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
             window.setNavigationBarColor(ContextCompat.getColor(this, android.R.color.black));
-            window.setBackgroundDrawable(new ColorDrawable(getColor(android.R.color.black)));
+            window.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, android.R.color.black)));
             Slide slide = new Slide();
             slide.setSlideEdge(Gravity.BOTTOM);
             window.setEnterTransition(slide);
@@ -262,7 +250,6 @@ public class PlayStreamActivity extends AppCompatActivity {
         mTarget = new Target() {
             @Override
             public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                //Do something
                 channelArtView.setImageBitmap(bitmap);
                 artFillImg.setImageBitmap(bitmap);
 
