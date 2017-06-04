@@ -28,12 +28,12 @@
                 android:layout_height="16dp"
                 android:layout_weight="1"
                 android:background="@color/colorAccentDark"
-                android:fontFamily="@font/dosis_bold"
                 android:gravity="center_vertical"
                 android:paddingLeft="16dp"
                 android:text="Channel"
-                android:textAllCaps="false"
-                android:textSize="12sp" />
+                android:textAllCaps="true"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/live_item_art"
@@ -61,7 +61,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="marquee"
-                android:fontFamily="@font/dosis_bold"
                 android:gravity="center"
                 android:scrollHorizontally="true"
                 android:singleLine="true"

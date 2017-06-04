@@ -68,7 +68,7 @@
         <name>PircBot</name>
         <url>http://www.jibble.org/pircbot.php</url>
         <copyright>Copyright Paul Mutton 2001-2013</copyright>
-        <license>GNU General Public License (GPL)</license>
+        <license>GNU General Public License 3.0</license>
     </notice>
 
 </notices>

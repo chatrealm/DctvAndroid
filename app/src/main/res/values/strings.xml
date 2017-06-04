@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Diamond Club TV</string>
-    <string name="app_description">Mobile app for the Diamond Club community podcast network. \n\nDiamond Club TV is not fueled by advertisers, but instead powered by support from our community. \n\n This app is a community project as well, with multiple contributions from fans of the shows and members of the Diamond Club community. \n\n &lt;&gt;</string>
+    <string name="app_description">Mobile app for the Diamond Club community podcast network. \n\nDiamond Club TV is not fueled by advertisers, but instead powered by support from our community. \n\nThis app is a community project as well, with multiple contributions from fans of the shows and members of the Diamond Club community. \n\n &lt;&gt;</string>
     <string name="action_settings">Settings</string>
     <string name="action_quality">Stream Quality</string>
     <string name="channel_art_description">Channel art</string>

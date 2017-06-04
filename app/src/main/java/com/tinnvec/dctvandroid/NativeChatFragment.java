@@ -134,7 +134,7 @@ public class NativeChatFragment extends Fragment {
 
         chatActivity = NativeChatFragment.this;
 
-        chatListView = v.findViewById(R.id.chatlist);
+        chatListView = (ListView) v.findViewById(R.id.chatlist);
 
         chatlines = new ArrayList<>();
         if (ircClient.chatlinesBackground != null) {
@@ -251,10 +251,10 @@ public class NativeChatFragment extends Fragment {
         });
         thread.start();
 
-        final ImageButton sendButton = v.findViewById(R.id.sendButton);
+        final ImageButton sendButton = (ImageButton) v.findViewById(R.id.sendButton);
         sendButton.setEnabled(false);
         sendButton.setAlpha((float) 0.3);
-        chatInputEditText = v.findViewById(R.id.chatInput);
+        chatInputEditText = (EditText) v.findViewById(R.id.chatInput);
 
         chatInputEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -333,7 +333,6 @@ public class NativeChatFragment extends Fragment {
         }
 
         transaction.replace(rootview.getId(), newFragment);
-        transaction.addToBackStack(null);
         transaction.commit();
     }
 

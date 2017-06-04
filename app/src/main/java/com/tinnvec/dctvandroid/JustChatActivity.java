@@ -71,7 +71,7 @@ public class JustChatActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_just_chat);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
 

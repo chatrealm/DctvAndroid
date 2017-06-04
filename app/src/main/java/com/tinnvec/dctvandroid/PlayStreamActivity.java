@@ -126,7 +126,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 
         setContentView(R.layout.activity_play_stream);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         channel = getIntent().getExtras().getParcelable(LiveChannelsActivity.CHANNEL_DATA);
         if (channel == null)
@@ -166,15 +166,15 @@ public class PlayStreamActivity extends AppCompatActivity {
         String title = channel.getFriendlyAlias();
         title = title != null ? title : "Unknown";
 
-        final ImageView channelArtView = findViewById(R.id.channelart);
-        final ImageView artFillImg = findViewById(R.id.art_fill);
+        final ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
+        final ImageView artFillImg = (ImageView) findViewById(R.id.art_fill);
         String urlChannelart = channel.getImageAssetHDUrl();
-        vidView = findViewById(R.id.video_view);
-        mPlayPause = findViewById(R.id.play_pause_button);
-        mLoading = findViewById(R.id.buffer_circle);
+        vidView = (EMVideoView) findViewById(R.id.video_view);
+        mPlayPause = (ImageButton) findViewById(R.id.play_pause_button);
+        mLoading = (ProgressBar) findViewById(R.id.buffer_circle);
         mControllers = findViewById(R.id.mediacontroller_anchor);
-        mFullscreenSwitch = findViewById(R.id.fullscreen_switch_button);
-        mChatrealmRevealer = findViewById(R.id.reveal_chat_button);
+        mFullscreenSwitch = (ImageButton) findViewById(R.id.fullscreen_switch_button);
+        mChatrealmRevealer = (ImageButton) findViewById(R.id.reveal_chat_button);
 
         chatFragment = new ChatLoginFragment();
         Bundle bundle = new Bundle();
@@ -182,7 +182,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         bundle.putString("channelName", channel.getName());
         chatFragment.setArguments(bundle);
 
-        chatContainer = findViewById(R.id.chat_fragment);
+        chatContainer = (RelativeLayout) findViewById(R.id.chat_fragment);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
@@ -240,8 +240,8 @@ public class PlayStreamActivity extends AppCompatActivity {
     }
 
     void loadArt(Context context, String url) {
-        final ImageView channelArtView = findViewById(R.id.channelart);
-        final ImageView artFillImg = findViewById(R.id.art_fill);
+        final ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
+        final ImageView artFillImg = (ImageView) findViewById(R.id.art_fill);
 
         mTarget = new Target() {
             @Override
@@ -699,7 +699,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                     mPlaybackState = PLAYING;
                     updatePlayButton(mPlaybackState);
                     mLoading.setVisibility(View.GONE);
-                    ImageView channelart = findViewById(R.id.channelart);
+                    ImageView channelart = (ImageView) findViewById(R.id.channelart);
                     channelart.setVisibility(View.GONE);
                 }
                 if (mLocation == PlaybackLocation.REMOTE) {
@@ -1069,7 +1069,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             params2.addRule(RelativeLayout.ALIGN_RIGHT, 0);
             findViewById(R.id.toolbar_layout).setLayoutParams(params2);
 
-            RelativeLayout artFillView = findViewById(R.id.art_fill_container);
+            RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
             artFillView.setVisibility(View.GONE);
 
             mLandscapeChatState = LandscapeChatState.HIDDEN;
@@ -1109,7 +1109,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     public void revealChat() {
         chatContainer.setVisibility(View.VISIBLE);
 
-        FrameLayout container = findViewById(R.id.view_group_video);
+        FrameLayout container = (FrameLayout) findViewById(R.id.view_group_video);
         container.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
 
@@ -1147,7 +1147,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         anim.setDuration(500);
         anim.start();
 
-        RelativeLayout artFillView = findViewById(R.id.art_fill_container);
+        RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
         artFillView.setVisibility(View.VISIBLE);
 
         mLandscapeChatState = LandscapeChatState.SHOWING;
@@ -1182,7 +1182,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         chatContainer.postDelayed(new Runnable() {
             @Override
             public void run() {
-                RelativeLayout artFillView = findViewById(R.id.art_fill_container);
+                RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
                 artFillView.setVisibility(View.GONE);
 
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) chatContainer.getLayoutParams();
@@ -1210,6 +1210,14 @@ public class PlayStreamActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+    }
+
+    public String getNowPlayingService() {
+        return streamService;
+    }
+
+    public String getNowPlayingChannelName() {
+        return channel.getName();
     }
 
     /**

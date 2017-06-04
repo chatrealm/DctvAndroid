@@ -59,7 +59,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         appConfig = ((DctvApplication) getApplication()).getAppConfig();
         setContentView(R.layout.activity_live_channels);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         Explode explode;
@@ -135,13 +135,13 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
             result.setSelection(1, false);
         }
 
-        mRecyclerView = findViewById(R.id.live_list);
+        mRecyclerView = (RecyclerView) findViewById(R.id.live_list);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getBaseContext(), null));
         mRecyclerView.setHasFixedSize(true);
         mAdapter = new ChannelListAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
-        swipeContainer = findViewById(R.id.swipeContainer);
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
         swipeRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

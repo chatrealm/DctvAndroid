@@ -24,7 +24,6 @@
         <item name="material_drawer_header_selection_text">
             @color/material_drawer_dark_header_selection_text
         </item>
-        <item name="android:fontFamily">@font/open_sans</item>
         <item name="android:colorEdgeEffect">@color/colorAccentDark</item>
     </style>
 

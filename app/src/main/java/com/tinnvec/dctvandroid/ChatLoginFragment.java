@@ -73,14 +73,14 @@ public class ChatLoginFragment extends Fragment {
             }
         };
 
-        twitchRadioButton = v.findViewById(R.id.twitchRadioButton);
-        chatrealmRadioButton = v.findViewById(R.id.chatrealmRadioButton);
+        twitchRadioButton = (RadioButton) v.findViewById(R.id.twitchRadioButton);
+        chatrealmRadioButton = (RadioButton) v.findViewById(R.id.chatrealmRadioButton);
 
         twitchRadioButton.setOnClickListener(onRadioButtonClickListener);
         chatrealmRadioButton.setOnClickListener(onRadioButtonClickListener);
 
-        loginButton = v.findViewById(R.id.loginButton);
-        twitchAuthButton = v.findViewById(R.id.twitchLoginButton);
+        loginButton = (Button) v.findViewById(R.id.loginButton);
+        twitchAuthButton = (Button) v.findViewById(R.id.twitchLoginButton);
 
         twitchAuthButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,9 +96,9 @@ public class ChatLoginFragment extends Fragment {
             }
         });
 
-        twitchAuthStatusView = v.findViewById(R.id.twitchLinkStatus);
-        nicknameEditText = v.findViewById(R.id.nickNameEditText);
-        channelEditText = v.findViewById(R.id.channelEditText);
+        twitchAuthStatusView = (TextView) v.findViewById(R.id.twitchLinkStatus);
+        nicknameEditText = (EditText) v.findViewById(R.id.nickNameEditText);
+        channelEditText = (EditText) v.findViewById(R.id.channelEditText);
 
         twitchToken = sharedPreferences.getString("TWITCH_TOKEN", null);
         twitchUsername = sharedPreferences.getString("TWITCH_USERNAME", null);
@@ -118,9 +118,12 @@ public class ChatLoginFragment extends Fragment {
             if (channelName != null && (channelName.equals("cordkillers") || channelName.equals("weridthings") || channelName.equals("bizarre") || channelName.equals("none"))) {
                 channelName = "nightattack";
             }
+        } else if (((PlayStreamActivity) getActivity()).getNowPlayingService() != null && ((PlayStreamActivity) getActivity()).getNowPlayingChannelName() != null) {
+            streamService = ((PlayStreamActivity) getActivity()).getNowPlayingService();
+            channelName = ((PlayStreamActivity) getActivity()).getNowPlayingChannelName();
         } else {
             streamService = "";
-            channelName = "nightattack";
+            channelName = "";
         }
 
 

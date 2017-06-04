@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion project.ANDROID_BUILD_SDK_VERSION
+    compileSdkVersion project.ANDROID_BUILD_SDK_VERSION.toInteger()
     buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
 
     defaultConfig {
         minSdkVersion project.ANDROID_BUILD_MIN_SDK_VERSION.toInteger()
-        targetSdkVersion project.ANDROID_BUILD_TARGET_SDK_VERSION
+        targetSdkVersion project.ANDROID_BUILD_TARGET_SDK_VERSION.toInteger()
 
         applicationId project.GROUP
         versionCode project.VERSION_CODE.toInteger()
@@ -20,6 +20,7 @@ android {
                 includeCompileClasspath false
             }
         }
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -37,11 +38,11 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:26.0.0-beta1'
-    compile 'com.android.support:design:26.0.0-beta1'
-    compile 'com.android.support:support-v4:26.0.0-beta1'
-    compile 'com.android.support:mediarouter-v7:26.0.0-beta1'
-    compile 'com.android.support:recyclerview-v7:26.0.0-beta1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:mediarouter-v7:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.onesignal:OneSignal:3.+@aar'
     compile 'com.google.android.gms:play-services-gcm:10.2.6'
     compile 'com.google.android.gms:play-services-cast-framework:10.2.6'
@@ -52,13 +53,12 @@ dependencies {
         transitive = true
     }
     compile 'com.devbrackets.android:exomedia:3.1.0'
-    compile 'com.android.support:palette-v7:26.0.0-beta1'
+    compile 'com.android.support:palette-v7:25.3.1'
     testCompile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support:support-annotations:26.0.0-beta1'
+    androidTestCompile 'com.android.support:support-annotations:25.3.1'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'org.pircbotx:pircbotx:2.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
