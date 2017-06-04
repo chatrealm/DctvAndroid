@@ -118,14 +118,15 @@ public class ChatLoginFragment extends Fragment {
             if (channelName != null && (channelName.equals("cordkillers") || channelName.equals("weridthings") || channelName.equals("bizarre") || channelName.equals("none"))) {
                 channelName = "nightattack";
             }
-        } else if (((PlayStreamActivity) getActivity()).getNowPlayingService() != null && ((PlayStreamActivity) getActivity()).getNowPlayingChannelName() != null) {
-            streamService = ((PlayStreamActivity) getActivity()).getNowPlayingService();
-            channelName = ((PlayStreamActivity) getActivity()).getNowPlayingChannelName();
+        } else if (getActivity().getClass().getSimpleName().equals("PlayStreamActivity")) {
+            if (((PlayStreamActivity) getActivity()).getNowPlayingService() != null && ((PlayStreamActivity) getActivity()).getNowPlayingChannelName() != null) {
+                streamService = ((PlayStreamActivity) getActivity()).getNowPlayingService();
+                channelName = ((PlayStreamActivity) getActivity()).getNowPlayingChannelName();
+            }
         } else {
             streamService = "";
             channelName = "";
         }
-
 
         if (streamService.equals("twitch")) {
             twitchRadioButton.setChecked(true);

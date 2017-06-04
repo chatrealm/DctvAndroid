@@ -125,6 +125,7 @@ public class NativeChatFragment extends Fragment {
             channel = ircClient.getChannels()[0];
         } else {
             nick = this.getArguments().getString("nick");
+            IRCClient.setNick(nick);
             server = this.getArguments().getString("server");
             pass = this.getArguments().getString("pass");
             channel = this.getArguments().getString("channel").toLowerCase();
@@ -273,6 +274,8 @@ public class NativeChatFragment extends Fragment {
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
                     hideKeyboard(v);
+                } else if (hasFocus) {
+                    chatListView.smoothScrollToPosition(chatlines.size() - 1);
                 }
             }
         });
