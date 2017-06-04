@@ -40,26 +40,34 @@
             android:label="@string/title_activity_play_stream"
             android:parentActivityName=".LiveChannelsActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:uiOptions="">
+            android:uiOptions=""
+            android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />
         </activity>
         <activity
-            android:name="io.vov.vitamio.activity.InitActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden"
-            android:launchMode="singleTop"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:windowSoftInputMode="stateAlwaysHidden"
-            tools:replace="android:configChanges" />
-        <activity
             android:name=".JustChatActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/chat_activity"
-            android:parentActivityName=".LiveChannelsActivity">
+            android:parentActivityName=".LiveChannelsActivity"
+            android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tinnvec.dctvandroid.LiveChannelsActivity" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="127.0.0.1"
+                    android:path="/token/"
+                    android:port="42069"
+                    android:scheme="http" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".SettingsActivity"
@@ -110,7 +118,14 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
 
+        <service
+            android:name=".IRCService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

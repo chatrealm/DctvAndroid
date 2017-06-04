@@ -7,15 +7,5 @@
         app:actionProviderClass="android.support.v7.app.MediaRouteActionProvider"
         app:showAsAction="always"/>
 
-    <item
-        android:id="@+id/switch_to_custom_twitch_chat"
-        android:title="@string/switch_to_custom_twitch_chat"
-        app:showAsAction="withText" />
-
-    <item
-        android:id="@+id/navigate_back"
-        android:checkable="false"
-        android:title="Chat: Navigate Back"
-        app:showAsAction="withText" />
 
 </menu>

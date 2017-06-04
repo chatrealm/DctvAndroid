@@ -10,5 +10,9 @@
         android:id="@+id/refresh"
         android:title="@string/refresh"
         app:showAsAction="withText" />
+    <item
+        android:id="@+id/twitchlogin"
+        android:title="Twitch login"
+        app:showAsAction="withText" />
 
 </menu>

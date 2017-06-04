@@ -1,0 +1,131 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="@color/primary_dark"
+    android:orientation="vertical"
+    tools:context="com.tinnvec.dctvandroid.ChatLoginFragment">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="16dp"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            android:paddingBottom="64dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/chat_service_switcher"
+                android:textAllCaps="false"
+                android:textAppearance="@android:style/TextAppearance.Large" />
+
+            <RadioButton
+                android:id="@+id/twitchRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="@string/twitch_radio_button" />
+
+            <RadioButton
+                android:id="@+id/chatrealmRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="@string/chatrealm_radio_button" />
+
+            <TextView
+                android:id="@+id/twitchLinkStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:text="@string/twitch_link_status_negative" />
+
+            <Button
+                android:id="@+id/twitchLoginButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_horizontal"
+                android:backgroundTint="#6441A4"
+                android:drawableLeft="@drawable/ic_twitch_white"
+                android:drawablePadding="8dp"
+                android:onClick="onTwitchAuthButtonClicked"
+                android:paddingRight="8dp"
+                android:text="@string/login_to_twitch" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/channel"
+                android:textAllCaps="true"
+                android:textAppearance="@android:style/TextAppearance.Small" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="#"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/channelEditText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:capitalize="none"
+                    android:completionHint="channel"
+                    android:imeOptions="actionNext|flagNavigateNext"
+                    android:inputType="textNoSuggestions"
+                    android:maxLines="1" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/nickname"
+                android:textAllCaps="true"
+                android:textAppearance="@android:style/TextAppearance.Small" />
+
+            <EditText
+                android:id="@+id/nickNameEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:capitalize="none"
+                android:imeOptions="actionNext"
+                android:inputType="textNoSuggestions"
+                android:maxLines="1" />
+
+            <Button
+                android:id="@+id/loginButton"
+                android:layout_width="196dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="@color/colorAccentDark"
+                android:drawableLeft="@drawable/ic_chatrealm_bubble_white_24px"
+                android:text="@string/login_button"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+</LinearLayout>

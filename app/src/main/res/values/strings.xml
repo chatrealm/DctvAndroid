@@ -44,6 +44,21 @@
     <string name="pref_stream_quality_mobile">Video Quality on Mobile</string>
     <string name="pref_stream_quality_mobile_summary">Video quality on mobile connections and metered WiFi hotspots</string>
     <string name="pref_stream_quality_mobile_default">low</string>
+    <string name="title_activity_twitch_login">TwitchLoginActivity</string>
+    <string name="enter_message">Enter a message</string>
+    <string name="send">Send</string>
+    <string name="chat_service_switcher">Choose a chat service</string>
+    <string name="twitch_radio_button">Twitch chat</string>
+    <string name="login_to_twitch">Link Twitch account</string>
+    <string name="chatrealm_radio_button">Chatrealm IRC chat</string>
+    <string name="channel">channel</string>
+    <string name="nickname">Nickname</string>
+    <string name="login_button">Login</string>
+    <string name="twitch_link_status_negative">The app is not linked with a Twitch account</string>
+    <string name="twitch_link_status_positive">The app is successfully linked to %s on Twitch</string>
+    <string name="disconnect">Disconnect chat</string>
+    <string name="unlink_twitch">Unlink Twitch</string>
+    <string name="new_chat_message">New chat message(s) have arrived</string>
 
 
 </resources>

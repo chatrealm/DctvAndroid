@@ -1,18 +1,16 @@
 package com.tinnvec.dctvandroid;
 
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
-import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
@@ -23,22 +21,57 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.tinnvec.dctvandroid.tasks.TwitchAPIUsernameTask;
+
+import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
 
 public class JustChatActivity extends AppCompatActivity {
 
     private MenuItem mediaRouteMenuItem;
     private CastContext mCastContext;
-    private ChatFragment chatFragment;
+    private ChatLoginFragment chatFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        Uri uri = intent.getData();
+        String username = null;
+        if (uri != null && !uri.toString().contains("error")) {
+            String[] parts = uri.toString().split("#access_token=");
+            String tokenAndScope = parts[1];
+            String[] smallerParts = tokenAndScope.split("&scope=");
+            String token = smallerParts[0];
+            PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().putString("TWITCH_TOKEN", token).apply();
+
+            Properties appConfig = ((DctvApplication) getApplication()).getAppConfig();
+            String apiUrl = appConfig.getProperty("api.twitch.api_url");
+            String clientId = appConfig.getProperty("api.twitch.client_id");
+
+
+            try {
+                username = new TwitchAPIUsernameTask(apiUrl, clientId, token).execute().get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (username != null) {
+            PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().putString("TWITCH_USERNAME", username).apply();
+            Toast.makeText(this, "Twitch Authorization successful for " + username, Toast.LENGTH_LONG).show();
+            Intent refresh = new Intent(this, JustChatActivity.class);
+            startActivity(refresh);
+            this.finish();
+        }
 
 
         setContentView(R.layout.activity_just_chat);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
 
@@ -99,19 +132,17 @@ public class JustChatActivity extends AppCompatActivity {
 
         mCastContext = CastContext.getSharedInstance(this); // initialises castcontext
 
-        chatFragment = new ChatFragment();
+        chatFragment = new ChatLoginFragment();
 
         Bundle bundle = new Bundle();
         bundle.putString("streamService", "none");
         bundle.putString("channelName", "none");
         chatFragment.setArguments(bundle);
 
-        getFragmentManager()
+        getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.chat_fragment, chatFragment)
                 .commit();
-
-
     }
 
     @Override
@@ -125,38 +156,4 @@ public class JustChatActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        switch (id) {
-            case R.id.switch_to_custom_twitch_chat:
-                final EditText twitchUser = new EditText(this);
-                twitchUser.setHint("username");
-                twitchUser.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.custom_twitch_chat_dialog_title)
-                        .setMessage(R.string.custom_twitch_chat_dialog_msg)
-                        .setView(twitchUser)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                chatFragment.setChatroom("twitch", twitchUser.getText().toString());
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                            }
-                        })
-                        .show();
-                break;
-            case R.id.navigate_back:
-                WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
-                chatWebview.goBack();
-                return true;
-        }
-        return true;
-    }
 }

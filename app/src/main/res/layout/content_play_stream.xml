@@ -19,6 +19,7 @@
             android:background="@color/transparent"
             android:elevation="@dimen/actionbar_elevation"
             android:orientation="horizontal"
+            android:outlineProvider="bounds"
             android:visibility="visible" />
 
         <FrameLayout

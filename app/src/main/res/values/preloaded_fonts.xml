@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preloaded_fonts" translatable="false">
+        <item>@font/dosis</item>
+        <item>@font/dosis_bold</item>
+        <item>@font/dosis_regular</item>
+        <item>@font/open_sans_bold</item>
+        <item>@font/open_sans_bold_italic</item>
+        <item>@font/open_sans_italic</item>
+        <item>@font/open_sans_regular</item>
+    </array>
+</resources>

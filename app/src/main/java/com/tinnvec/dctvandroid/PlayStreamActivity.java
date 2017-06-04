@@ -28,7 +28,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.transition.Slide;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -40,8 +39,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.WebView;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -111,7 +108,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     private Quality currentQuality;
     private RelativeLayout chatContainer;
     private String streamService;
-    private ChatFragment chatFragment;
+    private ChatLoginFragment chatFragment;
     private int actionBarColorIfShown;
     private GoogleApiClient client;
     private Target mTarget;
@@ -129,7 +126,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 
         setContentView(R.layout.activity_play_stream);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
 
         channel = getIntent().getExtras().getParcelable(LiveChannelsActivity.CHANNEL_DATA);
         if (channel == null)
@@ -169,23 +166,23 @@ public class PlayStreamActivity extends AppCompatActivity {
         String title = channel.getFriendlyAlias();
         title = title != null ? title : "Unknown";
 
-        final ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
-        final ImageView artFillImg = (ImageView) findViewById(R.id.art_fill);
+        final ImageView channelArtView = findViewById(R.id.channelart);
+        final ImageView artFillImg = findViewById(R.id.art_fill);
         String urlChannelart = channel.getImageAssetHDUrl();
-        vidView = (EMVideoView) findViewById(R.id.video_view);
-        mPlayPause = (ImageButton) findViewById(R.id.play_pause_button);
-        mLoading = (ProgressBar) findViewById(R.id.buffer_circle);
+        vidView = findViewById(R.id.video_view);
+        mPlayPause = findViewById(R.id.play_pause_button);
+        mLoading = findViewById(R.id.buffer_circle);
         mControllers = findViewById(R.id.mediacontroller_anchor);
-        mFullscreenSwitch = (ImageButton) findViewById(R.id.fullscreen_switch_button);
-        mChatrealmRevealer = (ImageButton) findViewById(R.id.reveal_chat_button);
+        mFullscreenSwitch = findViewById(R.id.fullscreen_switch_button);
+        mChatrealmRevealer = findViewById(R.id.reveal_chat_button);
 
-        chatFragment = new ChatFragment();
+        chatFragment = new ChatLoginFragment();
         Bundle bundle = new Bundle();
         bundle.putString("streamService", streamService);
         bundle.putString("channelName", channel.getName());
         chatFragment.setArguments(bundle);
 
-        chatContainer = (RelativeLayout) findViewById(R.id.chat_fragment);
+        chatContainer = findViewById(R.id.chat_fragment);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
@@ -200,10 +197,9 @@ public class PlayStreamActivity extends AppCompatActivity {
             window.setExitTransition(new Slide());
         }
 
-        getFragmentManager()
+        getSupportFragmentManager()
                 .beginTransaction()
                 .add(chatContainer.getId(), chatFragment)
-                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                 .commit();
 
         if (urlChannelart != null) {
@@ -244,8 +240,8 @@ public class PlayStreamActivity extends AppCompatActivity {
     }
 
     void loadArt(Context context, String url) {
-        final ImageView channelArtView = (ImageView) findViewById(R.id.channelart);
-        final ImageView artFillImg = (ImageView) findViewById(R.id.art_fill);
+        final ImageView channelArtView = findViewById(R.id.channelart);
+        final ImageView artFillImg = findViewById(R.id.art_fill);
 
         mTarget = new Target() {
             @Override
@@ -595,39 +591,11 @@ public class PlayStreamActivity extends AppCompatActivity {
 
         updateQualityButton(currentQuality);
 
-        if (chatFragment.shouldDisplayChatroomSwitcher()) {
-            menu.findItem(R.id.switch_chat).setVisible(true);
-            if (chatFragment.getDisplayedChatroomType().equals("alt")) {
-                menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
-                String msg = getString(R.string.alt_chat_msg);
-                Snackbar.make(findViewById(R.id.root_coordinator), msg, Snackbar.LENGTH_LONG)
-                        .show();
-            }
-            if (chatFragment.getDisplayedChatroomType().equals("main")) {
-                menu.findItem(R.id.switch_chat).setTitle("Switch to alt. chat room");
-            }
-        } else {
-            menu.findItem(R.id.switch_chat).setVisible(false);
-        }
-
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        String chatroomType = chatFragment.getDisplayedChatroomType();
-        if (chatroomType.equals("alt")) {
-            menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
-        } else if (chatroomType.equals("main")) {
-            menu.findItem(R.id.switch_chat).setTitle("Switch to channel chat room");
-        }
-
-        WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
-        if (chatWebview.canGoBack()) {
-            menu.findItem(R.id.navigate_back).setVisible(true);
-        } else {
-            menu.findItem(R.id.navigate_back).setVisible(false);
-        }
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -660,41 +628,6 @@ public class PlayStreamActivity extends AppCompatActivity {
                     }
                 });
                 builder.show();
-
-                return true;
-            case R.id.switch_chat:
-                String chatroomType = chatFragment.getDisplayedChatroomType();
-                if (chatroomType.equals("alt")) {
-                    chatFragment.setChatroom("dctv", "dummy");
-                    menu.findItem(R.id.switch_chat).setTitle("Switch to alternative chat room");
-                } else if (chatroomType.equals("main")) {
-                    chatFragment.setChatroom(streamService, channel.getName());
-                    menu.findItem(R.id.switch_chat).setTitle("Switch to #chat");
-                }
-                return true;
-            case R.id.navigate_back:
-                WebView chatWebview = (WebView) findViewById(R.id.chat_webview);
-                chatWebview.goBack();
-                return true;
-            case R.id.switch_to_custom_twitch_chat:
-                final EditText twitchUser = new EditText(this);
-                twitchUser.setHint(channel.getName());
-                twitchUser.setText(channel.getName());
-                twitchUser.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.custom_twitch_chat_dialog_title)
-                        .setMessage(R.string.custom_twitch_chat_dialog_msg)
-                        .setView(twitchUser)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                chatFragment.setChatroom("twitch", twitchUser.getText().toString());
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                            }
-                        })
-                        .show();
                 return true;
             case android.R.id.home:
                 supportFinishAfterTransition();
@@ -766,7 +699,7 @@ public class PlayStreamActivity extends AppCompatActivity {
                     mPlaybackState = PLAYING;
                     updatePlayButton(mPlaybackState);
                     mLoading.setVisibility(View.GONE);
-                    ImageView channelart = (ImageView) findViewById(R.id.channelart);
+                    ImageView channelart = findViewById(R.id.channelart);
                     channelart.setVisibility(View.GONE);
                 }
                 if (mLocation == PlaybackLocation.REMOTE) {
@@ -1054,7 +987,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             updateFullscreenButton(true);
         }
         if (newConfig.keyboardHidden == Configuration.KEYBOARDHIDDEN_YES && getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE && mLocation == PlaybackLocation.LOCAL) {
-            hideSystemUI();
+            delayedHide(600);
         }
     }
 
@@ -1136,7 +1069,7 @@ public class PlayStreamActivity extends AppCompatActivity {
             params2.addRule(RelativeLayout.ALIGN_RIGHT, 0);
             findViewById(R.id.toolbar_layout).setLayoutParams(params2);
 
-            RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
+            RelativeLayout artFillView = findViewById(R.id.art_fill_container);
             artFillView.setVisibility(View.GONE);
 
             mLandscapeChatState = LandscapeChatState.HIDDEN;
@@ -1176,7 +1109,7 @@ public class PlayStreamActivity extends AppCompatActivity {
     public void revealChat() {
         chatContainer.setVisibility(View.VISIBLE);
 
-        FrameLayout container = (FrameLayout) findViewById(R.id.view_group_video);
+        FrameLayout container = findViewById(R.id.view_group_video);
         container.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
 
@@ -1214,7 +1147,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         anim.setDuration(500);
         anim.start();
 
-        RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
+        RelativeLayout artFillView = findViewById(R.id.art_fill_container);
         artFillView.setVisibility(View.VISIBLE);
 
         mLandscapeChatState = LandscapeChatState.SHOWING;
@@ -1249,7 +1182,7 @@ public class PlayStreamActivity extends AppCompatActivity {
         chatContainer.postDelayed(new Runnable() {
             @Override
             public void run() {
-                RelativeLayout artFillView = (RelativeLayout) findViewById(R.id.art_fill_container);
+                RelativeLayout artFillView = findViewById(R.id.art_fill_container);
                 artFillView.setVisibility(View.GONE);
 
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) chatContainer.getLayoutParams();
