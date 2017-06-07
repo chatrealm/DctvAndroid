@@ -18,12 +18,9 @@
         android:clickable="true"
         android:divider="@android:drawable/divider_horizontal_dark"
         android:dividerHeight="0dp"
-        android:fadingEdge="vertical"
-        android:fadingEdgeLength="10dp"
-        android:fastScrollEnabled="true"
         android:focusable="true"
-        android:paddingBottom="5dp"
-        android:stackFromBottom="true" />
+        android:stackFromBottom="true"
+        android:transcriptMode="normal" />
 
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/snackbaranchor"
@@ -50,6 +47,7 @@
             android:imeActionLabel="@string/send"
             android:imeOptions="actionSend"
             android:inputType="textAutoCorrect|textShortMessage"
+            android:textSize="14sp"
             android:typeface="monospace" />
 
         <ImageButton

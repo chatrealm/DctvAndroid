@@ -140,9 +140,7 @@ public class TwitchAPIUsernameTask extends AsyncTask<Void, Void, String> {
             Log.e(LOG_TAG, "Problem making the HTTP request.", e);
         }
 
-        String username = extractUsernameFromJson(jsonResponse);
-
-        return username;
+        return extractUsernameFromJson(jsonResponse);
     }
 
     @Override

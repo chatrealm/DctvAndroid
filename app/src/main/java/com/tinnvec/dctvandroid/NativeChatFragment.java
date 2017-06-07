@@ -18,6 +18,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
@@ -42,6 +44,7 @@ public class NativeChatFragment extends Fragment {
     private static IRCClient ircClient;
     private static View rootview;
     private static View snackbaranchor;
+    private static boolean shouldDisplaySnackbar;
 
     static {
         handler = new Handler() {
@@ -59,6 +62,7 @@ public class NativeChatFragment extends Fragment {
     NativeChatFragment chatActivity;
     private String chatInput;
     private EditText chatInputEditText;
+    private ImageButton sendButton;
     private String channel;
     private String nick;
     private String server;
@@ -82,7 +86,7 @@ public class NativeChatFragment extends Fragment {
 
                 if (chatListView.getLastVisiblePosition() > (position - 5)) {
                     chatListView.smoothScrollToPosition(position);
-                } else {
+                } else if (shouldDisplaySnackbar) {
                     Snackbar snackbar = Snackbar
                             .make(snackbaranchor, R.string.new_chat_message, Snackbar.LENGTH_INDEFINITE)
                             .setAction("SCROLL", new View.OnClickListener() {
@@ -113,6 +117,8 @@ public class NativeChatFragment extends Fragment {
         View v = getView();
 
         snackbaranchor = v.findViewById(R.id.snackbaranchor);
+
+        shouldDisplaySnackbar = true;
 
         ircClient = IRCClient.getInstance();
 
@@ -252,9 +258,8 @@ public class NativeChatFragment extends Fragment {
         });
         thread.start();
 
-        final ImageButton sendButton = (ImageButton) v.findViewById(R.id.sendButton);
-        sendButton.setEnabled(false);
-        sendButton.setAlpha((float) 0.3);
+        sendButton = (ImageButton) v.findViewById(R.id.sendButton);
+        disableSendButton();
         chatInputEditText = (EditText) v.findViewById(R.id.chatInput);
 
         chatInputEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -274,8 +279,9 @@ public class NativeChatFragment extends Fragment {
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
                     hideKeyboard(v);
-                } else if (hasFocus) {
-                    chatListView.smoothScrollToPosition(chatlines.size() - 1);
+                    shouldDisplaySnackbar = true;
+                } else {
+                    shouldDisplaySnackbar = false;
                 }
             }
         });
@@ -286,14 +292,10 @@ public class NativeChatFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
                 if (s.toString().trim().length() == 0) {
-                    sendButton.setEnabled(false);
-                    sendButton.setAlpha((float) 0.3);
+                    disableSendButton();
                 } else {
-                    sendButton.setEnabled(true);
-                    sendButton.setAlpha((float) 0.9);
+                    enableSendButton();
                 }
-
-
             }
 
             @Override
@@ -314,6 +316,37 @@ public class NativeChatFragment extends Fragment {
         });
 
     }
+
+    private void disableSendButton() {
+        if (!sendButton.isEnabled()) {
+            return;
+        }
+        sendButton.setEnabled(false);
+
+        AlphaAnimation a1 = new AlphaAnimation(0.9f, 0.3f);
+        a1.setDuration(400);
+        a1.setStartOffset(100);
+        a1.setInterpolator(new AccelerateDecelerateInterpolator());
+        a1.setFillAfter(true);
+        sendButton.startAnimation(a1);
+
+    }
+
+    private void enableSendButton() {
+        if (sendButton.isEnabled()) {
+            return;
+        }
+        sendButton.setEnabled(true);
+
+        AlphaAnimation a2 = new AlphaAnimation(0.3f, 0.9f);
+        a2.setDuration(400);
+        a2.setStartOffset(100);
+        a2.setInterpolator(new AccelerateDecelerateInterpolator());
+        a2.setFillAfter(true);
+        sendButton.startAnimation(a2);
+
+    }
+
 
     public void disconnectAndGoBackToLogin() {
         ircClient.disconnect();

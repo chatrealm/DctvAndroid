@@ -112,10 +112,10 @@ public class ChatLoginFragment extends Fragment {
         if (this.getArguments() != null) {
             streamService = this.getArguments().getString("streamService");
             channelName = this.getArguments().getString("channelName");
-            if (channelName != null && (channelName.equals("jurystream") || channelName.equals("politics"))) {
+            if (channelName != null && (channelName.equals("jurystream") || channelName.equals("politics") || channelName.equals("1900wrestling"))) {
                 channelName = "justinryoung";
             }
-            if (channelName != null && (channelName.equals("cordkillers") || channelName.equals("weridthings") || channelName.equals("bizarre") || channelName.equals("none"))) {
+            if (channelName != null && (channelName.equals("cordkillers") || channelName.equals("weirdthings") || channelName.equals("bizarre") || channelName.equals("none"))) {
                 channelName = "nightattack";
             }
         } else if (getActivity().getClass().getSimpleName().equals("PlayStreamActivity")) {
