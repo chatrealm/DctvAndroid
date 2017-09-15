@@ -6,13 +6,9 @@
         android:title="@string/media_route_menu_title"
         app:actionProviderClass="android.support.v7.app.MediaRouteActionProvider"
         app:showAsAction="always"/>
-    <item
-        android:id="@+id/refresh"
-        android:title="@string/refresh"
-        app:showAsAction="withText" />
-    <item
-        android:id="@+id/twitchlogin"
-        android:title="Twitch login"
-        app:showAsAction="withText" />
+    <!--<item-->
+    <!--android:id="@+id/refresh"-->
+    <!--android:title="@string/refresh"-->
+    <!--app:showAsAction="withText" />-->
 
 </menu>

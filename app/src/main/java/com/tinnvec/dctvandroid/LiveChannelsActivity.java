@@ -1,18 +1,25 @@
 package com.tinnvec.dctvandroid;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.google.android.gms.cast.framework.CastButtonFactory;
@@ -30,10 +37,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.tinnvec.dctvandroid.adapters.ChannelListAdapter;
 import com.tinnvec.dctvandroid.adapters.ChannelListCallback;
 import com.tinnvec.dctvandroid.channel.AbstractChannel;
-import com.tinnvec.dctvandroid.tasks.LoadLiveChannelsTask;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 public class LiveChannelsActivity extends AppCompatActivity implements ChannelListCallback {
@@ -135,7 +139,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
             result.setSelection(1, false);
         }
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.live_list);
+/*        mRecyclerView = (RecyclerView) findViewById(R.id.live_list);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getBaseContext(), null));
         mRecyclerView.setHasFixedSize(true);
         mAdapter = new ChannelListAdapter(this);
@@ -169,7 +173,62 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
             mAdapter.addAll(savedChannels);
         } else {
             new LoadLiveChannelsTask(mRecyclerView, appConfig).execute();
+        }*/
+
+        Button dcNoticeButton = (Button) findViewById(R.id.dc_notice_button);
+
+        dcNoticeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = "http://diamondclub.tv/";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        PackageInfo pInfo;
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_META_DATA);
+            if (prefs.getLong("lastRunVersionCode", 0) < pInfo.versionCode) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                // Add the buttons
+                builder.setPositiveButton(R.string.visit, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User clicked OK button
+                        String url = "http://diamondclub.tv/";
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(url));
+                        startActivity(i);
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                        dialog.cancel();
+                    }
+                });
+                // Set other dialog properties
+
+                builder.setMessage(R.string.dc_notice_dialog_message)
+                        .setTitle(R.string.dc_notice_dialog_title);
+
+                // Create the AlertDialog
+                AlertDialog dialog = builder.create();
+
+                dialog.show();
+
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putLong("lastRunVersionCode", pInfo.versionCode);
+                editor.apply();
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Error reading versionCode");
+            e.printStackTrace();
         }
+
     }
 
     @Override
@@ -189,7 +248,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.refresh) {
+/*        if (id == R.id.refresh) {
             swipeContainer.post(new Runnable() {
                 @Override
                 public void run() {
@@ -198,11 +257,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
                     swipeRefreshListener.onRefresh();
                 }
             });
-        }
-        if (id == R.id.twitchlogin) {
-            Intent intent = new Intent(LiveChannelsActivity.this, NativeChatFragment.class);
-            LiveChannelsActivity.this.startActivity(intent);
-        }
+        }*/
 
         //noinspection SimplifiableIfStatement
         return super.onOptionsItemSelected(item);
@@ -258,7 +313,7 @@ public class LiveChannelsActivity extends AppCompatActivity implements ChannelLi
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(
-                "CHANNEL_LIST", (ArrayList<AbstractChannel>) mAdapter.getChannelList());
+//        outState.putParcelableArrayList(
+//                "CHANNEL_LIST", (ArrayList<AbstractChannel>) mAdapter.getChannelList());
     }
 }

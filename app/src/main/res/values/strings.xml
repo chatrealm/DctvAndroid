@@ -59,6 +59,13 @@
     <string name="disconnect">Disconnect chat</string>
     <string name="unlink_twitch">Unlink Twitch</string>
     <string name="new_chat_message">New chat message(s) have arrived</string>
+    <string name="dc_notice_title">Diamond Club has evolved</string>
+    <string name="dc_notice_message">Diamond Club TV has been through many changes behind the scenes. That means that this app for now doesn\'t work anymore for viewing our livestreams. Chat still works.  We are working on making this app useful again. \n\nPlease visit diamondclub.tv in your browser, for now.</string>
+    <string name="dc_notice_button">Visit diamondclub.tv</string>
+    <string name="visit">Visit</string>
+    <string name="cancel">Cancel</string>
+    <string name="dc_notice_dialog_title">Important notice</string>
+    <string name="dc_notice_dialog_message">Diamond Club TV has been through many changes behind the scenes. That means that this app for now doesn\'t work anymore for viewing our livestreams. Chat still works.  We are working on making this app useful again. \n\nPlease visit diamondclub.tv on your browser, for now.</string>
 
 
 </resources>

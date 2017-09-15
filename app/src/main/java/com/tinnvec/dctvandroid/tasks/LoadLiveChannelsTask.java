@@ -6,7 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.JsonReader;
 
 import com.tinnvec.dctvandroid.adapters.ChannelListAdapter;
-import com.tinnvec.dctvandroid.channel.*;
+import com.tinnvec.dctvandroid.channel.AbstractChannel;
+import com.tinnvec.dctvandroid.channel.ChannelReader;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -58,7 +59,7 @@ public class LoadLiveChannelsTask extends AsyncTask<Void,Void,List<AbstractChann
         HttpURLConnection urlConnection;
         InputStream in;
         List<AbstractChannel> liveChannels = new ArrayList<>();
-        liveChannels.add(DctvChannel.get247Channel(appConfig));
+//        liveChannels.add(DctvChannel.get247Channel(appConfig));
         try {
             url = new URL(dctvChannelsUrl);
             urlConnection = (HttpURLConnection) url.openConnection();

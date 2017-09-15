@@ -7,16 +7,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:fitsSystemWindows="true"
     tools:context="com.tinnvec.dctvandroid.LiveChannelsActivity">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="@string/main_bg_description"
-        android:scaleType="centerCrop"
-        android:src="@drawable/dctv_bg"
-        />
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:contentDescription="@string/main_bg_description"-->
+    <!--android:scaleType="centerCrop"-->
+    <!--android:src="@drawable/dctv_bg"-->
+    <!--/>-->
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -30,8 +29,6 @@
             app:logo="@drawable/ic_dctvlogo_padding" />
 
     </android.support.design.widget.AppBarLayout>
-
-
 
     <include layout="@layout/content_live_channels" />
 
